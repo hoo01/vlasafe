@@ -66,6 +66,13 @@
 - 新增 `scripts/validate_episode.py` 与 `src/vlasafe/rollout/validator.py`，将 finalized episode 的完整性检查自动化。
 - validator 检查 COMPLETE、必需文件/字段、schema 版本、episode ID、连续 step/frame ID、时间戳、有限数值、result step 数，以及 MP4/JSONL 帧数一致性。
 - validator 新增 4 个单元测试；与 recorder 测试合计 7/7 通过。
+- 将策略 recorder 扩展为同步保存主相机与腕部相机视频，并在 `result.json` 中记录 rollout、视频编码、吞吐率与峰值显存；validator 现会检查 episode 内所有 `*_camera.mp4`。
+- 扩展后单元测试合计 8/8 通过。
+- 完成首条完整 SmolVLA rollout（`libero_spatial` task 0、seed 42、最多 280 步）：第 81 步成功终止。
+- 完整 episode 通过 artifact validator：81 条 JSONL、所有相机视频帧数与日志对齐、`success=true`，产物约 992 KB。
+- 本轮 rollout 用时 4.433 秒（18.27 steps/s），双视频编码 0.922 秒，进程启动至 finalize 前共 51.239 秒，峰值显存约 921.9 MiB。
+- 本轮共查询 SmolVLA 2 次；仅 2 个 query 样本下推理延迟分位数暂不具有稳定统计意义。控制延迟 p50/p95/p99 为 37.59/43.43/48.62 ms。
+- 发现 81 步中 72 步触发执行边界裁剪（88.9%）；在进入 20-episode benchmark 前必须按动作维度分析原始越界幅度，区分夹爪饱和与机械臂运动维越界。
 
 ### 遇到的问题与处理
 
@@ -97,9 +104,10 @@ export HF_HOME=/root/autodl-tmp/vlasafe/cache/huggingface
 
 ### 下一步
 
-1. 上传并在 AutoDL 上运行 episode artifact validator，验收最新 5 步真实 episode。
+1. 分析完整成功 episode 的逐维原始动作范围与裁剪幅度，确认裁剪是否主要来自夹爪维度。
 2. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
-3. 运行 task 0 的首条完整策略 episode，并测量端到端耗时、成功状态、推理延迟和存储成本。
+3. 实现模型只加载一次的多 episode benchmark runner，避免将约 46 秒启动开销重复计入每条 episode。
+4. 运行 20-episode 成本与成功率验收，并取得至少一条自然失败 episode。
 
 ### 阶段判断
 
