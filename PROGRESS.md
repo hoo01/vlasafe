@@ -8,11 +8,11 @@
 | --- | --- |
 | 阶段 | Day 0–3：Plumbing 与成本验收 |
 | Policy / Simulator | SmolVLA + LIBERO，闭环 rollout 已跑通 |
-| 当前主任务候选 | `libero_spatial` task 4 |
-| 数据特征 | 同一 task 内已有混合 outcome：独立 pilot 约 2 成功 / 4 失败 |
-| 主线倾向 | **Outcome Prediction**；尚未正式冻结 |
-| 关键原因 | 修正事件语义后，task 4 自然失败暂未观察到可靠 self-collision / joint violation |
-| 当前阻塞 | 尚未完成 task 4 的 20-episode benchmark；impact/workspace 协议尚未冻结 |
+| 当前主任务 | `libero_spatial` task 4 |
+| 正式 benchmark | **20/20 验证通过；8 成功 / 12 失败（40% success）** |
+| 主线决策 | **Outcome Prediction** |
+| 关键原因 | 自然失败中仅 1/12 触发明确 self-collision / joint violation（8.3%） |
+| 当前剩余 | 补测 recording overhead、拆分存储成本并形成数据集成本预算 |
 
 ## 2. 阶段闸门
 
@@ -22,11 +22,12 @@
 | 从第 0 步同步记录 | ✅ | RGB、proprio、raw chunk、executed action、timing、label-only diagnostics |
 | 双相机 MP4 与 JSONL 对齐 | ✅ | validator 检查所有 `*_camera.mp4` 与 step 数 |
 | 至少一条成功和一条失败 | ✅ | task 4 同任务内已取得成功与失败 |
-| 20-episode intended-config benchmark | ⏳ | 下一项；计划 task 4、seed 700–719、init state 0–19 |
-| episodes/hour、延迟、录像与存储成本 | 🟡 | 已有 pilot 估计；等待 20 条正式汇总 |
-| 可用于分流的 unsafe-event 标签 | 🟡 | self/joint 可用；workspace/impact 仍为 `null` |
+| 20-episode intended-config benchmark | ✅ | task 4；seed 700–719；init state 0–19；20/20 artifact 验证通过 |
+| 吞吐、延迟、总存储 | ✅ | 246.37 episodes/hour；延迟与 52.75 MiB 总 artifact 已实测 |
+| Recording overhead 与存储拆分 | ⏳ | 尚需开/关录像对照及 RGB/JSONL 分项统计 |
+| 可用于分流的 unsafe-event 标签 | ✅ | self/joint 可用；失败覆盖 1/12，已据此选择 Outcome 主线 |
 
-在 20-episode benchmark 完成前，不进入 predictor 训练。
+完成 recording overhead 与成本预算后进入 predictor 数据集构建；impact/workspace 不阻塞 Outcome 主线。
 
 ## 3. 已实现系统
 
@@ -56,7 +57,7 @@
 | task 0，已知完整轨迹 | 9/9 成功 | 过易，排除主任务 |
 | task 1–3、6、8–9 初筛 | 各 1/1 成功 | 暂不扩测 |
 | task 5 | 0/6 成功 | 过难；仅保留失败回放 / supporting analysis |
-| **task 4** | **独立 pilot 约 2 成功 / 4 失败** | **选为 20-episode benchmark 主任务** |
+| **task 4** | **正式 benchmark：8/20 成功** | **冻结为 Outcome Prediction 首个 regime** |
 | task 7 | 6/6 成功 | 过易，排除主任务 |
 
 禁止把 task 0 的全成功与 task 5 的全失败直接混合训练，否则 predictor 可通过 task identity 作弊。
@@ -71,7 +72,26 @@
 
 这些是 pilot 数字，不作为最终 benchmark 结果。
 
-## 6. 事件协议状态
+## 6. 20-episode 正式验收
+
+| 指标 | 结果 |
+| --- | ---: |
+| Artifact validation | **20/20 通过** |
+| Outcome | **8 success / 12 failure** |
+| Success rate | **40.0%** |
+| 总 environment steps | 4,435 |
+| Throughput | 246.37 episodes/hour |
+| Query latency p50 / p95 / p99 | 344.59 / 363.18 / 400.22 ms |
+| Control latency p50 / p95 / p99 | 38.94 / 46.49 / 50.33 ms |
+| Artifact 总量 / 每 episode | 52.75 / 2.64 MiB |
+| 100 episodes 存储投影 | 263.75 MiB |
+| Action-clipped steps | 2,805 / 4,435（63.25%） |
+| Rollout / video encoding 总时长 | 215.51 / 27.22 s |
+| 失败且有明确 self/joint event | **1/12（8.33%）** |
+
+结论：同一 task、同一 checkpoint、不同 seed/init state 下同时具备足量成功与失败，适合作为 Outcome Prediction 的首个 regime。明确 self/joint event 对自然失败的覆盖过低，不能把这些失败统一叙述为 impending unsafe event。
+
+## 7. 事件协议状态
 
 | 事件 / 诊断量 | 状态 | 当前语义 |
 | --- | :---: | --- |
@@ -87,17 +107,17 @@ event schema 0.1.0 曾把左右 gripper pad 闭合接触误标为 self-collision
 
 event schema 0.2.0 已结构性排除 gripper–gripper 接触。相同 task 4 失败条件重跑后：18 步内部夹爪接触、0 步 self-collision、0 步 joint violation。
 
-当前 task 4 的已知失败中，可靠 self/joint event 初步覆盖接近 0，因此 Outcome 主线比 Impending Safety 主线更可能成立。最终分流仍以 Week-1 正式 pilot 为准。
+正式 20-episode benchmark 中，可靠 self/joint event 只覆盖 1/12 自然失败。因此主线正式冻结为 Outcome Prediction；Impending Safety 仅保留为 event-positive 子集上的 exploratory analysis。
 
-## 7. 下一步
+## 8. 下一步
 
-1. 运行 task 4 的 20-episode benchmark：seed 700–719、initial state 0–19。
-2. 自动验证全部 episode，汇总成功/失败、吞吐、延迟、裁剪率、存储和 self/joint event 覆盖。
-3. 用 pilot 原始 EEF/contact-force 分布形成并版本化 workspace/impact 协议；不得用 outcome 标签反向挑阈值。
-4. 固化依赖版本、LeRobot revision 与运行配置。
-5. 达到 Week-1 最低样本要求后，计算正式 `p_event_given_failure`，书面选择唯一主线。
+1. 做一次同配置开/关录像对照，测 recording overhead 与编码 CPU 成本。
+2. 将 artifact 存储拆成 RGB、JSONL/metadata 和其他文件，并投影 pilot/train/val/test 成本。
+3. 固化依赖版本、LeRobot revision 与运行配置，关闭 Day 0–3。
+4. 扩充 task 4 episode，并在按 episode/seed/init state 切分后构建 Outcome 窗口数据集。
+5. 训练强 baseline 与 state/action-only MLP；impact/workspace 协议降为 supporting work。
 
-## 8. 复现环境
+## 9. 复现环境
 
 | 组件 | 版本 / 路径 |
 | --- | --- |
