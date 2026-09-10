@@ -94,6 +94,10 @@
 - 对 task 5 扩测 5 条（seed 500–504、init state 0–4），5/5 均跑满 280 步失败；连同初筛共 6 条已知自然失败，判定 task 5 对当前 checkpoint 过难，不适合作为单任务二分类主数据源。
 - task 5 失败数据保留用于 failure replay 与 unsafe-event 分析，但禁止与 task 0 全成功数据直接混合训练 outcome predictor，以免模型仅凭 task identity 获得虚高结果。
 - task 5 五条扩测稳态吞吐约 220.40 episodes/hour；query latency p50/p95/p99 为 326.11/338.10/799.48 ms，control latency为 33.01/45.42/54.94 ms。
+- 扩测 task 4 五条得到 1/5 成功、4/5 失败（成功 episode 131 步，其余跑满 280 步），确认它在同一 task 内具有混合 outcome，是当前正式 pilot 首选。
+- task 4 五条稳态吞吐约 216.05 episodes/hour；query latency p50/p95/p99 为 330.37/345.79/834.10 ms，control latency为 39.11/45.74/51.87 ms。
+- 扩测 task 7 五条全部成功（115–121 步），判定过易，不作为自然失败主任务。
+- 任务搜索阶段结束：后续集中 `libero_spatial` task 4，不再用不同 task 的标签差异构造二分类结果。
 
 ### 遇到的问题与处理
 
@@ -125,8 +129,9 @@ export HF_HOME=/root/autodl-tmp/vlasafe/cache/huggingface
 
 ### 下一步
 
-1. 对初筛中轨迹较长且存在高力接触的 task 4 和 task 7 各扩测 5 条，寻找同一 task 内的混合成功率。
-2. 汇总 task 5 已保存的 joint violation 幅度与 self-collision pairs，作为失败诊断 supporting evidence。
+1. 汇总 task 4 五条扩测的 self-collision、joint violation、接触力和 EEF 范围，计算自然失败中的明确事件初步覆盖率。
+2. 若 task 4 的事件诊断正常，运行同一 task 的 20-episode Day-3 成本/分布 benchmark。
+3. 汇总 task 5 已保存的 joint violation 幅度与 self-collision pairs，作为失败诊断 supporting evidence。
 3. 在成功与失败 pilot 上比较 EEF/机器人接触力分布，再冻结 task-independent workspace 和明显 impact 协议；在此之前两类布尔标签保持 `null`。
 4. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
 5. 运行 20-episode 成本与成功率验收，并取得至少一条自然失败 episode。
