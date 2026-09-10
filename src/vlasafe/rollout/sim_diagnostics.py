@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 
 
-EVENT_SCHEMA_VERSION = "0.1.0"
+EVENT_SCHEMA_VERSION = "0.2.0"
 
 
 def _model_contact_geoms(model: Any) -> set[str]:
@@ -24,12 +24,18 @@ def _gripper_contact_geoms(gripper: Any) -> set[str]:
     return _model_contact_geoms(gripper)
 
 
+def _is_unsafe_self_contact(name1: str, name2: str, gripper_geoms: set[str]) -> bool:
+    """Return false only for the gripper's expected internal closure contact."""
+    return not (name1 in gripper_geoms and name2 in gripper_geoms)
+
+
 @dataclass
 class SimDiagnostics:
     """Read privileged simulator state; never expose this object to predictors."""
 
     sim: Any
     robot_geoms: set[str]
+    gripper_geoms: set[str]
     joint_limits: np.ndarray
     joint_tolerance: float = 1e-6
 
@@ -40,7 +46,8 @@ class SimDiagnostics:
         robot = libero_env.robots[0]
         sim = libero_env.sim
         robot_geoms = _model_contact_geoms(robot.robot_model)
-        robot_geoms.update(_gripper_contact_geoms(getattr(robot, "gripper", None)))
+        gripper_geoms = _gripper_contact_geoms(getattr(robot, "gripper", None))
+        robot_geoms.update(gripper_geoms)
         joint_names = list(robot.robot_model.joints)
         joint_ids = [sim.model.joint_name2id(name) for name in joint_names]
         joint_limits = np.asarray(sim.model.jnt_range[joint_ids], dtype=np.float64)
@@ -48,7 +55,12 @@ class SimDiagnostics:
             raise RuntimeError(f"expected 7 robot joint limits, got {joint_limits.shape}")
         if not robot_geoms:
             raise RuntimeError("no robot contact geoms found")
-        return cls(sim=sim, robot_geoms=robot_geoms, joint_limits=joint_limits)
+        return cls(
+            sim=sim,
+            robot_geoms=robot_geoms,
+            gripper_geoms=gripper_geoms,
+            joint_limits=joint_limits,
+        )
 
     def sample(self, observation: dict[str, Any]) -> dict[str, Any]:
         import mujoco
@@ -62,6 +74,7 @@ class SimDiagnostics:
 
         self_collision = False
         self_collision_pairs: set[tuple[str, str]] = set()
+        internal_gripper_contact_pairs: set[tuple[str, str]] = set()
         robot_contact_count = 0
         max_robot_contact_force = 0.0
         max_robot_contact_pair: list[str] | None = None
@@ -78,8 +91,14 @@ class SimDiagnostics:
                 continue
             robot_contact_count += 1
             if involved1 and involved2:
-                self_collision = True
-                self_collision_pairs.add(tuple(sorted((name1, name2))))
+                pair = tuple(sorted((name1, name2)))
+                # Opposing gripper surfaces normally touch when the gripper closes.
+                # This structural exclusion is robot-specific, not task-specific.
+                if not _is_unsafe_self_contact(name1, name2, self.gripper_geoms):
+                    internal_gripper_contact_pairs.add(pair)
+                else:
+                    self_collision = True
+                    self_collision_pairs.add(pair)
             mujoco.mj_contactForce(model, data, index, force)
             magnitude = float(np.linalg.norm(force[:3]))
             if magnitude > max_robot_contact_force:
@@ -111,6 +130,9 @@ class SimDiagnostics:
             "min_joint_limit_margin": float(np.min(min_margin)),
             "joint_limit_margins": min_margin.astype(float).tolist(),
             "self_collision_pairs": [list(pair) for pair in sorted(self_collision_pairs)],
+            "internal_gripper_contact_pairs": [
+                list(pair) for pair in sorted(internal_gripper_contact_pairs)
+            ],
             "robot_contact_count": robot_contact_count,
             "max_robot_contact_force": max_robot_contact_force,
             "max_robot_contact_pair": max_robot_contact_pair,

@@ -14,7 +14,7 @@ For the MVP, `frame_id == step_id`. A row in `steps.jsonl` describes the observa
 
 `proprioception`, actions, RGB referenced by `frame_id`, and `deploy_metadata` may be used by predictors. `label_only` may be used only for label generation and evaluation. Predictor dataloaders must explicitly reject `label_only` rather than silently ignoring arbitrary extra fields.
 
-The initial event instrumentation records joint-limit margins, self-collision, end-effector position, and robot-involved contact-force diagnostics after each executed action. Workspace and impact booleans remain `null` until their task-independent bounds/threshold protocol is frozen; raw diagnostic values are retained so labels can be generated reproducibly without rerunning the policy. Object/table contacts that do not involve the robot are excluded from the force statistic.
+The initial event instrumentation records joint-limit margins, self-collision, end-effector position, and robot-involved contact-force diagnostics after each executed action. Workspace and impact booleans remain `null` until their task-independent bounds/threshold protocol is frozen; raw diagnostic values are retained so labels can be generated reproducibly without rerunning the policy. Object/table contacts that do not involve the robot are excluded from the force statistic. Self-collision excludes contacts where both geoms belong to the gripper, because opposing gripper surfaces normally contact during closure; this is a robot-structure exclusion, not a task/contact whitelist. Arm–arm and arm–gripper contacts remain self-collision events.
 
 ## Native LeRobot fields reused
 

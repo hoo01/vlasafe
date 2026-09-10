@@ -98,6 +98,9 @@
 - task 4 五条稳态吞吐约 216.05 episodes/hour；query latency p50/p95/p99 为 330.37/345.79/834.10 ms，control latency为 39.11/45.74/51.87 ms。
 - 扩测 task 7 五条全部成功（115–121 步），判定过易，不作为自然失败主任务。
 - 任务搜索阶段结束：后续集中 `libero_spatial` task 4，不再用不同 task 的标签差异构造二分类结果。
+- task 4 初步事件汇总曾显示 4/4 失败均有 self-collision，但 95 个事件的唯一 geom pair 是左右 gripper pad 相互接触；判定为夹爪闭合的正常内部接触，而非 unsafe self-collision。
+- 废弃基于 event schema 0.1.0 得到的 `p_event_given_failure=1.0`；该数值不得进入报告。event schema 升级为 0.2.0，结构性排除 gripper–gripper 内部接触，同时保留 arm–arm 与 arm–gripper 自碰。
+- 按修正语义，当前 task 4 的 4 条失败没有已确认的 self-collision 或 joint violation；这使 Outcome 主线成为当前更可能的分流结果，但需完成正式 pilot 后决定。
 
 ### 遇到的问题与处理
 
@@ -129,8 +132,8 @@ export HF_HOME=/root/autodl-tmp/vlasafe/cache/huggingface
 
 ### 下一步
 
-1. 汇总 task 4 五条扩测的 self-collision、joint violation、接触力和 EEF 范围，计算自然失败中的明确事件初步覆盖率。
-2. 若 task 4 的事件诊断正常，运行同一 task 的 20-episode Day-3 成本/分布 benchmark。
+1. 用 event schema 0.2.0 重跑一条 task 4 失败倾向 initial state，确认 gripper–gripper 接触只进入诊断字段而不触发 self-collision。
+2. 验证修正后运行 task 4 的 20-episode Day-3 成本/分布 benchmark。
 3. 汇总 task 5 已保存的 joint violation 幅度与 self-collision pairs，作为失败诊断 supporting evidence。
 3. 在成功与失败 pilot 上比较 EEF/机器人接触力分布，再冻结 task-independent workspace 和明显 impact 协议；在此之前两类布尔标签保持 `null`。
 4. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
