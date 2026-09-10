@@ -21,6 +21,7 @@ from lerobot.policies import make_pre_post_processors
 from lerobot.policies.smolvla.modeling_smolvla import SmolVLAPolicy
 from lerobot.utils.constants import ACTION
 from vlasafe.rollout import EpisodeMetadata, SidecarRecorder, StepRecord
+from vlasafe.rollout.sim_diagnostics import SimDiagnostics
 
 
 def _first_bool(value: Any) -> bool:
@@ -96,6 +97,7 @@ def _record_episode(
     try:
         policy.reset()
         raw_obs, _ = env.reset(seed=seed)
+        diagnostics = SimDiagnostics.from_vector_env(env)
         main_frames: list[np.ndarray] = []
         wrist_frames: list[np.ndarray] = []
         action_queue: deque[np.ndarray] = deque()
@@ -173,13 +175,7 @@ def _record_episode(
                         "action_clipped": clip_delta > 0.0,
                         "action_clip_linf": clip_delta,
                     },
-                    label_only={
-                        "events_instrumented": False,
-                        "self_collision": None,
-                        "joint_violation": None,
-                        "workspace_violation": None,
-                        "impact": None,
-                    },
+                    label_only=diagnostics.sample(next_obs),
                 )
             )
             chunk_offset += 1
