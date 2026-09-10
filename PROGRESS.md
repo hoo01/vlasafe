@@ -79,6 +79,10 @@
 - 2-episode 汇总的 query latency p50/p95/p99 为 329.83/907.57/988.93 ms，control latency 为 36.67/45.85/49.62 ms；正式统计仍需 20-episode 样本。
 - 接入首版 privileged label-only 仿真诊断：逐步记录 self-collision、joint violation、关节余量、EEF 位置、机器人相关接触数量/最大接触力/接触对；workspace 与 impact 在协议阈值冻结前保持 `null`。
 - 事件插桩 5-step 兼容性测试通过并通过 artifact validator：字段齐全，self-collision 与 joint violation 均为 0，最小 joint-limit margin 约 0.6200；前 5 步尚未发生机器人接触，接触力为 0。
+- 完成首条带诊断的完整成功 episode（seed 203）：79 步成功，artifact validator 通过；39 步存在机器人相关接触，无 self-collision 或 joint violation。
+- 该成功 episode 的机器人接触力中位数约 1.90 N，但最大值达到 116.84 N；第 41–43 步的最大接触对为夹爪手指与桌面，峰值依次约 116.84/75.98/30.57 N。正常抓取阶段最常见的最大力接触对为夹爪 pad 与碗。
+- 这证明 contact 过滤排除了无机器人参与的物体—桌面静态接触，并揭示“最终成功但过程出现明显碰桌”的可能 unsafe episode；impact threshold 尚未因单条轨迹而冻结。
+- 本轮 EEF 范围为 x `[-0.2110, 0.0731]`、y `[-0.0107, 0.1729]`、z `[0.9115, 1.1794]`，用于 workspace 协议 pilot，不作为已冻结边界。
 
 ### 遇到的问题与处理
 
@@ -110,10 +114,11 @@ export HF_HOME=/root/autodl-tmp/vlasafe/cache/huggingface
 
 ### 下一步
 
-1. 跑一条带诊断的完整成功 episode，确认抓取阶段的机器人接触力与接触对可被记录。
-2. 根据 pilot 的 EEF/机器人接触力分布冻结 task-independent workspace 和明显 impact 协议；在此之前两类布尔标签保持 `null`。
-3. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
-4. 运行 20-episode 成本与成功率验收，并取得至少一条自然失败 episode。
+1. 人工检查 seed 203 第 41–43 步附近的主/腕部视频，确认 116.84 N 峰值对应真实碰桌而非数值伪影。
+2. 再跑 5 条带原始诊断的 pilot，比较成功/失败 episode 的 EEF 与机器人接触力分布。
+3. 根据 pilot 冻结 task-independent workspace 和明显 impact 协议；在此之前两类布尔标签保持 `null`。
+4. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
+5. 运行 20-episode 成本与成功率验收，并取得至少一条自然失败 episode。
 
 ### 阶段判断
 
