@@ -183,13 +183,19 @@ def validate_episode(
     if not isinstance(result.get("termination_reason"), str) or not result.get("termination_reason"):
         errors.append("result.termination_reason must be a non-empty string")
 
-    try:
-        video_frames = video_probe(root / "main_camera.mp4")
-    except ArtifactValidationError as exc:
-        errors.append(str(exc))
-        video_frames = -1
-    if video_frames != len(rows):
-        errors.append(f"video has {video_frames} frames but JSONL has {len(rows)} rows")
+    video_frames = -1
+    for video_path in sorted(root.glob("*_camera.mp4")):
+        try:
+            current_frames = video_probe(video_path)
+        except ArtifactValidationError as exc:
+            errors.append(str(exc))
+            current_frames = -1
+        if video_path.name == "main_camera.mp4":
+            video_frames = current_frames
+        if current_frames != len(rows):
+            errors.append(
+                f"{video_path.name} has {current_frames} frames but JSONL has {len(rows)} rows"
+            )
 
     if errors:
         raise ArtifactValidationError("\n- " + "\n- ".join(errors))

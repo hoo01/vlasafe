@@ -54,6 +54,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
+    program_started = time.perf_counter()
     os.environ.setdefault("MUJOCO_GL", "egl")
     os.environ.setdefault("PYOPENGL_PLATFORM", "egl")
 
@@ -103,16 +104,19 @@ def main() -> None:
 
         raw_obs, _ = env.reset(seed=args.seed)
         task_description = list(env.call("task_description"))
-        frames: list[np.ndarray] = []
+        main_frames: list[np.ndarray] = []
+        wrist_frames: list[np.ndarray] = []
         action_queue: deque[np.ndarray] = deque()
         active_chunk: np.ndarray | None = None
         chunk_id = -1
         chunk_offset = 0
         success = False
 
+        rollout_started = time.perf_counter()
         for step_id in range(args.max_steps):
             observation_timestamp_ns = time.monotonic_ns()
-            frames.append(np.asarray(raw_obs["pixels"]["image"][0]).copy())
+            main_frames.append(np.asarray(raw_obs["pixels"]["image"][0]).copy())
+            wrist_frames.append(np.asarray(raw_obs["pixels"]["image2"][0]).copy())
             proprio = _proprioception(raw_obs["robot_state"])
             inference_started_ns = time.monotonic_ns()
             queried_policy = not action_queue
@@ -185,18 +189,44 @@ def main() -> None:
             if _first_bool(terminated) or _first_bool(truncated):
                 break
 
+        rollout_finished = time.perf_counter()
+        encoding_started = time.perf_counter()
         imageio.mimsave(
             recorder.partial_dir / "main_camera.mp4",
-            frames,
+            main_frames,
             fps=20,
             codec="libx264",
             macro_block_size=8,
         )
-        reason = "success" if success else "integration_horizon"
-        final_dir = recorder.finalize(termination_reason=reason, success=success)
-        print(f"RECORDED {len(frames)} SmolVLA steps")
+        imageio.mimsave(
+            recorder.partial_dir / "wrist_camera.mp4",
+            wrist_frames,
+            fps=20,
+            codec="libx264",
+            macro_block_size=8,
+        )
+        encoding_finished = time.perf_counter()
+        reason = "success" if success else "max_steps"
+        rollout_s = rollout_finished - rollout_started
+        encoding_s = encoding_finished - encoding_started
+        metrics = {
+            "rollout_seconds": rollout_s,
+            "video_encoding_seconds": encoding_s,
+            "steps_per_second": len(main_frames) / rollout_s if rollout_s else None,
+            "program_seconds_before_finalize": encoding_finished - program_started,
+            "peak_vram_mib": torch.cuda.max_memory_allocated() / 1024**2,
+        }
+        final_dir = recorder.finalize(
+            termination_reason=reason,
+            success=success,
+            metrics=metrics,
+        )
+        print(f"RECORDED {len(main_frames)} SmolVLA steps")
         print(f"FINALIZED {final_dir}")
-        print(f"PEAK VRAM MiB {torch.cuda.max_memory_allocated() / 1024**2:.1f}")
+        print(f"ROLLOUT seconds {rollout_s:.3f}")
+        print(f"VIDEO ENCODING seconds {encoding_s:.3f}")
+        print(f"STEPS/s {metrics['steps_per_second']:.3f}")
+        print(f"PEAK VRAM MiB {metrics['peak_vram_mib']:.1f}")
     except BaseException:
         recorder.abort()
         raise

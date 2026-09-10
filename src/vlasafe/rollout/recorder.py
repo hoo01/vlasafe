@@ -42,20 +42,26 @@ class SidecarRecorder:
         self._steps.flush()
         self._next_step_id += 1
 
-    def finalize(self, *, termination_reason: str, success: bool) -> Path:
+    def finalize(
+        self,
+        *,
+        termination_reason: str,
+        success: bool,
+        metrics: dict | None = None,
+    ) -> Path:
         if self._finalized:
             raise RuntimeError("episode already finalized")
         self._steps.flush()
         os.fsync(self._steps.fileno())
         self._steps.close()
-        self._write_json(
-            self.partial_dir / "result.json",
-            {
-                "num_steps": self._next_step_id,
-                "success": success,
-                "termination_reason": termination_reason,
-            },
-        )
+        result = {
+            "num_steps": self._next_step_id,
+            "success": success,
+            "termination_reason": termination_reason,
+        }
+        if metrics is not None:
+            result["metrics"] = metrics
+        self._write_json(self.partial_dir / "result.json", result)
         (self.partial_dir / "COMPLETE").touch(exist_ok=False)
         os.replace(self.partial_dir, self.final_dir)
         self._finalized = True
@@ -66,4 +72,3 @@ class SidecarRecorder:
         if not self._steps.closed:
             self._steps.close()
         return self.partial_dir
-

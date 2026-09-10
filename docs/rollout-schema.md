@@ -26,4 +26,4 @@ Run the validator before adding an episode to any manifest:
 PYTHONPATH=src python scripts/validate_episode.py artifacts/episodes/<episode_id>
 ```
 
-The validator rejects incomplete episodes, missing required files or fields, malformed/non-finite records, mismatched episode IDs, noncontiguous step/frame IDs, nonmonotonic timestamps, inconsistent `result.num_steps`, and MP4/JSONL frame-count mismatches. Video inspection requires `ffprobe`.
+The validator rejects incomplete episodes, missing required files or fields, malformed/non-finite records, mismatched episode IDs, noncontiguous step/frame IDs, nonmonotonic timestamps, inconsistent `result.num_steps`, and camera-MP4/JSONL frame-count mismatches. Every `*_camera.mp4` present in the episode is checked. Video inspection requires `ffprobe`.

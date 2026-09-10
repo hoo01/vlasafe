@@ -55,8 +55,18 @@ class ArtifactValidatorTest(unittest.TestCase):
     def test_rejects_video_step_mismatch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             episode = write_episode(Path(tmp))
-            with self.assertRaisesRegex(ArtifactValidationError, "video has 1 frames"):
+            with self.assertRaisesRegex(ArtifactValidationError, "main_camera.mp4 has 1 frames"):
                 validate_episode(episode, video_probe=lambda _: 1)
+
+    def test_checks_every_camera_video(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            episode = write_episode(Path(tmp))
+            (episode / "wrist_camera.mp4").touch()
+            with self.assertRaisesRegex(ArtifactValidationError, "wrist_camera.mp4 has 1 frames"):
+                validate_episode(
+                    episode,
+                    video_probe=lambda path: 1 if path.name == "wrist_camera.mp4" else 2,
+                )
 
     def test_rejects_noncontiguous_ids(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
