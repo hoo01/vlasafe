@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import time
 from collections import deque
@@ -49,23 +50,32 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-steps", type=int, default=5)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--task-id", type=int, default=0)
+    parser.add_argument("--num-episodes", type=int, default=1)
     return parser.parse_args()
 
 
-def main() -> None:
-    args = parse_args()
-    program_started = time.perf_counter()
-    os.environ.setdefault("MUJOCO_GL", "egl")
-    os.environ.setdefault("PYOPENGL_PLATFORM", "egl")
-
-    checkpoint = args.checkpoint.resolve()
-    episode_id = datetime.now(timezone.utc).strftime("smolvla-%Y%m%dT%H%M%SZ")
+def _record_episode(
+    *,
+    args: argparse.Namespace,
+    episode_index: int,
+    checkpoint: Path,
+    env: Any,
+    policy: SmolVLAPolicy,
+    env_preprocessor: Any,
+    env_postprocessor: Any,
+    preprocessor: Any,
+    postprocessor: Any,
+    task_description: list[str],
+) -> dict[str, Any]:
+    episode_started = time.perf_counter()
+    seed = args.seed + episode_index
+    episode_id = datetime.now(timezone.utc).strftime("smolvla-%Y%m%dT%H%M%S%fZ")
     metadata = EpisodeMetadata(
         episode_id=episode_id,
         task="libero_spatial",
         task_id=args.task_id,
-        seed=args.seed,
-        initial_state_id=0,
+        seed=seed,
+        initial_state_id=episode_index,
         policy_id=str(checkpoint),
         policy_revision="local-compat-copy",
         lerobot_revision="codeload-main-unpinned",
@@ -75,35 +85,17 @@ def main() -> None:
             "observation_height": 360,
             "observation_width": 360,
             "control_mode": "relative",
+            "benchmark_episode_index": episode_index,
         },
         started_at_utc=datetime.now(timezone.utc).isoformat(),
     )
     recorder = SidecarRecorder(args.output_root, metadata)
-    env = None
-
+    query_latencies_ms: list[float] = []
+    control_latencies_ms: list[float] = []
+    clipped_steps = 0
     try:
-        cfg = LiberoEnvConfig(
-            task="libero_spatial",
-            task_ids=[args.task_id],
-            observation_height=360,
-            observation_width=360,
-            episode_length=args.max_steps,
-        )
-        env = cfg.create_envs(n_envs=1, use_async_envs=False)["libero_spatial"][args.task_id]
-        policy = SmolVLAPolicy.from_pretrained(checkpoint).to("cuda").eval()
         policy.reset()
-        env_preprocessor, env_postprocessor = make_env_pre_post_processors(
-            env_cfg=cfg,
-            policy_cfg=policy.config,
-        )
-        preprocessor, postprocessor = make_pre_post_processors(
-            policy_cfg=policy.config,
-            pretrained_path=checkpoint,
-            preprocessor_overrides={"device_processor": {"device": "cuda"}},
-        )
-
-        raw_obs, _ = env.reset(seed=args.seed)
-        task_description = list(env.call("task_description"))
+        raw_obs, _ = env.reset(seed=seed)
         main_frames: list[np.ndarray] = []
         wrist_frames: list[np.ndarray] = []
         action_queue: deque[np.ndarray] = deque()
@@ -136,6 +128,9 @@ def main() -> None:
                 chunk_offset = 0
 
             inference_finished_ns = time.monotonic_ns()
+            inference_latency_ms = (inference_finished_ns - inference_started_ns) / 1e6
+            if queried_policy:
+                query_latencies_ms.append(inference_latency_ms)
             if active_chunk is None:
                 raise RuntimeError("policy did not produce an action chunk")
             predicted_action = np.asarray(action_queue.popleft(), dtype=np.float32)[None, :]
@@ -148,6 +143,9 @@ def main() -> None:
             action_executed_ns = time.monotonic_ns()
             next_obs, reward, terminated, truncated, info = env.step(action_numpy)
             step_finished_ns = time.monotonic_ns()
+            control_latency_ms = (step_finished_ns - action_executed_ns) / 1e6
+            control_latencies_ms.append(control_latency_ms)
+            clipped_steps += int(clip_delta > 0.0)
             success = _first_bool(info.get("is_success", False))
 
             recorder.add_step(
@@ -159,8 +157,8 @@ def main() -> None:
                     inference_started_ns=inference_started_ns,
                     inference_finished_ns=inference_finished_ns,
                     action_executed_ns=action_executed_ns,
-                    inference_latency_ms=(inference_finished_ns - inference_started_ns) / 1e6,
-                    control_latency_ms=(step_finished_ns - action_executed_ns) / 1e6,
+                    inference_latency_ms=inference_latency_ms,
+                    control_latency_ms=control_latency_ms,
                     predicted_action_chunk=active_chunk[0].astype(float).tolist(),
                     executed_action=action_numpy[0].astype(float).tolist(),
                     proprioception=proprio,
@@ -213,7 +211,7 @@ def main() -> None:
             "rollout_seconds": rollout_s,
             "video_encoding_seconds": encoding_s,
             "steps_per_second": len(main_frames) / rollout_s if rollout_s else None,
-            "program_seconds_before_finalize": encoding_finished - program_started,
+            "episode_seconds_before_finalize": encoding_finished - episode_started,
             "peak_vram_mib": torch.cuda.max_memory_allocated() / 1024**2,
         }
         final_dir = recorder.finalize(
@@ -227,12 +225,115 @@ def main() -> None:
         print(f"VIDEO ENCODING seconds {encoding_s:.3f}")
         print(f"STEPS/s {metrics['steps_per_second']:.3f}")
         print(f"PEAK VRAM MiB {metrics['peak_vram_mib']:.1f}")
+        return {
+            "episode_id": episode_id,
+            "episode_index": episode_index,
+            "initial_state_id": episode_index,
+            "seed": seed,
+            "success": success,
+            "num_steps": len(main_frames),
+            "clipped_steps": clipped_steps,
+            "query_latencies_ms": query_latencies_ms,
+            "control_latencies_ms": control_latencies_ms,
+            "rollout_seconds": rollout_s,
+            "video_encoding_seconds": encoding_s,
+            "artifact_bytes": sum(path.stat().st_size for path in final_dir.rglob("*") if path.is_file()),
+        }
     except BaseException:
         recorder.abort()
         raise
+
+
+def _percentiles(values: list[float]) -> dict[str, float | None]:
+    if not values:
+        return {"p50": None, "p95": None, "p99": None}
+    result = np.percentile(np.asarray(values), [50, 95, 99])
+    return {"p50": float(result[0]), "p95": float(result[1]), "p99": float(result[2])}
+
+
+def main() -> None:
+    args = parse_args()
+    if args.num_episodes <= 0:
+        raise ValueError("--num-episodes must be positive")
+    os.environ.setdefault("MUJOCO_GL", "egl")
+    os.environ.setdefault("PYOPENGL_PLATFORM", "egl")
+    checkpoint = args.checkpoint.resolve()
+    benchmark_started = time.perf_counter()
+    env = None
+    try:
+        cfg = LiberoEnvConfig(
+            task="libero_spatial",
+            task_ids=[args.task_id],
+            observation_height=360,
+            observation_width=360,
+            episode_length=args.max_steps,
+        )
+        env = cfg.create_envs(n_envs=1, use_async_envs=False)["libero_spatial"][args.task_id]
+        policy = SmolVLAPolicy.from_pretrained(checkpoint).to("cuda").eval()
+        env_preprocessor, env_postprocessor = make_env_pre_post_processors(
+            env_cfg=cfg, policy_cfg=policy.config
+        )
+        preprocessor, postprocessor = make_pre_post_processors(
+            policy_cfg=policy.config,
+            pretrained_path=checkpoint,
+            preprocessor_overrides={"device_processor": {"device": "cuda"}},
+        )
+        task_description = list(env.call("task_description"))
+        setup_finished = time.perf_counter()
+        episodes = []
+        for episode_index in range(args.num_episodes):
+            print(f"\n=== EPISODE {episode_index + 1}/{args.num_episodes} ===")
+            episodes.append(
+                _record_episode(
+                    args=args,
+                    episode_index=episode_index,
+                    checkpoint=checkpoint,
+                    env=env,
+                    policy=policy,
+                    env_preprocessor=env_preprocessor,
+                    env_postprocessor=env_postprocessor,
+                    preprocessor=preprocessor,
+                    postprocessor=postprocessor,
+                    task_description=task_description,
+                )
+            )
+        benchmark_finished = time.perf_counter()
     finally:
         if env is not None:
             env.close()
+
+    query_latencies = [x for ep in episodes for x in ep["query_latencies_ms"]]
+    control_latencies = [x for ep in episodes for x in ep["control_latencies_ms"]]
+    collection_seconds = benchmark_finished - setup_finished
+    summary = {
+        "schema_version": "0.1.0",
+        "task": "libero_spatial",
+        "task_id": args.task_id,
+        "seed_start": args.seed,
+        "num_episodes": len(episodes),
+        "successes": sum(ep["success"] for ep in episodes),
+        "success_rate": sum(ep["success"] for ep in episodes) / len(episodes),
+        "total_steps": sum(ep["num_steps"] for ep in episodes),
+        "total_clipped_steps": sum(ep["clipped_steps"] for ep in episodes),
+        "setup_seconds": setup_finished - benchmark_started,
+        "collection_seconds": collection_seconds,
+        "episodes_per_hour": len(episodes) * 3600 / collection_seconds,
+        "query_latency_ms": _percentiles(query_latencies),
+        "control_latency_ms": _percentiles(control_latencies),
+        "total_artifact_bytes": sum(ep["artifact_bytes"] for ep in episodes),
+        "episodes": episodes,
+    }
+    benchmark_root = Path("artifacts/benchmarks")
+    benchmark_root.mkdir(parents=True, exist_ok=True)
+    summary_path = benchmark_root / datetime.now(timezone.utc).strftime(
+        "benchmark-%Y%m%dT%H%M%S%fZ.json"
+    )
+    summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    print(f"\nBENCHMARK SUMMARY {summary_path}")
+    print(f"SUCCESS {summary['successes']}/{summary['num_episodes']} ({summary['success_rate']:.1%})")
+    print(f"EPISODES/hour {summary['episodes_per_hour']:.2f}")
+    print(f"QUERY latency ms {summary['query_latency_ms']}")
+    print(f"CONTROL latency ms {summary['control_latency_ms']}")
 
 
 if __name__ == "__main__":
