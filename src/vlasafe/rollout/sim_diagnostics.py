@@ -61,6 +61,7 @@ class SimDiagnostics:
         joint_violation = bool(np.any(min_margin < -self.joint_tolerance))
 
         self_collision = False
+        self_collision_pairs: set[tuple[str, str]] = set()
         robot_contact_count = 0
         max_robot_contact_force = 0.0
         max_robot_contact_pair: list[str] | None = None
@@ -76,7 +77,9 @@ class SimDiagnostics:
             if not (involved1 or involved2):
                 continue
             robot_contact_count += 1
-            self_collision = self_collision or (involved1 and involved2)
+            if involved1 and involved2:
+                self_collision = True
+                self_collision_pairs.add(tuple(sorted((name1, name2))))
             mujoco.mj_contactForce(model, data, index, force)
             magnitude = float(np.linalg.norm(force[:3]))
             if magnitude > max_robot_contact_force:
@@ -94,6 +97,9 @@ class SimDiagnostics:
             },
             "self_collision": self_collision,
             "joint_violation": joint_violation,
+            "joint_violation_indices": np.flatnonzero(
+                min_margin < -self.joint_tolerance
+            ).astype(int).tolist(),
             # Bounds must be frozen from a documented LIBERO workspace protocol first.
             "workspace_violation": None,
             # Record force now; freeze an impact threshold after the pilot distribution.
@@ -103,6 +109,8 @@ class SimDiagnostics:
             "joint_lower_limits": self.joint_limits[:, 0].astype(float).tolist(),
             "joint_upper_limits": self.joint_limits[:, 1].astype(float).tolist(),
             "min_joint_limit_margin": float(np.min(min_margin)),
+            "joint_limit_margins": min_margin.astype(float).tolist(),
+            "self_collision_pairs": [list(pair) for pair in sorted(self_collision_pairs)],
             "robot_contact_count": robot_contact_count,
             "max_robot_contact_force": max_robot_contact_force,
             "max_robot_contact_pair": max_robot_contact_pair,

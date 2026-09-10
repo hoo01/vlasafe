@@ -87,6 +87,10 @@
 - 5-episode query latency p50/p95/p99 为 342.01/731.88/980.28 ms，control latency 为 35.73/47.75/53.66 ms。
 - 五条成功轨迹最大机器人接触力分别约为 77.61、119.68、13.38、112.51、14.90 N；其中 3/5 成功 episode 出现 `>50 N`。因此 `>50 N` 不能被解释为 outcome failure 标签，impact 只能作为独立 unsafe-event 候选并需进一步冻结协议。
 - task 0 至今多条完整 rollout 均成功，当前分布过于容易，不适合作为自然成功/失败二分类主任务；下一步筛选 LIBERO Spatial 其余 task。
+- 完成 `libero_spatial` task 1–9 单条初筛：task 1–4 与 6–9 成功，task 5 跑满 280 步失败，初筛成功率 8/9。
+- task 5 失败 episode 同时记录到 5 个 self-collision step、16 个 joint-violation step，最大机器人接触力约 33.03 N，是首个同时支持 outcome failure 与明确事件分析的候选；在扩样前需核验具体自碰 geom pair 与关节越界幅度。
+- 成功 task 4/7 分别出现约 103.62/201.34 N 峰值，再次说明高接触力与最终 outcome 不等价，impact 协议不能用 outcome 反向定义。
+- 扩充诊断 schema：后续 episode 额外保存 `self_collision_pairs`、逐关节 limit margin、violation indices 与具体 task language；已有日志不追溯伪造这些字段。
 
 ### 遇到的问题与处理
 
@@ -118,8 +122,8 @@ export HF_HOME=/root/autodl-tmp/vlasafe/cache/huggingface
 
 ### 下一步
 
-1. 对 `libero_spatial` task 1–9 各跑至少一条带诊断 rollout，筛选具有混合成功率的候选 task。
-2. 对候选困难 task 扩至至少 5 条，确认自然失败不是单个 seed 偶然现象。
+1. 从已有 task 5 episode 还原 joint violation 的关节与幅度，并人工查看失败视频。
+2. 用扩充后的诊断 schema 对 task 5 再跑 5 条，核验 self-collision pair，并确认自然失败不是单个 seed 偶然现象。
 3. 在成功与失败 pilot 上比较 EEF/机器人接触力分布，再冻结 task-independent workspace 和明显 impact 协议；在此之前两类布尔标签保持 `null`。
 4. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
 5. 运行 20-episode 成本与成功率验收，并取得至少一条自然失败 episode。

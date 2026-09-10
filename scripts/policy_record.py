@@ -87,6 +87,7 @@ def _record_episode(
             "observation_width": 360,
             "control_mode": "relative",
             "benchmark_episode_index": episode_index,
+            "task_description": task_description[0],
         },
         started_at_utc=datetime.now(timezone.utc).isoformat(),
     )
