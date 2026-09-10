@@ -83,6 +83,10 @@
 - 该成功 episode 的机器人接触力中位数约 1.90 N，但最大值达到 116.84 N；第 41–43 步的最大接触对为夹爪手指与桌面，峰值依次约 116.84/75.98/30.57 N。正常抓取阶段最常见的最大力接触对为夹爪 pad 与碗。
 - 这证明 contact 过滤排除了无机器人参与的物体—桌面静态接触，并揭示“最终成功但过程出现明显碰桌”的可能 unsafe episode；impact threshold 尚未因单条轨迹而冻结。
 - 本轮 EEF 范围为 x `[-0.2110, 0.0731]`、y `[-0.0107, 0.1729]`、z `[0.9115, 1.1794]`，用于 workspace 协议 pilot，不作为已冻结边界。
+- 完成 task 0 的 5-episode 诊断 pilot（seed 300–304、init state 0–4）：5/5 全部成功，75–88 步完成，稳态约 456.53 episodes/hour。
+- 5-episode query latency p50/p95/p99 为 342.01/731.88/980.28 ms，control latency 为 35.73/47.75/53.66 ms。
+- 五条成功轨迹最大机器人接触力分别约为 77.61、119.68、13.38、112.51、14.90 N；其中 3/5 成功 episode 出现 `>50 N`。因此 `>50 N` 不能被解释为 outcome failure 标签，impact 只能作为独立 unsafe-event 候选并需进一步冻结协议。
+- task 0 至今多条完整 rollout 均成功，当前分布过于容易，不适合作为自然成功/失败二分类主任务；下一步筛选 LIBERO Spatial 其余 task。
 
 ### 遇到的问题与处理
 
@@ -114,9 +118,9 @@ export HF_HOME=/root/autodl-tmp/vlasafe/cache/huggingface
 
 ### 下一步
 
-1. 人工检查 seed 203 第 41–43 步附近的主/腕部视频，确认 116.84 N 峰值对应真实碰桌而非数值伪影。
-2. 再跑 5 条带原始诊断的 pilot，比较成功/失败 episode 的 EEF 与机器人接触力分布。
-3. 根据 pilot 冻结 task-independent workspace 和明显 impact 协议；在此之前两类布尔标签保持 `null`。
+1. 对 `libero_spatial` task 1–9 各跑至少一条带诊断 rollout，筛选具有混合成功率的候选 task。
+2. 对候选困难 task 扩至至少 5 条，确认自然失败不是单个 seed 偶然现象。
+3. 在成功与失败 pilot 上比较 EEF/机器人接触力分布，再冻结 task-independent workspace 和明显 impact 协议；在此之前两类布尔标签保持 `null`。
 4. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
 5. 运行 20-episode 成本与成功率验收，并取得至少一条自然失败 episode。
 
