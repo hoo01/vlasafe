@@ -73,6 +73,10 @@
 - 本轮 rollout 用时 4.433 秒（18.27 steps/s），双视频编码 0.922 秒，进程启动至 finalize 前共 51.239 秒，峰值显存约 921.9 MiB。
 - 本轮共查询 SmolVLA 2 次；仅 2 个 query 样本下推理延迟分位数暂不具有稳定统计意义。控制延迟 p50/p95/p99 为 37.59/43.43/48.62 ms。
 - 发现 81 步中 72 步触发执行边界裁剪（88.9%）；在进入 20-episode benchmark 前必须按动作维度分析原始越界幅度，区分夹爪饱和与机械臂运动维越界。
+- 裁剪逐维分析完成：夹爪维裁剪 72/81 步、最大幅度 0.03778；机械臂仅 Z 位移维裁剪 7/81 步、最大幅度 0.02121，其余 5 个运动维无裁剪。判定为边界附近轻微 overshoot，保留显式裁剪和日志，不视为 schema/config 阻塞。
+- 实现复用单次模型加载的多 episode benchmark runner；每条 episode 使用递增 seed 与 initial-state ID，独立 finalize，并自动汇总成功率、吞吐率、延迟和存储。
+- 2-episode 集成运行成功：seed 100/101 分别在 81/89 步成功，连续 reset 正常；汇总成功率 2/2，稳态吞吐约 390.51 episodes/hour。
+- 2-episode 汇总的 query latency p50/p95/p99 为 329.83/907.57/988.93 ms，control latency 为 36.67/45.85/49.62 ms；正式统计仍需 20-episode 样本。
 
 ### 遇到的问题与处理
 
@@ -104,9 +108,9 @@ export HF_HOME=/root/autodl-tmp/vlasafe/cache/huggingface
 
 ### 下一步
 
-1. 分析完整成功 episode 的逐维原始动作范围与裁剪幅度，确认裁剪是否主要来自夹爪维度。
-2. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
-3. 实现模型只加载一次的多 episode benchmark runner，避免将约 46 秒启动开销重复计入每条 episode。
+1. 用 validator 验收两条连续 rollout，并核对 seed 与 initial-state ID 为 100/101 和 0/1。
+2. 接入 label-only unsafe-event 插桩；未完成前的数据不能用于 `p_event_given_failure`。
+3. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
 4. 运行 20-episode 成本与成功率验收，并取得至少一条自然失败 episode。
 
 ### 阶段判断
