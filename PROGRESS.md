@@ -91,6 +91,9 @@
 - task 5 失败 episode 同时记录到 5 个 self-collision step、16 个 joint-violation step，最大机器人接触力约 33.03 N，是首个同时支持 outcome failure 与明确事件分析的候选；在扩样前需核验具体自碰 geom pair 与关节越界幅度。
 - 成功 task 4/7 分别出现约 103.62/201.34 N 峰值，再次说明高接触力与最终 outcome 不等价，impact 协议不能用 outcome 反向定义。
 - 扩充诊断 schema：后续 episode 额外保存 `self_collision_pairs`、逐关节 limit margin、violation indices 与具体 task language；已有日志不追溯伪造这些字段。
+- 对 task 5 扩测 5 条（seed 500–504、init state 0–4），5/5 均跑满 280 步失败；连同初筛共 6 条已知自然失败，判定 task 5 对当前 checkpoint 过难，不适合作为单任务二分类主数据源。
+- task 5 失败数据保留用于 failure replay 与 unsafe-event 分析，但禁止与 task 0 全成功数据直接混合训练 outcome predictor，以免模型仅凭 task identity 获得虚高结果。
+- task 5 五条扩测稳态吞吐约 220.40 episodes/hour；query latency p50/p95/p99 为 326.11/338.10/799.48 ms，control latency为 33.01/45.42/54.94 ms。
 
 ### 遇到的问题与处理
 
@@ -122,8 +125,8 @@ export HF_HOME=/root/autodl-tmp/vlasafe/cache/huggingface
 
 ### 下一步
 
-1. 从已有 task 5 episode 还原 joint violation 的关节与幅度，并人工查看失败视频。
-2. 用扩充后的诊断 schema 对 task 5 再跑 5 条，核验 self-collision pair，并确认自然失败不是单个 seed 偶然现象。
+1. 对初筛中轨迹较长且存在高力接触的 task 4 和 task 7 各扩测 5 条，寻找同一 task 内的混合成功率。
+2. 汇总 task 5 已保存的 joint violation 幅度与 self-collision pairs，作为失败诊断 supporting evidence。
 3. 在成功与失败 pilot 上比较 EEF/机器人接触力分布，再冻结 task-independent workspace 和明显 impact 协议；在此之前两类布尔标签保持 `null`。
 4. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
 5. 运行 20-episode 成本与成功率验收，并取得至少一条自然失败 episode。
