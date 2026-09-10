@@ -1,0 +1,41 @@
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+*.local
+*.local.*
+*credential*
+*credentials*
+*secret*
+*token*
+凭证*
+.libero/
+
+# Python environments and generated files
+.venv/
+venv/
+envs/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Large or generated experiment data
+artifacts/
+checkpoints/
+cache/
+datasets/
+libero-assets/
+third_party/
+*.mp4
+*.safetensors
+*.ckpt
+*.pt
+*.pth
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
