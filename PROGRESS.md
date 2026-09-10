@@ -77,6 +77,8 @@
 - 实现复用单次模型加载的多 episode benchmark runner；每条 episode 使用递增 seed 与 initial-state ID，独立 finalize，并自动汇总成功率、吞吐率、延迟和存储。
 - 2-episode 集成运行成功：seed 100/101 分别在 81/89 步成功，连续 reset 正常；汇总成功率 2/2，稳态吞吐约 390.51 episodes/hour。
 - 2-episode 汇总的 query latency p50/p95/p99 为 329.83/907.57/988.93 ms，control latency 为 36.67/45.85/49.62 ms；正式统计仍需 20-episode 样本。
+- 接入首版 privileged label-only 仿真诊断：逐步记录 self-collision、joint violation、关节余量、EEF 位置、机器人相关接触数量/最大接触力/接触对；workspace 与 impact 在协议阈值冻结前保持 `null`。
+- 事件插桩 5-step 兼容性测试通过并通过 artifact validator：字段齐全，self-collision 与 joint violation 均为 0，最小 joint-limit margin 约 0.6200；前 5 步尚未发生机器人接触，接触力为 0。
 
 ### 遇到的问题与处理
 
@@ -108,8 +110,8 @@ export HF_HOME=/root/autodl-tmp/vlasafe/cache/huggingface
 
 ### 下一步
 
-1. 用 validator 验收两条连续 rollout，并核对 seed 与 initial-state ID 为 100/101 和 0/1。
-2. 接入 label-only unsafe-event 插桩；未完成前的数据不能用于 `p_event_given_failure`。
+1. 跑一条带诊断的完整成功 episode，确认抓取阶段的机器人接触力与接触对可被记录。
+2. 根据 pilot 的 EEF/机器人接触力分布冻结 task-independent workspace 和明显 impact 协议；在此之前两类布尔标签保持 `null`。
 3. 固化环境变量与依赖版本，记录 LeRobot 源码归档哈希。
 4. 运行 20-episode 成本与成功率验收，并取得至少一条自然失败 episode。
 
