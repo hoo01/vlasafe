@@ -1,6 +1,6 @@
 # VLA-SafeBench Progress
 
-> 最后更新：2026-09-10。这里只保留影响当前决策、阶段闸门和复现的事实；完整研究边界见 `README.md`。
+> 最后更新：2026-09-11。这里只保留影响当前决策、阶段闸门和复现的事实；完整研究边界见 `README.md`。
 
 ## 1. 当前状态
 
@@ -28,6 +28,18 @@
 | 可用于分流的 unsafe-event 标签 | ✅ | self/joint 可用；失败覆盖 1/12，已据此选择 Outcome 主线 |
 
 **Day 0–3 Gate：GO。** Impact/workspace 不阻塞 Outcome 主线。
+
+### 与初始 README 的偏差
+
+| 初始设定 | 当前状态 | 处理 |
+| --- | --- | --- |
+| 用 Week-1 数据在 Outcome / Impending 中二选一 | self/joint event 仅覆盖 1/12 自然失败 | 按预注册阈值冻结 **Outcome** 主线；不是路线偏离 |
+| Impending risk 可驱动 safe stop | 当前数据不支持可靠 impending 标签 | safe stop 与 lead time 从核心交付移除，仅保留 exploratory |
+| MVP 最终覆盖 2–3 个任务 | 当前只冻结 task 4 作为首个 regime | Day 0–3 合理；第二任务后续补，held-out task 仍不作核心主张 |
+| self/joint/workspace/impact 标签 | self/joint 已可靠；workspace/impact 未冻结 | 后两者降为 supporting work，不阻塞 Outcome |
+| 精确可复现 revision / environment | 主要依赖已记录 | LeRobot commit、checkpoint revision 与环境 lock 尚需固化 |
+
+总体属于数据驱动的范围收缩：工程路径不重做，核心叙事从“近期 unsafe-event 预警”收敛为“基于部署可用历史的 episode outcome 预测”。不得将 Outcome 指标表述为 runtime safety detection。
 
 ## 3. 已实现系统
 
@@ -162,3 +174,4 @@ export HF_HUB_DISABLE_XET=1
 
 - robosuite private macro 警告不影响当前 reset/step/render。
 - LIBERO assets 当前位于 `/root/.cache/libero/assets`；关机前需确认持久性或迁移到数据盘。
+- `lerobot_revision` 与 `policy_revision` 当前仍是占位描述；正式数据扩充前必须替换为可验证 commit/hash。

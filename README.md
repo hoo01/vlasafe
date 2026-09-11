@@ -303,6 +303,24 @@ Logger 必须从第一条正式 rollout 起就是执行路径的一部分，禁�
 
 如果 20-episode benchmark 推算“仅采集目标数据就超过 1 周或超过既定算力预算”，第 3 天立即缩任务、分辨率、录像策略或模型；不能带着未经验证的成本假设进入第 2 周。
 
+#### Day 0–3 实际验收（2026-09-11）
+
+**结论：GO。** SmolVLA + LIBERO 闭环、同步 sidecar logger、双相机视频和原子 finalize 已跑通；`libero_spatial` task 4 的 intended-config benchmark 共 20 episodes，20/20 artifact 验证通过，得到 8 success / 12 failure。
+
+| 指标 | 实测结果 |
+| --- | ---: |
+| Environment steps | 4,435 |
+| Throughput | 246.37 episodes/hour |
+| Query latency p50 / p95 / p99 | 344.59 / 363.18 / 400.22 ms |
+| Control latency p50 / p95 / p99 | 38.94 / 46.49 / 50.33 ms |
+| 录像总采集开销（按 step 归一化） | +13.8% |
+| MP4 / structured / total，投影每 100 episodes | 56.49 / 207.26 / 263.75 MiB |
+| 100 episodes 成本投影 | 约 0.41 GPU-hour / ¥0.84（按 ¥2.08/hour） |
+
+自然失败中仅 1/12 episode 触发可靠 self-collision 或 joint violation，`p_event_given_failure = 8.33% < 20%`。因此按 §4.1 的预注册分流规则，四周主线冻结为 **Outcome Prediction**；停止核心 unsafe lead-time / safe-stop 主张，Impending Safety 仅作 event-positive 子集的探索性分析。Workspace/impact 标签不再阻塞主线。
+
+相对初始范围的剩余缺口是：当前只冻结一个主任务；LeRobot commit、checkpoint revision 与环境 lock 尚待固化；workspace/impact 尚未形成正式协议。这些不推翻 Day 0–3 的 GO，但精确 revision 必须在下一轮正式数据扩充前完成。完整数字、兼容性说明与后续动作见 `PROGRESS.md`。
+
 ### 11.2 完整版路线（MVP 后保留）
 
 MVP 完成后按证据逐层扩展，而不是同时开工：
