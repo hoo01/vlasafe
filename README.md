@@ -241,6 +241,7 @@ K_t = g(r_t)   low → 长 chunk ; high → 短 chunk / stop
 | Collision / Unsafe-event Rate | 碰撞或 unsafe-event 比例 | 直接衡量风险降低 |
 | Precision / Recall / F1 | 异常检测质量 | 防止只靠激进 stop 刷"安全" |
 | Outcome AUPRC / AUROC | episode 最终结果预测，按执行进度分桶 | 衡量 outcome prediction，不代表 impending detection |
+| Outcome Decision Utility | validation 选定阈值下的 saved steps/time、false terminations、sacrificed successes | 衡量离线提前终止是否可能具有实际收益；不等同于 safe-stop 验证 |
 | Impending AUPRC / Event Recall | 未来 K 步事件检测 | 衡量 runtime detection |
 | Brier Score / ECE | 所选主线输出的风险概率校准 | 决定风险分数是否可信 |
 | Risk–Coverage | 在不同干预覆盖率下的剩余风险 | 衡量安全与可用性的权衡 |
@@ -268,6 +269,8 @@ K_t = g(r_t)   low → 长 chunk ; high → 短 chunk / stop
 | Task ID + Initial Frame Difficulty Baseline | — | — | — | — | — |
 | State/Action Temporal MLP | — | — | — | — | — |
 | + Frozen Vision Features | — | — | — | — | — |
+
+Outcome 主线在判别与校准指标之外，增加一张 **offline decision-utility curve**：风险阈值只能由 validation 选择，并在 test 上报告平均/总节省步数与时间、提前终止率、false termination rate、sacrificed successes，以及每牺牲一个成功 episode 所节省的失败 rollout 计算量。该分析是基于已记录轨迹的反事实上界：它可以回答“提前结束是否可能省算力”，但不能证明真实闭环干预安全或有效，也不得称为 impending warning 或 safe stop。
 
 若选择 Safety 线，safe-stop 干预作为一张 supporting table，另报 Vanilla／Rule Stop／Learned Stop 的 success、unsafe rate、prevented events、false stops 与 sacrificed successes。A1/A2 stress test 同样只作为 supporting table。Fixed short chunk 与 adaptive chunk 仅在 MVP release 后实验。
 

@@ -214,10 +214,12 @@ step 120 的 Brier 差值为 -0.143、ECE 差值为 -0.078，但置信区间均�
 
 ### Week 2 入口
 
-1. 在同一冻结 split 和 steps 0/40/80/120 上提取 frozen image features。
-2. 冻结视觉 encoder，只训练轻量 outcome head；所有选择只看 validation。
-3. 将 frozen vision、initial difficulty、temporal MLP 做 episode-paired bootstrap。
-4. 若 learned 方法在预注册指标上不能稳定超过强 baseline，按 README 执行 framework / negative-result pivot，不升级 Transformer。
+1. 先审计成功/失败终止步数分布，确认 step 120 相对真实 episode 生命周期究竟有多早。
+2. 在同一冻结 split 和 steps 0/40/80/120 上提取 frozen image features。
+3. 冻结视觉 encoder，只训练轻量 outcome head；所有选择只看 validation。
+4. 将 frozen vision、initial difficulty、temporal MLP 做 episode-paired bootstrap。
+5. 补充离线 decision-utility：阈值只由 validation 选择；test 报 saved steps/time、false terminations 与 sacrificed successes，并明确它只是反事实上界，不是 safe-stop 验证。
+6. 若 learned 方法在预注册指标上不能稳定超过强 baseline，按 README 执行 framework / negative-result pivot，不升级 Transformer。
 
 ## 9. 复现环境
 
