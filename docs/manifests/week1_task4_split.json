@@ -1,0 +1,431 @@
+{
+  "schema_version": "0.1.0",
+  "split_seed": 20260911,
+  "group_key": "initial_state_id",
+  "stratify_key": "success",
+  "identity": {
+    "task": "libero_spatial",
+    "task_id": 4,
+    "vlasafe_revision": "d16985fcbd9a3decf02d64a639ecfb630aafbe5e",
+    "provenance": {
+      "lerobot_revision": "tree-sha256:a48da8638188f062ce74e13e1a3ef9060a362c6b914c905b14db62ebc475f39a",
+      "lerobot_tree_files": 1084,
+      "lerobot_tree_hash_algorithm": "sha256(relative_posix_path + NUL + sha256(file_bytes), sorted; excludes __pycache__, .pyc, .pyo, .DS_Store)",
+      "policy_revision": "model.safetensors-sha256:9a9f6413e42c0f332fccbce9a0dc796af2790f82cf002f791cdbf7e01e1afca8",
+      "policy_source": "lerobot/smolvla_libero with local observation.state metadata compatibility fix"
+    }
+  },
+  "totals": {
+    "episodes": 50,
+    "successes": 18,
+    "failures": 32
+  },
+  "splits": {
+    "train": [
+      {
+        "episode_id": "smolvla-20260911T013238778439Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013238778439Z",
+        "seed": 1011,
+        "initial_state_id": 11,
+        "success": true,
+        "num_steps": 134
+      },
+      {
+        "episode_id": "smolvla-20260911T014324922851Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014324922851Z",
+        "seed": 1041,
+        "initial_state_id": 11,
+        "success": true,
+        "num_steps": 135
+      },
+      {
+        "episode_id": "smolvla-20260911T013133660179Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013133660179Z",
+        "seed": 1006,
+        "initial_state_id": 6,
+        "success": true,
+        "num_steps": 160
+      },
+      {
+        "episode_id": "smolvla-20260911T014216008737Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014216008737Z",
+        "seed": 1036,
+        "initial_state_id": 6,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013406446190Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013406446190Z",
+        "seed": 1017,
+        "initial_state_id": 17,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014452431149Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014452431149Z",
+        "seed": 1047,
+        "initial_state_id": 17,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013100252873Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013100252873Z",
+        "seed": 1004,
+        "initial_state_id": 4,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014156927957Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014156927957Z",
+        "seed": 1034,
+        "initial_state_id": 4,
+        "success": true,
+        "num_steps": 130
+      },
+      {
+        "episode_id": "smolvla-20260911T013154476913Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013154476913Z",
+        "seed": 1008,
+        "initial_state_id": 8,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014241734179Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014241734179Z",
+        "seed": 1038,
+        "initial_state_id": 8,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013043352862Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013043352862Z",
+        "seed": 1003,
+        "initial_state_id": 3,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014147825258Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014147825258Z",
+        "seed": 1033,
+        "initial_state_id": 3,
+        "success": true,
+        "num_steps": 122
+      },
+      {
+        "episode_id": "smolvla-20260911T013711174099Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013711174099Z",
+        "seed": 1029,
+        "initial_state_id": 29,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013332331208Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013332331208Z",
+        "seed": 1015,
+        "initial_state_id": 15,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014417974454Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014417974454Z",
+        "seed": 1045,
+        "initial_state_id": 15,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013643813835Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013643813835Z",
+        "seed": 1027,
+        "initial_state_id": 27,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013211863962Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013211863962Z",
+        "seed": 1009,
+        "initial_state_id": 9,
+        "success": true,
+        "num_steps": 134
+      },
+      {
+        "episode_id": "smolvla-20260911T014258676660Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014258676660Z",
+        "seed": 1039,
+        "initial_state_id": 9,
+        "success": true,
+        "num_steps": 133
+      },
+      {
+        "episode_id": "smolvla-20260911T013144885145Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013144885145Z",
+        "seed": 1007,
+        "initial_state_id": 7,
+        "success": true,
+        "num_steps": 130
+      },
+      {
+        "episode_id": "smolvla-20260911T014232430175Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014232430175Z",
+        "seed": 1037,
+        "initial_state_id": 7,
+        "success": true,
+        "num_steps": 127
+      },
+      {
+        "episode_id": "smolvla-20260911T013315261201Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013315261201Z",
+        "seed": 1014,
+        "initial_state_id": 14,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014400705066Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014400705066Z",
+        "seed": 1044,
+        "initial_state_id": 14,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013008503232Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013008503232Z",
+        "seed": 1001,
+        "initial_state_id": 1,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014114174706Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014114174706Z",
+        "seed": 1031,
+        "initial_state_id": 1,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013609135190Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013609135190Z",
+        "seed": 1025,
+        "initial_state_id": 25,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013025870303Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013025870303Z",
+        "seed": 1002,
+        "initial_state_id": 2,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014131007536Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014131007536Z",
+        "seed": 1032,
+        "initial_state_id": 2,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013551918910Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013551918910Z",
+        "seed": 1024,
+        "initial_state_id": 24,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013248561988Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013248561988Z",
+        "seed": 1012,
+        "initial_state_id": 12,
+        "success": true,
+        "num_steps": 140
+      },
+      {
+        "episode_id": "smolvla-20260911T014334375052Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014334375052Z",
+        "seed": 1042,
+        "initial_state_id": 12,
+        "success": true,
+        "num_steps": 133
+      }
+    ],
+    "validation": [
+      {
+        "episode_id": "smolvla-20260911T013349393426Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013349393426Z",
+        "seed": 1016,
+        "initial_state_id": 16,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014435252422Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014435252422Z",
+        "seed": 1046,
+        "initial_state_id": 16,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013524645481Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013524645481Z",
+        "seed": 1022,
+        "initial_state_id": 22,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013423454070Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013423454070Z",
+        "seed": 1018,
+        "initial_state_id": 18,
+        "success": true,
+        "num_steps": 140
+      },
+      {
+        "episode_id": "smolvla-20260911T014509334954Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014509334954Z",
+        "seed": 1048,
+        "initial_state_id": 18,
+        "success": true,
+        "num_steps": 133
+      },
+      {
+        "episode_id": "smolvla-20260911T013450326711Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013450326711Z",
+        "seed": 1020,
+        "initial_state_id": 20,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013542070305Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013542070305Z",
+        "seed": 1023,
+        "initial_state_id": 23,
+        "success": true,
+        "num_steps": 136
+      },
+      {
+        "episode_id": "smolvla-20260911T013258491859Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013258491859Z",
+        "seed": 1013,
+        "initial_state_id": 13,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014343827197Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014343827197Z",
+        "seed": 1043,
+        "initial_state_id": 13,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013701491263Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013701491263Z",
+        "seed": 1028,
+        "initial_state_id": 28,
+        "success": true,
+        "num_steps": 129
+      }
+    ],
+    "test": [
+      {
+        "episode_id": "smolvla-20260911T013221629537Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013221629537Z",
+        "seed": 1010,
+        "initial_state_id": 10,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014308102939Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014308102939Z",
+        "seed": 1040,
+        "initial_state_id": 10,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013507535948Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013507535948Z",
+        "seed": 1021,
+        "initial_state_id": 21,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T012955337938Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T012955337938Z",
+        "seed": 1000,
+        "initial_state_id": 0,
+        "success": true,
+        "num_steps": 122
+      },
+      {
+        "episode_id": "smolvla-20260911T014100736108Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014100736108Z",
+        "seed": 1030,
+        "initial_state_id": 0,
+        "success": true,
+        "num_steps": 127
+      },
+      {
+        "episode_id": "smolvla-20260911T013433290458Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013433290458Z",
+        "seed": 1019,
+        "initial_state_id": 19,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014518928210Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014518928210Z",
+        "seed": 1049,
+        "initial_state_id": 19,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013626499446Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013626499446Z",
+        "seed": 1026,
+        "initial_state_id": 26,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T013117405943Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T013117405943Z",
+        "seed": 1005,
+        "initial_state_id": 5,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260911T014206507407Z",
+        "path": "artifacts/week1/task4/episodes/smolvla-20260911T014206507407Z",
+        "seed": 1035,
+        "initial_state_id": 5,
+        "success": true,
+        "num_steps": 134
+      }
+    ]
+  }
+}
