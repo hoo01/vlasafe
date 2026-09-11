@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 import time
 from collections import deque
 from datetime import datetime, timezone
@@ -53,6 +54,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--task-id", type=int, default=0)
     parser.add_argument("--num-episodes", type=int, default=1)
     parser.add_argument(
+        "--provenance",
+        type=Path,
+        default=Path("docs/provenance.json"),
+    )
+    parser.add_argument(
         "--no-video",
         action="store_true",
         help="Disable frame copies and MP4 encoding for recording-overhead benchmarks.",
@@ -72,6 +78,8 @@ def _record_episode(
     preprocessor: Any,
     postprocessor: Any,
     task_description: list[str],
+    provenance: dict[str, Any],
+    vlasafe_revision: str,
 ) -> dict[str, Any]:
     episode_started = time.perf_counter()
     seed = args.seed + episode_index
@@ -83,8 +91,8 @@ def _record_episode(
         seed=seed,
         initial_state_id=episode_index,
         policy_id=str(checkpoint),
-        policy_revision="local-compat-copy",
-        lerobot_revision="codeload-main-unpinned",
+        policy_revision=provenance["policy_revision"],
+        lerobot_revision=provenance["lerobot_revision"],
         resolved_config={
             "fps": 20,
             "max_steps": args.max_steps,
@@ -94,6 +102,8 @@ def _record_episode(
             "benchmark_episode_index": episode_index,
             "task_description": task_description[0],
             "video_enabled": not args.no_video,
+            "vlasafe_revision": vlasafe_revision,
+            "provenance": provenance,
         },
         started_at_utc=datetime.now(timezone.utc).isoformat(),
     )
@@ -272,6 +282,21 @@ def main() -> None:
     os.environ.setdefault("MUJOCO_GL", "egl")
     os.environ.setdefault("PYOPENGL_PLATFORM", "egl")
     checkpoint = args.checkpoint.resolve()
+    provenance = json.loads(args.provenance.read_text(encoding="utf-8"))
+    required_provenance = {"lerobot_revision", "policy_revision"}
+    missing_provenance = required_provenance - provenance.keys()
+    if missing_provenance:
+        raise ValueError(f"missing provenance keys: {sorted(missing_provenance)}")
+    vlasafe_revision = subprocess.check_output(
+        ["git", "rev-parse", "HEAD"], text=True
+    ).strip()
+    dirty_paths = subprocess.check_output(
+        ["git", "status", "--porcelain", "--untracked-files=no"], text=True
+    ).strip()
+    if dirty_paths:
+        raise RuntimeError(
+            "tracked files are dirty; commit or stash them before formal collection"
+        )
     benchmark_started = time.perf_counter()
     env = None
     try:
@@ -309,6 +334,8 @@ def main() -> None:
                     preprocessor=preprocessor,
                     postprocessor=postprocessor,
                     task_description=task_description,
+                    provenance=provenance,
+                    vlasafe_revision=vlasafe_revision,
                 )
             )
         benchmark_finished = time.perf_counter()
@@ -324,6 +351,8 @@ def main() -> None:
         "task": "libero_spatial",
         "task_id": args.task_id,
         "seed_start": args.seed,
+        "vlasafe_revision": vlasafe_revision,
+        "provenance": provenance,
         "video_enabled": not args.no_video,
         "num_episodes": len(episodes),
         "successes": sum(ep["success"] for ep in episodes),

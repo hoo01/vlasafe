@@ -1,0 +1,7 @@
+{
+  "lerobot_revision": "tree-sha256:a48da8638188f062ce74e13e1a3ef9060a362c6b914c905b14db62ebc475f39a",
+  "lerobot_tree_files": 1084,
+  "lerobot_tree_hash_algorithm": "sha256(relative_posix_path + NUL + sha256(file_bytes), sorted; excludes __pycache__, .pyc, .pyo, .DS_Store)",
+  "policy_revision": "model.safetensors-sha256:9a9f6413e42c0f332fccbce9a0dc796af2790f82cf002f791cdbf7e01e1afca8",
+  "policy_source": "lerobot/smolvla_libero with local observation.state metadata compatibility fix"
+}
