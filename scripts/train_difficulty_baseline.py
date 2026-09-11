@@ -61,6 +61,7 @@ def main() -> None:
             {"l2": item["l2"], **item["validation"]} for item in candidates
         ],
         "results": {},
+        "predictions": [],
     }
     for split_name, selected in (
         ("train", train),
@@ -78,6 +79,17 @@ def main() -> None:
             "prevalence": binary_metrics(labels, constant_probability),
             "initial_proprio_logistic": binary_metrics(labels, learned_probability),
         }
+    all_probability = predict_logistic(normalized, chosen["weights"], chosen["bias"])
+    for index in range(len(target)):
+        report["predictions"].append(
+            {
+                "episode_id": str(episode_ids[index]),
+                "split": str(splits[index]),
+                "failure": int(target[index]),
+                "initial_proprio_probability": float(all_probability[index]),
+                "prevalence_probability": prevalence,
+            }
+        )
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
