@@ -142,6 +142,8 @@ p_event_given_failure
 
 第 1 周报告必须明确写出最终选择及被放弃的主张。两条主线只能选一条作为四周项目的核心结论。
 
+**Week-1 实际分流（2026-09-11）：** 固定 provenance 的 task-4 cohort 共 50 episodes（18 success / 32 failure）。已插桩的 self-collision 与 joint violation 仅覆盖 1 个失败 episode，`p_event_given_failure = 1/32 = 3.125%`；唯一 event-positive episode 位于 train，validation/test 均为 0。因此正式选择 **Outcome Prediction**，停止 unsafe lead-time 与 safe-stop 核心主张。Workspace/impact 尚未插桩，不得把它们记作已验证的零事件。冻结的 group-disjoint split 为 30/10/10，见 `docs/manifests/week1_task4_split.json`。
+
 ## 5. Fault Injection：部署故障分类（A1/A2 类，stress-test 轴）
 
 | 故障类型 | 示例 | 本质 |

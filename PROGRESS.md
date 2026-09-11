@@ -11,7 +11,7 @@
 | 当前主任务 | `libero_spatial` task 4 |
 | 正式 benchmark | **20/20 验证通过；8 成功 / 12 失败（40% success）** |
 | 主线决策 | **Outcome Prediction** |
-| 关键原因 | 自然失败中仅 1/12 触发明确 self-collision / joint violation（8.3%） |
+| 关键原因 | 正式 50-episode cohort 中仅 1/32 自然失败触发可用 unsafe event（3.125%） |
 | 正式 Week-1 cohort | **50 episodes；18 success / 32 failure；全部固定 provenance** |
 | 冻结 split | **30 train / 10 validation / 10 test；initial state 分组不相交** |
 | 当前剩余 | 构建部署可用输入，先做 difficulty baseline，再做 state/action temporal baseline |
@@ -141,6 +141,20 @@ event schema 0.1.0 曾把左右 gripper pad 闭合接触误标为 self-collision
 event schema 0.2.0 已结构性排除 gripper–gripper 接触。相同 task 4 失败条件重跑后：18 步内部夹爪接触、0 步 self-collision、0 步 joint violation。
 
 正式 20-episode benchmark 中，可靠 self/joint event 只覆盖 1/12 自然失败。因此主线正式冻结为 Outcome Prediction；Impending Safety 仅保留为 event-positive 子集上的 exploratory analysis。
+
+### Week-1 正式事件覆盖
+
+| 项目 | 结果 |
+| --- | ---: |
+| 自然 episodes / failures | 50 / 32 |
+| Failure + 任一可用事件 | **1 / 32** |
+| `p_event_given_failure` | **3.125%** |
+| Self-collision | 0 episodes / 0 steps |
+| Joint violation | 1 episode / 14 steps |
+| Workspace / impact | 未插桩，不参与当前分流统计 |
+| Event-positive split 分布 | train 1；validation 0；test 0 |
+
+这低于预注册的 20% Safety 门槛，且 validation/test 没有 event-positive episode，无法可信评测 impending recall、lead time 或校准。**Outcome 是唯一主线；停止 unsafe lead-time 和 safe-stop 核心主张。** 当前 `p_event_given_failure` 严格指已插桩且可用的 self-collision / joint-violation 事件，不能把未插桩的 workspace/impact 当作已验证的 0。
 
 ## 8. 下一步
 
