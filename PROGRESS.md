@@ -6,13 +6,15 @@
 
 | 项目 | 当前结论 |
 | --- | --- |
-| 阶段 | **Day 0–3 已通过**；进入 Week 1 数据扩充与 split 设计 |
+| 阶段 | **Week-1 数据门槛与 split 已通过**；进入 Outcome baseline 数据构建 |
 | Policy / Simulator | SmolVLA + LIBERO，闭环 rollout 已跑通 |
 | 当前主任务 | `libero_spatial` task 4 |
 | 正式 benchmark | **20/20 验证通过；8 成功 / 12 失败（40% success）** |
 | 主线决策 | **Outcome Prediction** |
 | 关键原因 | 自然失败中仅 1/12 触发明确 self-collision / joint violation（8.3%） |
-| 当前剩余 | 扩充到 Week-1 最低样本量，并冻结无泄漏 episode split |
+| 正式 Week-1 cohort | **50 episodes；18 success / 32 failure；全部固定 provenance** |
+| 冻结 split | **30 train / 10 validation / 10 test；initial state 分组不相交** |
+| 当前剩余 | 构建部署可用输入，先做 difficulty baseline，再做 state/action temporal baseline |
 
 ## 2. 阶段闸门
 
@@ -142,11 +144,26 @@ event schema 0.2.0 已结构性排除 gripper–gripper 接触。相同 task 4 �
 
 ## 8. 下一步
 
-1. 扩充 task 4 到 Week-1 最低要求：至少 50 个自然 episode、至少 20 个失败。
-2. 先冻结 train/validation/test episode、seed、initial-state manifest，再生成任何时间窗口。
-3. 固化依赖版本、LeRobot revision 与运行配置。
-4. 构建 Outcome 数据集，先实现 task/initial-frame difficulty baseline。
-5. 训练 state/action temporal MLP，并并行准备 frozen-image features；impact/workspace 降为 supporting work。
+### Week-1 正式 cohort 与冻结切分
+
+| Split | Episodes | Success | Failure | Success rate | Initial-state groups |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Train | 30 | 11 | 19 | 36.7% | 17 |
+| Validation | 10 | 4 | 6 | 40.0% | 7 |
+| Test | 10 | 3 | 7 | 30.0% | 6 |
+| **Total** | **50** | **18** | **32** | **36.0%** | **30 unique** |
+
+冻结 manifest：`docs/manifests/week1_task4_split.json`（commit `6b3f445`）。切分 seed 为 `20260911`；按 `initial_state_id` 分组、按 outcome 分层。任何时间窗口必须继承 episode split，禁止重新随机切窗口或使用 test set 选择阈值。
+
+正式 cohort 使用 seed 1000–1049，VLA-SafeBench revision `d16985f`，LeRobot tree SHA-256 `a48da863...f39a`，policy weights SHA-256 `9a9f6413...fca8`。旧 Day 0–3 benchmark 保留作成本与系统验收，不并入 predictor 训练集。
+
+### 下一步
+
+1. 定义 predictor deploy-input allowlist，并加入 privileged-field leakage 测试。
+2. 从冻结 manifest 构建按 episode 归属的 Outcome 样本；先不生成视觉特征。
+3. 实现 task/initial-frame difficulty baseline 与 episode-progress 分桶评测。
+4. 训练 state/action temporal MLP，并并行准备 frozen-image features。
+5. 只在 validation 上选择模型与校准方式，test 保持封存。
 
 ## 9. 复现环境
 
