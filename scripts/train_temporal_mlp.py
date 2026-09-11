@@ -163,6 +163,7 @@ def main() -> None:
         "runs": runs,
         "normalization": normalization,
         "results": {},
+        "predictions": [],
     }
     for split_name, selected in (
         ("train", train),
@@ -182,6 +183,17 @@ def main() -> None:
                 "temporal_mlp": binary_metrics(labels, probability[bucket]),
             }
         report["results"][split_name] = split_result
+    for index in range(len(target)):
+        report["predictions"].append(
+            {
+                "episode_id": str(data["episode_id"][index]),
+                "split": str(data["split"][index]),
+                "checkpoint_step": int(data["checkpoint_step"][index]),
+                "failure": int(target[index]),
+                "prevalence_probability": train_prevalence,
+                "temporal_mlp_probability": float(probability[index]),
+            }
+        )
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
