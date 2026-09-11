@@ -18,7 +18,7 @@
 
 ## 0. 项目概览
 
-**当前状态：** Design / pre-implementation。本文档描述目标、假设与实施边界；在实验完成前，所有模型效果与简历数据均为待验证项，不代表已有结果。
+**当前状态（2026-09-11）：** Day 0–3 与 Week 1 已完成；正式选择 **Outcome Prediction** 主线，冻结 50-episode cohort、group-disjoint split、输入边界和 state/action temporal baseline。当前进入 Week 2 frozen-image-feature baseline 与 learned-signal Go / Pivot 闸门。只有写入本 README 或 `PROGRESS.md` 且有冻结 artifact 支撑的数字才视为已验证结果。
 
 **范围说明：** 本项目保留完整研究愿景，但把工作拆成可独立交付的层级。MVP 缩小不等于删除最终方向：π0.5、多故障类型、Transformer、双臂 RoboTwin、recovery 与 adaptive chunking 均保留在后续阶段，只有在前置证据成立后才启动。
 
@@ -319,9 +319,23 @@ Logger 必须从第一条正式 rollout 起就是执行路径的一部分，禁�
 | MP4 / structured / total，投影每 100 episodes | 56.49 / 207.26 / 263.75 MiB |
 | 100 episodes 成本投影 | 约 0.41 GPU-hour / ¥0.84（按 ¥2.08/hour） |
 
-自然失败中仅 1/12 episode 触发可靠 self-collision 或 joint violation，`p_event_given_failure = 8.33% < 20%`。因此按 §4.1 的预注册分流规则，四周主线冻结为 **Outcome Prediction**；停止核心 unsafe lead-time / safe-stop 主张，Impending Safety 仅作 event-positive 子集的探索性分析。Workspace/impact 标签不再阻塞主线。
+Day 0–3 的 20-episode benchmark 中，仅 1/12 个失败 episode 触发可靠 self-collision 或 joint violation（8.33%）。该结果随后由正式 Week-1 50-episode cohort 取代作为分流依据；正式统计为 `1/32 = 3.125% < 20%`。因此按 §4.1 的预注册规则，四周主线冻结为 **Outcome Prediction**；停止核心 unsafe lead-time / safe-stop 主张。Workspace/impact 尚未插桩，不能记作已验证的零事件。
 
-相对初始范围的剩余缺口是：当前只冻结一个主任务；LeRobot commit、checkpoint revision 与环境 lock 尚待固化；workspace/impact 尚未形成正式协议。这些不推翻 Day 0–3 的 GO，但精确 revision 必须在下一轮正式数据扩充前完成。完整数字、兼容性说明与后续动作见 `PROGRESS.md`。
+相对初始范围的剩余缺口是：当前只冻结一个主任务，workspace/impact 尚未形成正式协议。这些不推翻 Day 0–3 的 GO。完整数字、兼容性说明与后续动作见 `PROGRESS.md`。
+
+#### Week 1 实际收口（2026-09-11）
+
+**结论：Week 1 完成，Outcome 主线和数据协议冻结。** 正式 cohort 为 50 episodes（18 success / 32 failure）；按 `initial_state_id` 分组冻结为 train/validation/test = 30/10/10，之后才生成 steps 0/40/80/120 的因果窗口。Predictor 输入仅含部署可得 proprio、历史 action 与 timing；privileged labels 被输入边界拒绝。
+
+| 项目 | 结果 |
+| --- | --- |
+| Initial-proprio difficulty baseline（test） | AUPRC 0.799；AUROC 0.452；Brier 0.238；ECE 0.173，未显示可靠泛化 |
+| State/action temporal MLP（test step 80） | AUPRC 0.909；AUROC 0.762；相对 difficulty 的配对 CI 跨 0 |
+| State/action temporal MLP（test step 120） | AUPRC 0.982；AUROC 0.952 |
+| Step 120 vs initial-proprio | AUPRC 差值 +0.183，95% CI [0.033, 0.450]；AUROC +0.500，[0.143, 0.860] |
+| 校准结论 | step 120 Brier/ECE 点估计改善，但配对 CI 均跨 0，不能声称显著改善 |
+
+这证明冻结 test 上存在**较晚出现的 outcome 排序信号**，但 step 0–80 尚无可靠的相对 difficulty 优势；不能将其描述为提前故障预警、unsafe-event 检测或 safe-stop 依据。Test 只有 10 episodes，结论必须保留小样本限制。Week 2 按预注册计划完成 frozen-image-feature baseline，再执行 learned-signal Go / Pivot 闸门；不根据这些 test 结果修改 split、checkpoint steps 或超参数。
 
 ### 11.2 完整版路线（MVP 后保留）
 

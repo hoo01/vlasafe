@@ -6,7 +6,7 @@
 
 | 项目 | 当前结论 |
 | --- | --- |
-| 阶段 | **Week-1 数据门槛与 split 已通过**；进入 Outcome baseline 数据构建 |
+| 阶段 | **Week 1 已完成并关闭**；进入 Week 2 frozen-vision baseline 与学习信号闸门 |
 | Policy / Simulator | SmolVLA + LIBERO，闭环 rollout 已跑通 |
 | 当前主任务 | `libero_spatial` task 4 |
 | 正式 benchmark | **20/20 验证通过；8 成功 / 12 失败（40% success）** |
@@ -14,7 +14,8 @@
 | 关键原因 | 正式 50-episode cohort 中仅 1/32 自然失败触发可用 unsafe event（3.125%） |
 | 正式 Week-1 cohort | **50 episodes；18 success / 32 failure；全部固定 provenance** |
 | 冻结 split | **30 train / 10 validation / 10 test；initial state 分组不相交** |
-| 当前剩余 | 构建部署可用输入，先做 difficulty baseline，再做 state/action temporal baseline |
+| Week-1 结论 | temporal MLP 在 step 120 显著优于 initial-proprio difficulty baseline；step 0–80 尚无可靠优势 |
+| 当前剩余 | 完成 frozen-image-feature baseline，并据 episode bootstrap 执行 Week-2 Go / Pivot |
 
 ## 2. 阶段闸门
 
@@ -54,7 +55,7 @@
 | Artifact validator | COMPLETE、schema、必填字段、有限数值、连续 ID、时间戳、result/JSONL/video 对齐 |
 | Label-only diagnostics | joint limits/margins、EEF xyz、机器人 contact force/pair、self-collision pair |
 | 信息边界 | privileged diagnostics 只进入 `label_only`，不得进入 predictor |
-| 自动化测试 | 13/13 通过 |
+| 自动化测试 | 25/25 通过 |
 
 ### Checkpoint 兼容性
 
@@ -156,7 +157,7 @@ event schema 0.2.0 已结构性排除 gripper–gripper 接触。相同 task 4 �
 
 这低于预注册的 20% Safety 门槛，且 validation/test 没有 event-positive episode，无法可信评测 impending recall、lead time 或校准。**Outcome 是唯一主线；停止 unsafe lead-time 和 safe-stop 核心主张。** 当前 `p_event_given_failure` 严格指已插桩且可用的 self-collision / joint-violation 事件，不能把未插桩的 workspace/impact 当作已验证的 0。
 
-## 8. 下一步
+## 8. Week 1 收口
 
 ### Week-1 正式 cohort 与冻结切分
 
@@ -171,8 +172,6 @@ event schema 0.2.0 已结构性排除 gripper–gripper 接触。相同 task 4 �
 
 正式 cohort 使用 seed 1000–1049，VLA-SafeBench revision `d16985f`，LeRobot tree SHA-256 `a48da863...f39a`，policy weights SHA-256 `9a9f6413...fca8`。旧 Day 0–3 benchmark 保留作成本与系统验收，不并入 predictor 训练集。
 
-### 下一步
-
 ### Outcome 数据入口与首个 difficulty baseline
 
 | 项目 | 状态 / 结果 |
@@ -186,12 +185,39 @@ event schema 0.2.0 已结构性排除 gripper–gripper 接触。相同 task 4 �
 
 Initial-proprio logistic 的 validation 满分未迁移到 held-out initial-state test；test AUROC 低于随机，Brier/ECE 也差于 prevalence。仅 AUPRC 较高不足以支持泛化结论，且 test 只有 10 episodes。当前把它记录为**初步负结果/难度对照**，不据此调 split 或反复选择超参数。
 
-### 下一步
+### State/action temporal MLP
 
-1. 实现预注册的 state/action temporal MLP，并只用 validation 选择 checkpoint/超参数。
-2. 按固定 step 0/40/80/120 分桶报告，最终差值使用 episode bootstrap。
-3. 并行准备 frozen initial-frame / temporal image features，形成真正的视觉 difficulty baseline。
-4. Test 对每个预注册方法只执行一次，不根据 test 结果修改 split。
+模型只使用部署可得的 16-step proprio/action/timing 历史；训练归一化仅来自 train，五个固定 seed 的 checkpoint 只按 validation BCE 选择。Test 仍为冻结的 10 个 held-out initial-state episode。
+
+| Step | Test temporal AUPRC / AUROC | Test Brier / ECE | 相对 initial-proprio 的配对 bootstrap 结论 |
+| ---: | ---: | ---: | --- |
+| 0 | 0.609 / 0.286 | 0.246 / 0.036 | 无优势；AUPRC、AUROC 差值均为负且 CI 跨 0 |
+| 40 | 0.856 / 0.571 | 0.230 / 0.167 | 正向点估计很小，全部 CI 跨 0 |
+| 80 | 0.909 / 0.762 | 0.229 / 0.252 | 有排序趋势，但相对 difficulty 的 AUPRC/AUROC CI 仍跨 0 |
+| 120 | **0.982 / 0.952** | **0.096 / 0.095** | **AUPRC +0.183，95% CI [0.033, 0.450]；AUROC +0.500，[0.143, 0.860]** |
+
+step 120 的 Brier 差值为 -0.143、ECE 差值为 -0.078，但置信区间均跨 0，不能声称校准显著改善。可靠排序优势出现较晚；这是 **Outcome Prediction** 的运行历史信号，不是 impending failure detection，也不构成 safe-stop 依据。Test 仅 10 episodes，所有区间仍较宽。
+
+### Week-1 完成判定
+
+| 交付项 | 状态 |
+| --- | :---: |
+| ≥50 natural episodes 且 ≥20 failures | ✅ 50 episodes / 32 failures |
+| 正式事件覆盖与主线分流 | ✅ 1/32 = 3.125%；冻结 Outcome 主线 |
+| Provenance 固化 | ✅ project revision、LeRobot tree hash、policy weights hash 已写入 rollout metadata |
+| Group-disjoint split 先于窗口生成 | ✅ 30/10/10，按 initial state 分组 |
+| Predictor 输入边界与 leakage tests | ✅ |
+| Difficulty baseline | ✅ 初始 proprio 泛化不足 |
+| State/action temporal baseline | ✅ step 120 有显著排序优势，早期优势不足 |
+
+**Week 1：完成。** 不再修改 cohort、split、checkpoint steps 或 test episode 来改善结果。
+
+### Week 2 入口
+
+1. 在同一冻结 split 和 steps 0/40/80/120 上提取 frozen image features。
+2. 冻结视觉 encoder，只训练轻量 outcome head；所有选择只看 validation。
+3. 将 frozen vision、initial difficulty、temporal MLP 做 episode-paired bootstrap。
+4. 若 learned 方法在预注册指标上不能稳定超过强 baseline，按 README 执行 framework / negative-result pivot，不升级 Transformer。
 
 ## 9. 复现环境
 
@@ -219,4 +245,3 @@ export HF_HUB_DISABLE_XET=1
 
 - robosuite private macro 警告不影响当前 reset/step/render。
 - LIBERO assets 当前位于 `/root/.cache/libero/assets`；关机前需确认持久性或迁移到数据盘。
-- `lerobot_revision` 与 `policy_revision` 当前仍是占位描述；正式数据扩充前必须替换为可验证 commit/hash。
