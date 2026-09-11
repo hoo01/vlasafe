@@ -18,7 +18,7 @@
 
 ## 0. 项目概览
 
-**当前状态（2026-09-11）：** Day 0–3 与 Week 1 已完成；正式选择 **Outcome Prediction** 主线，冻结 50-episode cohort、group-disjoint split、输入边界和 state/action temporal baseline。当前进入 Week 2 frozen-image-feature baseline 与 learned-signal Go / Pivot 闸门。只有写入本 README 或 `PROGRESS.md` 且有冻结 artifact 支撑的数字才视为已验证结果。
+**当前状态（2026-09-11）：** Day 0–3、Week 1 与 Week-2 learned-signal gate 已完成；正式选择 **Outcome Prediction** 主线，并冻结 50-episode cohort、group-disjoint split 与输入边界。Frozen checkpoint vision 在 step 80 显著超过初始难度基线，下一阶段完成 decision utility、最小消融与可视化。只有写入本 README 或 `PROGRESS.md` 且有冻结 artifact 支撑的数字才视为已验证结果。
 
 **范围说明：** 本项目保留完整研究愿景，但把工作拆成可独立交付的层级。MVP 缩小不等于删除最终方向：π0.5、多故障类型、Transformer、双臂 RoboTwin、recovery 与 adaptive chunking 均保留在后续阶段，只有在前置证据成立后才启动。
 
@@ -338,7 +338,13 @@ Day 0–3 的 20-episode benchmark 中，仅 1/12 个失败 episode 触发可靠
 | Step 120 vs initial-proprio | AUPRC 差值 +0.183，95% CI [0.033, 0.450]；AUROC +0.500，[0.143, 0.860] |
 | 校准结论 | step 120 Brier/ECE 点估计改善，但配对 CI 均跨 0，不能声称显著改善 |
 
-这证明冻结 test 上存在**较晚出现的 outcome 排序信号**，但 step 0–80 尚无可靠的相对 difficulty 优势；不能将其描述为提前故障预警、unsafe-event 检测或 safe-stop 依据。Test 只有 10 episodes，结论必须保留小样本限制。Week 2 按预注册计划完成 frozen-image-feature baseline，再执行 learned-signal Go / Pivot 闸门；不根据这些 test 结果修改 split、checkpoint steps 或超参数。
+State/action temporal MLP 在冻结 test 上呈现**较晚出现的 outcome 排序信号**，但截至 step 80 尚无可靠的相对 difficulty 优势；不能将其描述为提前故障预警、unsafe-event 检测或 safe-stop 依据。Test 只有 10 episodes，结论必须保留小样本限制。随后按预注册计划完成 frozen-image-feature baseline；不根据 test 结果修改 split、checkpoint steps 或超参数。
+
+#### Week 2 learned-signal gate（2026-09-11）
+
+冻结双相机 ResNet-50 特征的 checkpoint vision 在 test step 80 达到 AUPRC 0.982、AUROC 0.952、Brier 0.100、ECE 0.096。相对 initial-proprio difficulty baseline，AUPRC 差值为 +0.183（95% CI [0.031, 0.450]），AUROC 为 +0.500（[0.125, 0.857]）；step 40 尚无可靠优势。相对 step-80 temporal MLP，vision 的排序差值区间下界为 0，不能声称严格显著击败，但 Brier/ECE 配对区间支持改善。
+
+因此 Week-2 learned-signal gate 判定为 **GO**：当前证据支持“视觉上下文使 outcome-discriminative signal 从 step 120 提前到 step 80”。该主张限于 task 4 的 held-out initial states，不等同于 impending warning 或 safe-stop 效果；test 仅 10 episodes，失败均运行到 280-step horizon。下一步只做 validation-thresholded offline decision utility、双相机最小消融与可视化，不升级 Transformer。
 
 ### 11.2 完整版路线（MVP 后保留）
 

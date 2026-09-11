@@ -16,11 +16,15 @@ That experience motivated a simulator-first project about distinguishing deploym
 
 ## Current project state
 
-- Status: design / pre-implementation.
+- Status (2026-09-11): Week 1 and the Week-2 learned-signal gate are complete; the project is on the Outcome Prediction main track.
 - Canonical specification: `README.md` in this directory.
-- No benchmark result has been produced yet.
-- No resume claim in the README should be treated as completed until backed by a frozen experiment configuration and artifacts.
-- Initial platform choice: SmolVLA + LIBERO, preferably with model serving isolated from the benchmark environment.
+- Platform: SmolVLA + LIBERO `libero_spatial` task 4 on RTX 4090 D.
+- Frozen natural cohort: 50 episodes, 18 successes / 32 failures; group-disjoint train/validation/test = 30/10/10 by `initial_state_id`.
+- Formal event coverage: 1/32 failures has an available self-collision or joint-violation event (3.125%); therefore impending lead-time and safe-stop claims were dropped.
+- State/action temporal MLP first reliably exceeds initial-proprio difficulty at step 120.
+- Frozen dual-camera ResNet-50 checkpoint vision reliably exceeds initial-frame and initial-proprio difficulty at step 80 (test AUPRC 0.982, AUROC 0.952). This supports earlier outcome-discriminative signal, not impending unsafe-event detection.
+- Test contains only 10 episodes and every failure reaches the 280-step horizon; retain both limitations in every claim.
+- Next: freeze the main comparison, compute validation-thresholded offline decision utility, run only the main/wrist/dual-camera ablation, and prepare visualization. Do not upgrade to Transformer.
 
 ## Locked research definitions
 
@@ -98,7 +102,6 @@ If natural failure data, event labels, or learned-signal gates fail, ship the pr
 
 These remain possible follow-up work only after the MVP release is frozen.
 
-## First implementation action
+## Completed implementation foundation
 
-Do not train a predictor first. Reproduce one SmolVLA + LIBERO rollout through the chosen evaluation stack, with the recorder active from step zero. The Day-3 plumbing and cost gate precedes all model work.
-
+The recorder has been active from step zero since the first formal SmolVLA + LIBERO rollout. The Day-3 plumbing/cost gate, provenance capture, artifact validation, predictor input allowlist, frozen split, outcome dataset, initial-proprio baseline, temporal MLP, episode bootstrap, timing audit, and frozen-vision baseline are complete. Generated rollouts, videos, feature caches, and model files remain outside Git; tracked manifests and reports define their provenance.

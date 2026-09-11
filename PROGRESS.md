@@ -6,7 +6,7 @@
 
 | 项目 | 当前结论 |
 | --- | --- |
-| 阶段 | **Week 1 已完成并关闭**；进入 Week 2 frozen-vision baseline 与学习信号闸门 |
+| 阶段 | **Week 2 learned-signal gate 已通过**；进入 decision utility 与最小消融 |
 | Policy / Simulator | SmolVLA + LIBERO，闭环 rollout 已跑通 |
 | 当前主任务 | `libero_spatial` task 4 |
 | 正式 benchmark | **20/20 验证通过；8 成功 / 12 失败（40% success）** |
@@ -15,7 +15,8 @@
 | 正式 Week-1 cohort | **50 episodes；18 success / 32 failure；全部固定 provenance** |
 | 冻结 split | **30 train / 10 validation / 10 test；initial state 分组不相交** |
 | Week-1 结论 | temporal MLP 在 step 120 显著优于 initial-proprio difficulty baseline；step 0–80 尚无可靠优势 |
-| 当前剩余 | 完成 frozen-image-feature baseline，并据 episode bootstrap 执行 Week-2 Go / Pivot |
+| Week-2 结论 | frozen checkpoint vision 在 step 80 已显著超过 initial-frame 与 initial-proprio difficulty baselines |
+| 当前剩余 | 冻结主结果协议；完成离线 decision utility、必要消融与结果可视化 |
 
 ## 2. 阶段闸门
 
@@ -230,14 +231,29 @@ step 120 的 Brier 差值为 -0.143、ECE 差值为 -0.078，但置信区间均�
 
 所有 50 条轨迹在 step 120 仍可观测，但成功轨迹此时通常已接近结束，而失败轨迹全部持续到 280-step horizon。因而 step-120 高指标可能同时反映真实运行历史信号和“是否已呈现成功收尾”的进展/停滞信号。它有潜在计算节省价值，但现阶段只能称为 late-stage outcome/progress diagnosis，不能称为 early warning。脚本：`scripts/audit_episode_timing.py`。
 
-### Week 2 入口
+### Frozen-vision baseline 与 Week-2 信号闸门
 
-1. 先审计成功/失败终止步数分布，确认 step 120 相对真实 episode 生命周期究竟有多早。
-2. 在同一冻结 split 和 steps 0/40/80/120 上提取 frozen image features。
-3. 冻结视觉 encoder，只训练轻量 outcome head；所有选择只看 validation。
-4. 将 frozen vision、initial difficulty、temporal MLP 做 episode-paired bootstrap。
-5. 补充离线 decision-utility：阈值只由 validation 选择；test 报 saved steps/time、false terminations 与 sacrificed successes，并明确它只是反事实上界，不是 safe-stop 验证。
-6. 若 learned 方法在预注册指标上不能稳定超过强 baseline，按 README 执行 framework / negative-result pivot，不升级 Transformer。
+冻结 `torchvision/resnet50 IMAGENET1K_V2`，从主相机与腕部相机的固定 checkpoint 帧提取 2×2048 维特征；encoder 不训练，每个 checkpoint 的线性 probe 仅用 validation 选择 L2。缓存为 200 records、shape `(200, 2, 2048)`、2.2 MiB，全部有限。
+
+| Step | Checkpoint vision AUPRC / AUROC | Brier / ECE | 相对强基线的配对结论 |
+| ---: | ---: | ---: | --- |
+| 0 | 0.652 / 0.190 | 0.563 / 0.636 | 无信号，且校准明显差 |
+| 40 | 0.856 / 0.571 | 0.377 / 0.399 | 所有关键 CI 跨 0 |
+| 80 | **0.982 / 0.952** | **0.100 / 0.096** | vs initial-proprio：AUPRC +0.183，[0.031, 0.450]；AUROC +0.500，[0.125, 0.857] |
+| 120 | 0.982 / 0.952 | 0.100 / 0.101 | 与 temporal MLP 排序相同，无额外提升 |
+
+在 step 80，checkpoint vision 相对 initial-frame vision 的 AUPRC、AUROC、Brier、ECE 四项 CI 均支持改善；相对 temporal MLP 的 AUPRC/AUROC 区间下界为 0，不能称为严格显著的排序提升，但 Brier 与 ECE 的 CI 严格低于 0。结合 temporal MLP 在 step 80 相对 initial-proprio 的排序 CI 跨 0，而 vision 的 CI 严格高于 0，证据支持：**视觉上下文使 outcome-discriminative signal 从 late stage（step 120）提前到 step 80。**
+
+该结论仍只适用于 task 4 的 held-out initial states；test 仅 10 episodes，且失败全部跑满 280 步。它不是 impending unsafe-event detection，也不授权 safe stop。
+
+**Week-2 learned-signal gate：GO。** 不执行 negative-result pivot，也不升级 Transformer。
+
+### 下一步
+
+1. 冻结当前主表方法与 checkpoint，不再根据 test 修改模型。
+2. 用 validation 选择 outcome threshold，计算 test saved steps/time、false terminations 与 sacrificed successes。
+3. 做最小必要消融：主相机 / 腕部相机 / 双相机；避免扩展模型矩阵。
+4. 生成按 checkpoint 展示 risk 与最终 outcome 的可视化；措辞保持 outcome/progress diagnosis。
 
 ## 9. 复现环境
 
