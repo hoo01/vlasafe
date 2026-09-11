@@ -37,6 +37,16 @@ def main() -> None:
     no_video_rate = float(no_video["episodes_per_hour"])
     video_seconds = float(video["collection_seconds"])
     no_video_seconds = float(no_video["collection_seconds"])
+    video_steps = int(video["total_steps"])
+    no_video_steps = int(no_video["total_steps"])
+    video_rollout_seconds = sum(item["rollout_seconds"] for item in video["episodes"])
+    no_video_rollout_seconds = sum(
+        item["rollout_seconds"] for item in no_video["episodes"]
+    )
+    video_rollout_seconds_per_step = video_rollout_seconds / video_steps
+    no_video_rollout_seconds_per_step = no_video_rollout_seconds / no_video_steps
+    video_total_seconds_per_step = video_seconds / video_steps
+    no_video_total_seconds_per_step = no_video_seconds / no_video_steps
     overhead = {
         "task": video["task"],
         "task_id": video["task_id"],
@@ -50,6 +60,18 @@ def main() -> None:
         "extra_wall_seconds_per_episode": (
             video_seconds - no_video_seconds
         ) / video["num_episodes"],
+        "video_total_steps": video_steps,
+        "no_video_total_steps": no_video_steps,
+        "video_rollout_ms_per_step": video_rollout_seconds_per_step * 1000,
+        "no_video_rollout_ms_per_step": no_video_rollout_seconds_per_step * 1000,
+        "frame_copy_rollout_overhead_fraction": (
+            video_rollout_seconds_per_step / no_video_rollout_seconds_per_step - 1.0
+        ),
+        "video_total_ms_per_step": video_total_seconds_per_step * 1000,
+        "no_video_total_ms_per_step": no_video_total_seconds_per_step * 1000,
+        "normalized_total_overhead_fraction": (
+            video_total_seconds_per_step / no_video_total_seconds_per_step - 1.0
+        ),
         "video_encoding_wall_seconds": sum(
             item["video_encoding_seconds"] for item in video["episodes"]
         ),

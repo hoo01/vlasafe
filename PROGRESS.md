@@ -6,13 +6,13 @@
 
 | 项目 | 当前结论 |
 | --- | --- |
-| 阶段 | Day 0–3：Plumbing 与成本验收 |
+| 阶段 | **Day 0–3 已通过**；进入 Week 1 数据扩充与 split 设计 |
 | Policy / Simulator | SmolVLA + LIBERO，闭环 rollout 已跑通 |
 | 当前主任务 | `libero_spatial` task 4 |
 | 正式 benchmark | **20/20 验证通过；8 成功 / 12 失败（40% success）** |
 | 主线决策 | **Outcome Prediction** |
 | 关键原因 | 自然失败中仅 1/12 触发明确 self-collision / joint violation（8.3%） |
-| 当前剩余 | 补测 recording overhead、拆分存储成本并形成数据集成本预算 |
+| 当前剩余 | 扩充到 Week-1 最低样本量，并冻结无泄漏 episode split |
 
 ## 2. 阶段闸门
 
@@ -24,10 +24,10 @@
 | 至少一条成功和一条失败 | ✅ | task 4 同任务内已取得成功与失败 |
 | 20-episode intended-config benchmark | ✅ | task 4；seed 700–719；init state 0–19；20/20 artifact 验证通过 |
 | 吞吐、延迟、总存储 | ✅ | 246.37 episodes/hour；延迟与 52.75 MiB 总 artifact 已实测 |
-| Recording overhead 与存储拆分 | ⏳ | 尚需开/关录像对照及 RGB/JSONL 分项统计 |
+| Recording overhead 与存储拆分 | ✅ | 同 seed 5+5 对照；按 step 归一化总开销 13.8%；已完成分项统计 |
 | 可用于分流的 unsafe-event 标签 | ✅ | self/joint 可用；失败覆盖 1/12，已据此选择 Outcome 主线 |
 
-完成 recording overhead 与成本预算后进入 predictor 数据集构建；impact/workspace 不阻塞 Outcome 主线。
+**Day 0–3 Gate：GO。** Impact/workspace 不阻塞 Outcome 主线。
 
 ## 3. 已实现系统
 
@@ -91,6 +91,25 @@
 
 结论：同一 task、同一 checkpoint、不同 seed/init state 下同时具备足量成功与失败，适合作为 Outcome Prediction 的首个 regime。明确 self/joint event 对自然失败的覆盖过低，不能把这些失败统一叙述为 impending unsafe event。
 
+### Recording overhead 与成本投影
+
+录像开/关各跑 5 个匹配 seed；两组 outcome 均为 2/5 success。成功 episode 的终止步数有轻微差异（1,104 vs 1,110 steps），因此采用按 step 归一化结果，不直接把原始 episodes/hour 差值当作录像开销。
+
+| 指标 | 开录像 | 关录像 | 开销 |
+| --- | ---: | ---: | ---: |
+| Rollout ms/step | 49.973 | 48.281 | +3.5% |
+| 总采集 ms/step（含编码） | 70.042 | 61.539 | **+13.8%** |
+| Episodes/hour（仅供参考） | 232.78 | 263.51 | -11.7% |
+| Encoding wall / CPU | 6.474 s / 1.481 s（5 episodes） | 0 / 0 | 1.295 / 0.296 s per episode |
+
+| 存储项 | 20 episodes | 投影 / 100 episodes |
+| --- | ---: | ---: |
+| 双相机 MP4 | 11.30 MiB | 56.49 MiB |
+| JSONL + metadata | 41.45 MiB | 207.26 MiB |
+| 合计 | 52.75 MiB | **263.75 MiB** |
+
+按实测 246.37 episodes/hour 和当前租价 ¥2.08/hour 粗略投影：100 episodes 约 0.41 GPU-hour、¥0.84、0.258 GiB；200 episodes 约 0.81 GPU-hour、¥1.69、0.515 GiB。未计模型首次下载和人工操作间隔。采集远低于一周与算力预算阈值，无需降低分辨率或取消录像。
+
 ## 7. 事件协议状态
 
 | 事件 / 诊断量 | 状态 | 当前语义 |
@@ -111,11 +130,11 @@ event schema 0.2.0 已结构性排除 gripper–gripper 接触。相同 task 4 �
 
 ## 8. 下一步
 
-1. 做一次同配置开/关录像对照，测 recording overhead 与编码 CPU 成本。
-2. 将 artifact 存储拆成 RGB、JSONL/metadata 和其他文件，并投影 pilot/train/val/test 成本。
-3. 固化依赖版本、LeRobot revision 与运行配置，关闭 Day 0–3。
-4. 扩充 task 4 episode，并在按 episode/seed/init state 切分后构建 Outcome 窗口数据集。
-5. 训练强 baseline 与 state/action-only MLP；impact/workspace 协议降为 supporting work。
+1. 扩充 task 4 到 Week-1 最低要求：至少 50 个自然 episode、至少 20 个失败。
+2. 先冻结 train/validation/test episode、seed、initial-state manifest，再生成任何时间窗口。
+3. 固化依赖版本、LeRobot revision 与运行配置。
+4. 构建 Outcome 数据集，先实现 task/initial-frame difficulty baseline。
+5. 训练 state/action temporal MLP，并并行准备 frozen-image features；impact/workspace 降为 supporting work。
 
 ## 9. 复现环境
 
