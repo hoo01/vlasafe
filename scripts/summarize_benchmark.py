@@ -19,6 +19,7 @@ def main() -> None:
     summary: dict[str, Any] = json.loads(args.summary.read_text(encoding="utf-8"))
     episode_rows = []
     all_steps: list[dict[str, Any]] = []
+    storage_bytes = {"video": 0, "structured": 0, "other": 0}
     for expected_index, item in enumerate(summary["episodes"]):
         episode_dir = args.episodes_root / item["episode_id"]
         validation = validate_episode(episode_dir)
@@ -53,6 +54,16 @@ def main() -> None:
             }
         )
         all_steps.extend(rows)
+        for path in episode_dir.rglob("*"):
+            if not path.is_file():
+                continue
+            if path.suffix.lower() == ".mp4":
+                category = "video"
+            elif path.suffix.lower() in {".json", ".jsonl"} or path.name == "COMPLETE":
+                category = "structured"
+            else:
+                category = "other"
+            storage_bytes[category] += path.stat().st_size
 
     failures = [row for row in episode_rows if not row["success"]]
     failures_with_event = [row for row in failures if row["clear_self_or_joint_event"]]
@@ -71,6 +82,13 @@ def main() -> None:
         "total_artifact_mib": total_bytes / 1024**2,
         "mean_artifact_mib_per_episode": total_bytes / len(episode_rows) / 1024**2,
         "projected_mib_per_100_episodes": total_bytes / len(episode_rows) * 100 / 1024**2,
+        "storage_mib": {
+            key: value / 1024**2 for key, value in storage_bytes.items()
+        },
+        "storage_mib_per_100_episodes": {
+            key: value / len(episode_rows) * 100 / 1024**2
+            for key, value in storage_bytes.items()
+        },
         "clipped_steps": sum(row["clipped_steps"] for row in episode_rows),
         "clipped_step_rate": sum(row["clipped_steps"] for row in episode_rows) / total_steps,
         "failures_with_self_or_joint_event": len(failures_with_event),
@@ -80,6 +98,9 @@ def main() -> None:
         "rollout_seconds": sum(item["rollout_seconds"] for item in summary["episodes"]),
         "video_encoding_seconds": sum(
             item["video_encoding_seconds"] for item in summary["episodes"]
+        ),
+        "video_encoding_cpu_seconds": sum(
+            item.get("video_encoding_cpu_seconds", 0.0) for item in summary["episodes"]
         ),
         "episode_rows": episode_rows,
     }

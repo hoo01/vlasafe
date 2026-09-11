@@ -52,6 +52,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--task-id", type=int, default=0)
     parser.add_argument("--num-episodes", type=int, default=1)
+    parser.add_argument(
+        "--no-video",
+        action="store_true",
+        help="Disable frame copies and MP4 encoding for recording-overhead benchmarks.",
+    )
     return parser.parse_args()
 
 
@@ -88,6 +93,7 @@ def _record_episode(
             "control_mode": "relative",
             "benchmark_episode_index": episode_index,
             "task_description": task_description[0],
+            "video_enabled": not args.no_video,
         },
         started_at_utc=datetime.now(timezone.utc).isoformat(),
     )
@@ -106,12 +112,14 @@ def _record_episode(
         chunk_id = -1
         chunk_offset = 0
         success = False
+        num_steps = 0
 
         rollout_started = time.perf_counter()
         for step_id in range(args.max_steps):
             observation_timestamp_ns = time.monotonic_ns()
-            main_frames.append(np.asarray(raw_obs["pixels"]["image"][0]).copy())
-            wrist_frames.append(np.asarray(raw_obs["pixels"]["image2"][0]).copy())
+            if not args.no_video:
+                main_frames.append(np.asarray(raw_obs["pixels"]["image"][0]).copy())
+                wrist_frames.append(np.asarray(raw_obs["pixels"]["image2"][0]).copy())
             proprio = _proprioception(raw_obs["robot_state"])
             inference_started_ns = time.monotonic_ns()
             queried_policy = not action_queue
@@ -180,34 +188,41 @@ def _record_episode(
                 )
             )
             chunk_offset += 1
+            num_steps += 1
             raw_obs = next_obs
             if _first_bool(terminated) or _first_bool(truncated):
                 break
 
         rollout_finished = time.perf_counter()
         encoding_started = time.perf_counter()
-        imageio.mimsave(
-            recorder.partial_dir / "main_camera.mp4",
-            main_frames,
-            fps=20,
-            codec="libx264",
-            macro_block_size=8,
-        )
-        imageio.mimsave(
-            recorder.partial_dir / "wrist_camera.mp4",
-            wrist_frames,
-            fps=20,
-            codec="libx264",
-            macro_block_size=8,
-        )
+        encoding_cpu_started = time.process_time()
+        if not args.no_video:
+            imageio.mimsave(
+                recorder.partial_dir / "main_camera.mp4",
+                main_frames,
+                fps=20,
+                codec="libx264",
+                macro_block_size=8,
+            )
+            imageio.mimsave(
+                recorder.partial_dir / "wrist_camera.mp4",
+                wrist_frames,
+                fps=20,
+                codec="libx264",
+                macro_block_size=8,
+            )
+        encoding_cpu_finished = time.process_time()
         encoding_finished = time.perf_counter()
         reason = "success" if success else "max_steps"
         rollout_s = rollout_finished - rollout_started
         encoding_s = encoding_finished - encoding_started
+        encoding_cpu_s = encoding_cpu_finished - encoding_cpu_started
         metrics = {
             "rollout_seconds": rollout_s,
             "video_encoding_seconds": encoding_s,
-            "steps_per_second": len(main_frames) / rollout_s if rollout_s else None,
+            "video_encoding_cpu_seconds": encoding_cpu_s,
+            "video_enabled": not args.no_video,
+            "steps_per_second": num_steps / rollout_s if rollout_s else None,
             "episode_seconds_before_finalize": encoding_finished - episode_started,
             "peak_vram_mib": torch.cuda.max_memory_allocated() / 1024**2,
         }
@@ -216,10 +231,11 @@ def _record_episode(
             success=success,
             metrics=metrics,
         )
-        print(f"RECORDED {len(main_frames)} SmolVLA steps")
+        print(f"RECORDED {num_steps} SmolVLA steps")
         print(f"FINALIZED {final_dir}")
         print(f"ROLLOUT seconds {rollout_s:.3f}")
         print(f"VIDEO ENCODING seconds {encoding_s:.3f}")
+        print(f"VIDEO ENCODING CPU seconds {encoding_cpu_s:.3f}")
         print(f"STEPS/s {metrics['steps_per_second']:.3f}")
         print(f"PEAK VRAM MiB {metrics['peak_vram_mib']:.1f}")
         return {
@@ -228,12 +244,13 @@ def _record_episode(
             "initial_state_id": episode_index,
             "seed": seed,
             "success": success,
-            "num_steps": len(main_frames),
+            "num_steps": num_steps,
             "clipped_steps": clipped_steps,
             "query_latencies_ms": query_latencies_ms,
             "control_latencies_ms": control_latencies_ms,
             "rollout_seconds": rollout_s,
             "video_encoding_seconds": encoding_s,
+            "video_encoding_cpu_seconds": encoding_cpu_s,
             "artifact_bytes": sum(path.stat().st_size for path in final_dir.rglob("*") if path.is_file()),
         }
     except BaseException:
@@ -307,6 +324,7 @@ def main() -> None:
         "task": "libero_spatial",
         "task_id": args.task_id,
         "seed_start": args.seed,
+        "video_enabled": not args.no_video,
         "num_episodes": len(episodes),
         "successes": sum(ep["success"] for ep in episodes),
         "success_rate": sum(ep["success"] for ep in episodes) / len(episodes),
