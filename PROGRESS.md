@@ -212,6 +212,24 @@ step 120 的 Brier 差值为 -0.143、ECE 差值为 -0.078，但置信区间均�
 
 **Week 1：完成。** 不再修改 cohort、split、checkpoint steps 或 test episode 来改善结果。
 
+### Episode 时长审计（Week 2 前置）
+
+冻结 manifest 已足以复现该统计；`remaining steps` 定义为观察完 checkpoint step 后仍未执行的已记录步骤。
+
+| Outcome | Episodes | 终止步数 min / median / max | 平均终止步数 |
+| --- | ---: | ---: | ---: |
+| Success | 18 | 122 / 133 / 160 | 133.28 |
+| Failure | 32 | 280 / 280 / 280 | 280.00 |
+| All | 50 | 122 / 280 / 280 | 227.18 |
+
+| Checkpoint | 成功轨迹剩余步数（median / mean） | 失败轨迹剩余步数（median / mean） |
+| ---: | ---: | ---: |
+| 40 | 92 / 92.28 | 239 / 239.00 |
+| 80 | 52 / 52.28 | 199 / 199.00 |
+| 120 | **12 / 12.28** | **159 / 159.00** |
+
+所有 50 条轨迹在 step 120 仍可观测，但成功轨迹此时通常已接近结束，而失败轨迹全部持续到 280-step horizon。因而 step-120 高指标可能同时反映真实运行历史信号和“是否已呈现成功收尾”的进展/停滞信号。它有潜在计算节省价值，但现阶段只能称为 late-stage outcome/progress diagnosis，不能称为 early warning。脚本：`scripts/audit_episode_timing.py`。
+
 ### Week 2 入口
 
 1. 先审计成功/失败终止步数分布，确认 step 120 相对真实 episode 生命周期究竟有多早。
