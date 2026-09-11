@@ -173,11 +173,25 @@ event schema 0.2.0 已结构性排除 gripper–gripper 接触。相同 task 4 �
 
 ### 下一步
 
-1. 定义 predictor deploy-input allowlist，并加入 privileged-field leakage 测试。
-2. 从冻结 manifest 构建按 episode 归属的 Outcome 样本；先不生成视觉特征。
-3. 实现 task/initial-frame difficulty baseline 与 episode-progress 分桶评测。
-4. 训练 state/action temporal MLP，并并行准备 frozen-image features。
-5. 只在 validation 上选择模型与校准方式，test 保持封存。
+### Outcome 数据入口与首个 difficulty baseline
+
+| 项目 | 状态 / 结果 |
+| --- | --- |
+| Deploy-input allowlist | ✅ 只允许 proprio、action/chunk、timing 与 frame index；拒绝 label/outcome 字段 |
+| Leakage tests | ✅ 总测试 25/25 通过 |
+| Outcome dataset | ✅ 200 samples；steps 0/40/80/120；window 16；0 skipped |
+| Prevalence baseline（test） | AUPRC 0.700；AUROC 0.500；Brier 0.214；ECE 0.067 |
+| Initial-proprio logistic（validation） | AUPRC/AUROC 1.000；Brier 0.206；ECE 0.109 |
+| Initial-proprio logistic（test） | AUPRC 0.799；AUROC 0.452；Brier 0.238；ECE 0.173 |
+
+Initial-proprio logistic 的 validation 满分未迁移到 held-out initial-state test；test AUROC 低于随机，Brier/ECE 也差于 prevalence。仅 AUPRC 较高不足以支持泛化结论，且 test 只有 10 episodes。当前把它记录为**初步负结果/难度对照**，不据此调 split 或反复选择超参数。
+
+### 下一步
+
+1. 实现预注册的 state/action temporal MLP，并只用 validation 选择 checkpoint/超参数。
+2. 按固定 step 0/40/80/120 分桶报告，最终差值使用 episode bootstrap。
+3. 并行准备 frozen initial-frame / temporal image features，形成真正的视觉 difficulty baseline。
+4. Test 对每个预注册方法只执行一次，不根据 test 结果修改 split。
 
 ## 9. 复现环境
 
