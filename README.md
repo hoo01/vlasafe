@@ -449,6 +449,24 @@ vla-safe-bench/
 - Predictor 的输入 schema 使用 allowlist；label-only privileged fields 在 dataloader 边界被显式拒绝。
 - README 只展示由固定 release 配置生成的数字，失败实验和已知限制一并保留。
 
+### 15.4 AutoDL 上的 GitHub 网络恢复
+
+AutoDL 实例重启后若 `git pull` 卡住、`curl https://github.com` 超时或出现 `GnuTLS recv error (-110)`，先在当前 shell 启用平台代理并验证远端，再执行同步：
+
+```bash
+source /etc/network_turbo
+
+GIT_TERMINAL_PROMPT=0 \
+git -c http.version=HTTP/1.1 \
+    -c http.lowSpeedLimit=1000 \
+    -c http.lowSpeedTime=30 \
+    ls-remote origin HEAD
+
+git -c http.version=HTTP/1.1 pull --ff-only
+```
+
+`source` 只影响当前 shell，新开终端或实例重启后需要重新执行。`http.postBuffer` 主要影响大体积 HTTP push，不是连接超时或 pull 失败的必要修复。若曾通过 VS Code 手动覆盖仓库文件，先用 `git status --short` 检查并 `git stash push --include-untracked` 保存，再 pull；远端已包含相同修改时不要盲目 `stash pop`。
+
 ## 16. 已知风险与诚实边界
 
 - LIBERO 是单臂，双臂故障不适用；需要就切 RoboTwin。
