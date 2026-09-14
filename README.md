@@ -18,7 +18,7 @@
 
 ## 0. 项目概览
 
-**当前状态（2026-09-11）：** Day 0–3、Week 1 与 Week-2 learned-signal gate 已完成；正式选择 **Outcome Prediction** 主线，并冻结 50-episode cohort、group-disjoint split 与输入边界。Frozen checkpoint vision 在 step 80 显著超过初始难度基线，下一阶段完成 decision utility、最小消融与可视化。只有写入本 README 或 `PROGRESS.md` 且有冻结 artifact 支撑的数字才视为已验证结果。
+**当前状态（2026-09-14）：** Outcome Prediction MVP 的核心实验已完成。项目冻结了 task 4 的 50-episode cohort、group-disjoint split 与 predictor 输入边界；完成 initial-proprio、state/action temporal MLP 和 frozen dual-camera vision 对照、相机消融、错误案例/LOEO 审计、offline decision utility 与风险叠加视频。Vision 在 step 80 显著超过初始难度基线，但现有证据表明它主要读取 outcome-associated execution progress，不能解释为独立的早期失效前兆。当前只做主表、文档与 release 收口；A1/A2 RQ1 和 Impending Failure Detection 尚未评测，不进入本次主张。
 
 **范围说明：** 本项目保留完整研究愿景，但把工作拆成可独立交付的层级。MVP 缩小不等于删除最终方向：π0.5、多故障类型、Transformer、双臂 RoboTwin、recovery 与 adaptive chunking 均保留在后续阶段，只有在前置证据成立后才启动。
 
@@ -34,7 +34,6 @@
 A1 单元测试、A2 stress test 和另一预测任务只能作为 supporting result；如果主线数据不支持，不得为了保留原计划而继续铺矩阵。
 
 ### 总体架构
-
 ```text
                      ┌──────────────────────────────┐
 RGB / proprio / task │                              │ action chunk
@@ -70,24 +69,36 @@ RGB / proprio / task │                              │ action chunk
 - **算法：** 监督数据构造、时序/多模态 failure predictor、消融、泛化协议设计、风险分数建模。
 - **控制：** 按控制语义执行 safe stop；recovery / 动态 chunk 作为后续扩展。
 
-## 2. 失败分类学（本项目的核心概念）
+## 2. 失败分类（本项目的核心概念）
 
-把 VLA 闭环失败明确分成三类，是整个方案成立的前提：
+VLA（视觉-语言-动作模型）在仿真里执行任务的时候，会失败。这个项目想搞清楚，能不能提前发现"这次要失败了"，甚至提前让机器人停下来。
 
-| 类别 | 来源 | 典型特征 | 主要处理方式 |
-| --- | --- | --- | --- |
-| **A1. 语法/协议故障** | shape、dtype、NaN/Inf、时间戳、显式越界 | 通常可由局部、确定性约束识别 | 规则监控器瞬时拦截 |
-| **A2. 语义配置故障** | 相机映射、action permutation、absolute/delta、单位或 chunk 语义错误 | 数值可能完全合法，但闭环含义错误 | 规则 + command-effect consistency；学习模型作为探索性补充 |
-| **B. 自然/涌现失败** | 不注入故障，策略自身把任务做失败 | drift、误差累积、遮挡或场景歧义逐渐显现 | 学习式 failure predictor 的主战场 |
+但"失败"这个词太笼统了，项目一开始就把失败拆成了三种，因为这三种失败的应对方式完全不同：
 
-**关键结论：** A1 类上规则便宜、可靠，学习模型不该争功；A2 类不能预设规则接近满分，因为错误可能满足所有数值约束；学习模型的主要价值仍限定在 B 类——“提前预测一个原本正常运行的策略正在走向失败”。三类结果分别报告，绝不混成一个 F1。
+**A1.语法/协议故障：**比如动作的维度对不上、数值出现了 NaN、时间戳乱了。这种问题用简单的规则就能抓住，不需要训练模型。
+**A2.语义配置故障：**数值本身合法，但意思配错了。比如相机接反了、单位弄混了（角度当成了弧度）、动作是"绝对位置"还是"相对位移"搞反了。这种问题规则不一定能抓住，因为从数值上看一切正常。
+**B.自然/涌现失败：**没有人为制造任何错误，policy 自己把任务做砸了。比如抓偏了、没放稳、遮挡导致判断错了。这才是训练模型去预测的主战场。
+
+**关键结论：**
+- A1 类上规则便宜、可靠，学习模型不该争功；A2 类不能预设规则接近满分，因为错误可能满足所有数值约束；学习模型的主要价值仍限定在 B 类——“提前预测一个原本正常运行的策略正在走向失败”。
+- 三类结果分别报告，绝不混成一个 F1。如果把这三种混在一起算一个总的准确率，简单的语法故障会因为规则很容易抓到而拉高整体分数，掩盖模型在真正困难的"自然失败"上表现平庸的事实。
 
 ## 3. 研究问题
 
-- **RQ1（A1/A2 类）：** 规则监控器能否完整拦截语法/协议故障？面对数值合法的语义配置故障，command-effect consistency 与学习监控分别能覆盖多少？
-- **RQ2a（Outcome Prediction）：** 给定当前历史，模型能否预测 episode 最终成功/失败？它提供的是 outcome risk，不自动等价于“即将失败”。
-- **RQ2b（Impending Failure Detection，核心）：** 对具有明确 `t_event` 的事件，学习式监控器能否比手工阈值更早、更准地预测未来 K 步内的 unsafe event？
+- **RQ1（A1/A2 类）：** 最基础的监控手段——写死的规则——能不能用？具体来说，规则能不能完整拦截语法/协议故障？面对那些数值合法但语义配错了的故障，规则加上一种叫"command-effect consistency"（命令-效果一致性检查）的方法，再加上训练出来的模型，各自能抓住多少？
+
+command-effect consistency 说白了就是"说到做到"检查：机器人收到一个"往右移"的指令，就应该真的往右移动。如果动作和效果对不上（比如根本没动、或者动错方向了），就报警。它的死穴是：如果 VLA 因为某个 bug 看错了相机画面，但机械臂依然精确执行了"根据这张错误画面算出来的动作"——命令和效果是一致的，这套方法完全发现不了问题，因为它只检查"做没做到"，不检查"做的这件事本身是不是基于正确信息"。
+
+- **RQ2a（Outcome Predictor）：** 预测最终是成功还是失败
+
+给定当前历史，模型能否预测 episode 最终成功/失败？它提供的是 outcome risk，不自动等价于“即将失败”。
+
+- **RQ2b（Impending Failure Detection，核心）：** 对于那些有明确发生时刻的具体危险事件（比如自身碰撞），模型能不能比手工设定的阈值更早、更准地预测"接下来几步之内会不会发生"？(这叫Impending Failure Detection)
+
 - **RQ3（控制）：** 由 impending-risk 驱动的 safe stop 能否降低 unsafe event，同时把误停与被牺牲的成功 episode 控制在可接受范围？Outcome score 在 MVP 中只做诊断，不直接触发停止。
+
+如果真的能提前预测出"接下来要出危险了"，那拿这个预测去主动让机器人停下来，能不能既降低危险，又不要误停太多、不要把本该成功的任务也搅黄？
+
 - **RQ4（核心泛化）：** predictor 能否迁移到 held-out episode、seed 与 initial state，而不是记住 rollout？Held-out task、物体与 A2 故障类型仅作探索性结果，不在 2–3 个任务上声称 task-level generalization。
 
 ## 4. 数据与标签构造
@@ -97,16 +108,23 @@ RGB / proprio / task │                              │ action chunk
 数据来源：
 
 - **B 类自然数据（主）：** 未改动策略，在多任务、多 seed 下大量 rollout，自然收集成功与失败 episode。为拿到足够多的自然失败，每个任务跑足够 seed，并可优先选策略本就不稳的任务/初始化。
-- **A1/A2 类故障数据（辅）：** 注入 §5 的部署错误，用于 stress-test 规则监控器、一致性检测与探索性泛化评测。
+目前只完成了task4这一个正式cohort
+
+- **A1/A2 类故障数据（辅,还没有做）：** 注入 §5 的部署错误，用于 stress-test 规则监控器、一致性检测与探索性泛化评测。
 
 每步记录：RGB、proprioception、action、action chunk、时间戳、推理延迟、仿真状态、接触/碰撞信号、成功标记、视频。
 
-**信息边界：** predictor 只能读取真实部署时可获得的 RGB、proprioception、历史 action 与 timing metadata。物体真值位姿、完整仿真状态、接触力等 privileged state 只能用于生成标签、评测与失败分析，禁止进入 predictor 输入或归一化统计。
+**信息边界：**
+关于哪些信息能给模型用、哪些不能，这里有一条硬性边界：模型只能读取真实部署时真的能拿到的东西——画面、本体状态、过去的动作历史、时间信息。仿真器才知道的"作弊信息"——比如物体的精确三维坐标、仿真引擎的完整内部状态、精确的接触力——只能用来生成标签、拿来做失败分析，绝对不能进入模型的输入，也不能用来做数据归一化。一旦这条线被打破，后面所有关于"这个模型能不能泛化"的结论都作废。
 
-**标签定义（两个不同研究任务，不要混用）：**
+**标签定义（对应前面第二个问题的两个版本，千万不能混用）：**
 
-- **Impending Failure Detection / unsafe-event 标签（有时刻）：** 在 robosuite/MuJoCo 里只检测容易自动、任务无关地标注的事件：self-collision、joint/workspace violation、超过固定阈值的明显 impact，得到事件时刻 `t_event`。这里的未来 K 步检测和 lead time 有明确含义。MVP 不做“unexpected contact”及其任务相关 whitelist。
-- **Outcome Prediction / episode-outcome 标签（episode 级）：** episode 最终成功/失败。每个时刻预测最终结果或剩余成功概率，不把启发式“point-of-no-return”冒充真实事件时刻。
+1. **Impending Failure Detection / unsafe-event 标签（有时刻）：**
+ - 一种标签是"接下来 K 步内会不会发生一次具体的、有明确时刻的危险事件"。这类事件只用容易自动、且和具体任务无关的判定标准——自身碰撞、关节超出限位、明显的撞击——因为这些有一个确切的"发生时刻"，才能问"提前了多久预测到"这种有意义的问题。
+ - MVP 不做“unexpected contact”及其任务相关 whitelist。
+
+2. **Outcome Prediction / episode-outcome 标签（episode 级）：**
+另一种标签是"这一局最终是成功还是失败"，这是整个 episode 只有一个固定答案的标签，不随时间变化。
 
 **重要约束：** Outcome Prediction 很可能学到“这个任务/初始场景有多难”，即使指标很好，也不能据此声称实现了 runtime failure detection。只有带明确事件锚点、预测窗口 K 和 lead time 的 Impending Failure Detection 才回答“是否即将发生故障”。两者可以共享 encoder，但必须使用独立 label、输出、结果表和结论。
 
@@ -114,24 +132,25 @@ A1/A2 类注入故障多数从 t=0 起坏，不对它报 lead time——那只�
 
 形式化定义如下；MVP 可用同一时序 encoder 加两个独立 head，但训练损失和评测必须分开：
 
-```
-y_t^unsafe = 1  if 0 < t_event − t ≤ K   else 0
-y_t^outcome = 1 if episode eventually fails         else 0
-
-Input : (o_{t−h:t}, a_{t−h:t}, m_{t−h:t})
-Output A: P(unsafe within next K steps)   # Impending Failure Detection
-Output B: P(episode failure)              # Outcome Prediction
-```
+$y_t^{\text{unsafe}} =
+\begin{cases}
+1 & \text{if } 0 < t_{\text{event}} - t \le K \\
+0 & \text{otherwise}
+\end{cases}
+\qquad
+y_t^{\text{outcome}} =
+\begin{cases}
+1 & \text{if episode eventually fails} \\
+0 & \text{otherwise}
+\end{cases}$
 
 ### 4.1 第 1 周必须测出的分流统计
 
 在任何 predictor 训练前，先对自然 rollout 计算：
+`p_event_given_failure` = `自然失败且至少触发一次已定义 unsafe-event 的 episode 数`
+    / `自然失败 episode 总数`
 
-```text
-p_event_given_failure
-  = 自然失败且至少触发一次已定义 unsafe-event 的 episode 数
-    / 自然失败 episode 总数
-```
+**为什么要先算这个再决定方向：**如果这个比例够高，说明"失败"和"危险事件"高度相关，值得往更有野心的方向（提前预测具体危险）去做；如果比例很低，说明大部分失败根本不是什么惊险的事故，做不了那个更难的目标，应该退而求其次，只做"预测最终成功失败"这个更朴素的版本。
 
 同时报告分子、分母、各事件类型计数和任务分布，不能只报百分比。这个统计决定项目主线：
 
@@ -142,7 +161,10 @@ p_event_given_failure
 
 第 1 周报告必须明确写出最终选择及被放弃的主张。两条主线只能选一条作为四周项目的核心结论。
 
-**Week-1 实际分流（2026-09-11）：** 固定 provenance 的 task-4 cohort 共 50 episodes（18 success / 32 failure）。已插桩的 self-collision 与 joint violation 仅覆盖 1 个失败 episode，`p_event_given_failure = 1/32 = 3.125%`；唯一 event-positive episode 位于 train，validation/test 均为 0。因此正式选择 **Outcome Prediction**，停止 unsafe lead-time 与 safe-stop 核心主张。Workspace/impact 尚未插桩，不得把它们记作已验证的零事件。冻结的 group-disjoint split 为 30/10/10，见 `docs/manifests/week1_task4_split.json`。
+**Week-1 实际分流（2026-09-11）：**
+正式收集了 50 个 episode（18 个成功、32 个失败）。已经能检测的两类危险事件（自身碰撞、关节超限）里，32 个失败里只有 1 个伴随着这样的事件，比例是 3.125%，远低于 20% 的门槛。而且唯一那一个"带危险事件"的样本恰好落在训练集里，验证集和测试集里一个都没有——这意味着就算侥幸凑够训练数据，也完全没法在没见过的数据上验证这个方向到底行不行。所以项目正式选择了"预测最终成功失败"这条更朴素的路线，放弃了"提前预警具体危险"和"安全停止"这两个原本更有野心的目标。
+
+需要额外说明的是：还有两类危险事件（工作空间越界、明显撞击）到现在都还没有开始检测，不是"测了发现没有"，而是压根没测，不能把这两类也算作已经验证过的"零事件"。
 
 ## 5. Fault Injection：部署故障分类（A1/A2 类，stress-test 轴）
 
@@ -252,25 +274,21 @@ K_t = g(r_t)   low → 长 chunk ; high → 短 chunk / stop
 | Queries per Episode | 每 episode 的 VLA 调用次数 | 衡量 adaptive chunking 开销 |
 | Inference / Control Latency | 端到端时延 | 衡量闭环效率 |
 
-四周 release 只能从下面两张模板中选择一张作为主表；另一张为空也可以，不得为填矩阵牺牲主线质量。
+### 冻结主结果：Outcome Prediction
 
-**Safety / Impending 主表（仅第 1 周分流通过时）：**
+下表是本次 release 的唯一主结果表。所有数字来自同一组 10 个 held-out initial-state test episodes（7 failure / 3 success）；checkpoint、模型选择和 split 均在查看 test 前冻结。Initial-proprio 是 episode 初始状态难度对照，因此各 checkpoint 使用同一预测。数值格式为 AUPRC / AUROC / Brier / ECE；Brier 与 ECE 越低越好。
 
-| Method | AUPRC | Event Recall @ fixed FAR | False Alarms / 1k steps | Median Lead Time | ECE |
-| --- | --- | --- | --- | --- | --- |
-| Tuned Rule Monitor | — | — | — | — | — |
-| State/Action Temporal MLP | — | — | — | — | — |
-| + Frozen Vision Features | — | — | — | — | — |
+| Method | Step 0 | Step 40 | Step 80 | Step 120 |
+| --- | --- | --- | --- | --- |
+| Initial-proprio difficulty | 0.799 / 0.452 / 0.238 / 0.173 | 0.799 / 0.452 / 0.238 / 0.173 | 0.799 / 0.452 / 0.238 / 0.173 | 0.799 / 0.452 / 0.238 / 0.173 |
+| State/action temporal MLP | 0.609 / 0.286 / 0.246 / 0.036 | 0.856 / 0.571 / 0.230 / 0.167 | 0.909 / 0.762 / 0.229 / 0.252 | **0.982 / 0.952 / 0.096 / 0.095** |
+| Frozen dual-camera vision | 0.652 / 0.190 / 0.563 / 0.636 | 0.856 / 0.571 / 0.377 / 0.399 | **0.982 / 0.952 / 0.100 / 0.096** | **0.982 / 0.952 / 0.100 / 0.101** |
 
-**Outcome 主表（自然 unsafe event 不足时）：**
+配对 episode bootstrap 支持 vision-step80 相对 initial-proprio 的排序改善：AUPRC +0.183（95% CI [0.031, 0.450]），AUROC +0.500（[0.125, 0.857]）。Temporal-step120 相对 initial-proprio 的对应差值为 +0.183（[0.033, 0.450]）和 +0.500（[0.143, 0.860]）。这证明冻结 test 上存在 outcome/progress signal；它不证明 impending failure detection。Test 只有 10 episodes，所有精度结论均受小样本限制。
 
-| Method | Early AUPRC | Mid AUPRC | Late AUPRC | AUROC | ECE / Brier |
-| --- | --- | --- | --- | --- | --- |
-| Task ID + Initial Frame Difficulty Baseline | — | — | — | — | — |
-| State/Action Temporal MLP | — | — | — | — | — |
-| + Frozen Vision Features | — | — | — | — | — |
+**Supporting utility result：** validation 在零 sacrificed-success 约束下选择阈值 `0.9998072982`。固定策略在 test 检出 4/7 failures、牺牲 0/3 successes，共节省 756 recorded steps（按 `70.042 ms/step` 估算 52.95 秒）；3 条在 step 80、1 条在 step 120 首次触发。该结果是 offline counterfactual efficiency bound，不是闭环 safe stop 或安全改进证明。
 
-Outcome 主线在判别与校准指标之外，增加一张 **offline decision-utility curve**：风险阈值只能由 validation 选择，并在 test 上报告平均/总节省步数与时间、提前终止率、false termination rate、sacrificed successes，以及每牺牲一个成功 episode 所节省的失败 rollout 计算量。该分析是基于已记录轨迹的反事实上界：它可以回答“提前结束是否可能省算力”，但不能证明真实闭环干预安全或有效，也不得称为 impending warning 或 safe stop。
+**Supporting camera ablation：** step 80 的 main / wrist / dual AUPRC 分别为 0.844 / 1.000 / 0.982，AUROC 为 0.667 / 1.000 / 0.952。Wrist 与 dual 相对 main 的 Brier/ECE 配对区间支持改善；wrist 与 dual 之间的所有关键区间触及或跨过 0，不能声称 wrist 显著更好，也不据此在 test 上更换正式 dual-camera pipeline。
 
 若选择 Safety 线，safe-stop 干预作为一张 supporting table，另报 Vanilla／Rule Stop／Learned Stop 的 success、unsafe rate、prevented events、false stops 与 sacrificed successes。A1/A2 stress test 同样只作为 supporting table。Fixed short chunk 与 adaptive chunk 仅在 MVP release 后实验。
 
@@ -278,13 +296,13 @@ Outcome 主线在判别与校准指标之外，增加一张 **offline decision-u
 
 - **环境：** LIBERO。
 - **策略：** 先跑通 SmolVLA；π0.5 只在 MVP 完成后加入。
-- **任务：** 选择 2–3 个具有成功与自然失败混合分布的任务；避免成功率接近 0% 或 100% 导致监督信号退化。
+- **任务：** 当前 release 冻结 `libero_spatial` task 4；task-level generalization 留待后续多任务数据。
 - **第一里程碑：** 确定性复现至少一个成功和一个失败 episode，并保存同步 RGB、proprioception、action、timing、标签与 MP4。
-- **故障：** A1 用单元测试覆盖。A2 不进入四周主线；主表与 demo 稳定后最多加入 1–2 类 supporting stress test。若项目 pivot 到保底诊断框架，再把 A2 提升为主体。
+- **故障：** 当前完成 artifact/schema 验证与 simulator diagnostics；A1 主动注入、A2 stress test 和 command-effect consistency 明确记录为未测试，不进入本次主表。
 - **检测：** 强规则 baseline + state/action temporal MLP + frozen-vision predictor；Transformer 延后。
-- **控制：** 只实现环境终止或 hold-current-state 的 safe stop；recovery / adaptive chunk 全部延后。
+- **控制：** Outcome 分数只做离线诊断；未实施 safe stop。Recovery / adaptive chunk 延后。
 - **评测：** 核心只做 held-out episode / seed / initial state；held-out task 仅作 exploratory。Outcome 与 Impending 分表，后者才报告 unsafe-event lead time。
-- **展示：** 结构化日志 + 分 regime 结果表 + 风险曲线叠加的失败预警视频。
+- **展示：** 结构化日志、唯一 Outcome 主表、test risk 曲线和 outcome-risk 叠加视频。
 
 ### 11.1 Day 0–3：Plumbing 与成本验收
 
@@ -342,9 +360,16 @@ State/action temporal MLP 在冻结 test 上呈现**较晚出现的 outcome 排�
 
 #### Week 2 learned-signal gate（2026-09-11）
 
-冻结双相机 ResNet-50 特征的 checkpoint vision 在 test step 80 达到 AUPRC 0.982、AUROC 0.952、Brier 0.100、ECE 0.096。相对 initial-proprio difficulty baseline，AUPRC 差值为 +0.183（95% CI [0.031, 0.450]），AUROC 为 +0.500（[0.125, 0.857]）；step 40 尚无可靠优势。相对 step-80 temporal MLP，vision 的排序差值区间下界为 0，不能声称严格显著击败，但 Brier/ECE 配对区间支持改善。
+**判定：GO，但撤回“视觉更早发现独立失效前兆”的解释。** 冻结双相机 ResNet-50 特征的 vision predictor 在 test step 80 达到 AUPRC 0.982、AUROC 0.952，与 temporal MLP 在 step 120 的排序指标相同。这些测量结果仍成立；进一步审计改变的是对它们所代表信号的判断。
 
-因此 Week-2 learned-signal gate 判定为 **GO**：当前证据支持“视觉上下文使 outcome-discriminative signal 从 step 120 提前到 step 80”。该主张限于 task 4 的 held-out initial states，不等同于 impending warning 或 safe-stop 效果；test 仅 10 episodes，失败均运行到 280-step horizon。下一步只做 validation-thresholded offline decision utility、双相机最小消融与可视化，不升级 Transformer。
+| 证据 | 对结论的约束 |
+| --- | --- |
+| Vision-step80 的 Brier 0.100、ECE 0.096；相对 initial-proprio difficulty baseline，AUPRC +0.183（95% CI [0.031, 0.450]）、AUROC +0.500（[0.125, 0.857]） | Outcome Prediction 的 learned-signal gate 通过；step 40 尚无可靠优势。 |
+| 与 step-80 temporal MLP 直接比较，AUPRC/AUROC 配对区间包含 0；Brier/ECE 配对区间支持 vision 的概率误差与校准改善 | 不能据此声称视觉在排序意义上显著更早识别失败。 |
+| RGB/error 审计：risk 主要随目标接近和成功构型进度变化；唯一 false negative 在 step 80 看起来仍顺利推进，之后接近完成却未满足成功条件，持续微调直到 step 280 超时 | 该案例与成功轨迹的可靠分叉约在 step 120–160，不能把 step-80 分数解释成独立的早期失效前兆。 |
+| Leave-one-episode-out（LOEO）与逐 episode 预测审计：vision-step80、temporal-step120 错排同一 failure/success pair，LOEO 排名结果相同；概率相关为 Pearson `r = 0.9998`、Spearman `ρ = 0.9515` | 两条 pipeline 很可能读取同一种执行进度信号，不能当作相互独立的证据链；LOEO 本身也不足以单独证明信号机制。 |
+
+因此保留的结论是：**vision 在 step 80 能读到与最终 outcome 相关的 execution progress**。撤回原“视觉把独立的 failure-discriminative signal 从 step 120 提前到 step 80”的结论；不将 outcome 分数称为 impending warning，也不据此触发 safe stop。该解释只基于 task 4 的 10 个 held-out initial-state test episodes，且失败轨迹均跑满 280 步，仍需审慎；按已通过的 gate 继续做主线收口，不升级 Transformer。
 
 ### 11.2 完整版路线（MVP 后保留）
 
@@ -418,41 +443,37 @@ MVP 完成后按证据逐层扩展，而不是同时开工：
 
 ## 13. 停手标准
 
-> **达到即可投实习：** SmolVLA 跑通 + 2–3 个任务 + 同步日志/视频 + A1 规则覆盖 + 数据选择的一条 learned 主线 + 对应强 baseline + held-out episode/seed/initial-state 与校准评测 + 一张主结果表 + 一个风险叠加视频。只有选择 Safety 线时才要求 safe stop 与 lead time；A2 supporting stress test 不作为交付前置条件。此时冻结可复现 release；另一预测任务、held-out task、多模型、双臂、recovery 或 adaptive chunking 不阻塞投递。
+> **本次 release 停手点：** SmolVLA + LIBERO task 4 闭环、同步日志/视频、50-episode 冻结 cohort、held-out initial-state Outcome Prediction、预注册 baseline、校准与 episode bootstrap、唯一主结果表、最小相机消融、offline efficiency 分析和 outcome-risk 叠加视频。RQ1、Impending、held-out task、多模型、双臂、recovery 与 adaptive chunking 均留作明确的后续工作，不阻塞当前单任务 MVP 发布。
 
 ## 14. 简历 / README 表述
 
 **项目名：** VLA-SafeBench: Learning-Based Failure Prediction and Risk-Aware Closed-Loop Control for VLA Policies
 
-**一句话（按最终主线二选一，完成后使用）：**
+**一句话：** Built a reproducible SmolVLA–LIBERO evaluation pipeline and trained episode-outcome predictors on deployment-available observation–action histories, separating outcome-associated execution progress from imminent safety-event detection.
 
-- **Safety 线：** Built a closed-loop VLA runtime-monitoring framework in simulation, trained an impending-failure detector on self-generated rollouts, and used calibrated near-term risk to trigger control-semantics-aware safe stopping.
-- **Outcome 线：** Built a reproducible closed-loop VLA evaluation framework and trained a calibrated episode-outcome predictor on deployment-available observation–action histories, separating task difficulty estimation from runtime failure detection.
+**Bullets：**
 
-**Bullets（诚实、按 regime；占位数据完成后替换）：**
-
-- Built a LIBERO-based VLA runtime-safety framework separating configuration faults (schema, unit, control-semantics, camera, chunk, latency) from emergent policy failures; logged synchronized RGB, proprioception, actions, timing, and contact/collision events with rollout video.
-- Trained the data-selected predictor from deployment-available observation–action histories and measured calibration on held-out episodes, seeds, and initial states against a pre-registered strong baseline.
-- **Safety 线才使用：** Implemented control-semantics-aware safe stopping and quantified prevented unsafe events, false stops, sacrificed successes, and task success after intervention.
+- Built a SmolVLA + LIBERO closed-loop pipeline with synchronized dual-camera video, proprioception, predicted/executed actions, timing, provenance, and label-only simulator diagnostics from the first rollout step.
+- Froze a 50-episode task-4 cohort and group-disjoint 30/10/10 split by initial state; compared initial-difficulty, temporal, and frozen-vision outcome predictors without privileged simulator inputs.
+- Found frozen dual-camera vision reached test AUPRC 0.982 / AUROC 0.952 at step 80, then used RGB/error and LOEO audits to limit the claim to outcome-associated execution progress rather than imminent failure prediction.
+- Evaluated a validation-thresholded offline policy that identified 4/7 held-out failures with 0/3 observed sacrificed successes and a 756-step counterfactual saving; did not present it as a safety intervention.
 
 ## 15. 实现与仓库结构
 
-### 15.1 预期目录
+### 15.1 当前目录
 
 ```text
 vla-safe-bench/
-├── configs/                 # model、benchmark、fault、monitor 与 eval 配置
 ├── src/vlasafe/
-│   ├── rollout/             # model client、environment runner、同步 recorder
-│   ├── faults/              # A1/A2 fault injectors
-│   ├── monitors/            # schema、kinematic、temporal、effect consistency
-│   ├── predictors/          # temporal MLP、vision encoder、multimodal model
-│   ├── interventions/       # terminate、hold、recovery、chunk policy
-│   └── evaluation/          # metrics、calibration、risk-coverage、report
+│   ├── rollout/             # schema、recorder、validator、simulator diagnostics
+│   ├── outcome_dataset.py
+│   ├── outcome_metrics.py
+│   └── predictor_inputs.py  # deployment-input allowlist
 ├── scripts/                 # collect、train、evaluate、render 等入口
-├── tests/                   # schema、fault、split、privileged-leakage 单元测试
-├── artifacts/examples/      # 少量可提交的样例日志、曲线与短视频
-├── docs/                    # 数据 schema、实验协议与设计决策
+├── tests/                   # recorder、validator、dataset、metrics、leakage tests
+├── docs/manifests/          # 冻结 episode split
+├── docs/release-artifacts.md
+├── PROGRESS.md              # 阶段决策、结果与限制
 └── README.md
 ```
 

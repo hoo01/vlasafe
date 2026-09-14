@@ -16,15 +16,19 @@ That experience motivated a simulator-first project about distinguishing deploym
 
 ## Current project state
 
-- Status (2026-09-11): Week 1 and the Week-2 learned-signal gate are complete; the project is on the Outcome Prediction main track.
+- Status (2026-09-14): the Outcome Prediction MVP experiments are complete; the remaining work is release integrity/indexing and final documentation.
 - Canonical specification: `README.md` in this directory.
 - Platform: SmolVLA + LIBERO `libero_spatial` task 4 on RTX 4090 D.
 - Frozen natural cohort: 50 episodes, 18 successes / 32 failures; group-disjoint train/validation/test = 30/10/10 by `initial_state_id`.
 - Formal event coverage: 1/32 failures has an available self-collision or joint-violation event (3.125%); therefore impending lead-time and safe-stop claims were dropped.
 - State/action temporal MLP first reliably exceeds initial-proprio difficulty at step 120.
-- Frozen dual-camera ResNet-50 checkpoint vision reliably exceeds initial-frame and initial-proprio difficulty at step 80 (test AUPRC 0.982, AUROC 0.952). This supports earlier outcome-discriminative signal, not impending unsafe-event detection.
+- Frozen dual-camera ResNet-50 checkpoint vision reliably exceeds initial-frame and initial-proprio difficulty at step 80 (test AUPRC 0.982, AUROC 0.952), so the Week-2 learned-signal gate remains GO. Frozen RGB/error and LOEO audits classify the cue as B: vision mainly reads outcome-associated execution progress / proximity to a successful configuration, not an independent early failure precursor. Vision-step80 and temporal-step120 assign different probabilities but misorder the same failure/success pair, have identical LOEO ranking metrics, and are highly correlated across the 10 test episodes (Pearson 0.9998; Spearman 0.9515). Treat them as likely measurements of the same latent progress signal, not independent evidence chains.
+- The shared false negative `smolvla-20260911T013117405943Z` looks success-like at step 80, reaches a near-complete configuration around steps 120–160, then makes small adjustments until the 280-step timeout without a usable self-collision or joint-violation event. Its first reliable divergence from successful trajectories is around steps 120–160, not step 80.
 - Test contains only 10 episodes and every failure reaches the 280-step horizon; retain both limitations in every claim.
-- Next: freeze the main comparison, compute validation-thresholded offline decision utility, run only the main/wrist/dual-camera ablation, and prepare visualization. Do not upgrade to Transformer.
+- The main/wrist/dual-camera ablation is complete. At step 80, main/wrist/dual test AUPRC is 0.844/1.000/0.982 and AUROC is 0.667/1.000/0.952. Paired bootstrap supports lower Brier/ECE for wrist and dual versus main, but does not support a reliable wrist-versus-dual difference. Keep the preregistered dual-camera pipeline as the main model.
+- Validation selected an offline outcome threshold of 0.9998072982 under a zero-sacrificed-validation-success constraint. On test it identified 4/7 failures, observed 0/3 sacrificed successes, and counterfactually saved 756 recorded steps (52.95 seconds at the measured 70.042 ms/step). This is an offline efficiency/faster-confirmation result, not a safety intervention.
+- The test risk plot and a 360x360, 20 FPS, 280-frame outcome-risk overlay video are complete. The overlay explicitly marks the step-80 trigger as offline counterfactual and continues the recorded trajectory.
+- Next: freeze the release artifact hashes and finish documentation. Do not reopen model selection, frame outcome-based termination as a safety intervention, or upgrade to Transformer.
 
 ## Locked research definitions
 

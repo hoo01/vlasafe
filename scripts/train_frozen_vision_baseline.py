@@ -16,6 +16,23 @@ from vlasafe.outcome_metrics import binary_metrics
 L2_CANDIDATES = (1e-4, 1e-3, 1e-2, 1e-1, 1.0)
 
 
+def select_camera_features(
+    raw_features: np.ndarray, camera_names: np.ndarray, selection: str
+) -> tuple[np.ndarray, list[str]]:
+    if raw_features.ndim != 3:
+        raise ValueError(
+            f"expected features with shape (samples, cameras, dim), got {raw_features.shape}"
+        )
+    names = [str(value) for value in camera_names]
+    requested = names if selection == "dual" else [f"{selection}_camera"]
+    missing = [name for name in requested if name not in names]
+    if missing:
+        raise ValueError(f"camera features not found: {missing}; available={names}")
+    indexes = [names.index(name) for name in requested]
+    selected = raw_features[:, indexes, :].reshape(len(raw_features), -1)
+    return selected, requested
+
+
 class LinearProbe(nn.Module):
     def __init__(self, input_dim: int) -> None:
         super().__init__()
@@ -80,12 +97,20 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("features", type=Path)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument(
+        "--cameras",
+        choices=("main", "wrist", "dual"),
+        default="dual",
+        help="camera features used by the linear probe",
+    )
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     args = parser.parse_args()
 
     data = np.load(args.features)
     raw_features = data["features"].astype(np.float32)
-    features = raw_features.reshape(len(raw_features), -1)
+    features, selected_cameras = select_camera_features(
+        raw_features, data["camera"], args.cameras
+    )
     target = data["failure"].astype(np.int64)
     splits = data["split"]
     checkpoints = data["checkpoint_step"].astype(np.int64)
@@ -153,7 +178,10 @@ def main() -> None:
     }
     report = {
         "features": str(args.features),
-        "model": "checkpoint-specific frozen ResNet-50 dual-camera linear probes",
+        "model": "checkpoint-specific frozen ResNet-50 linear probes",
+        "camera_selection": args.cameras,
+        "cameras": selected_cameras,
+        "feature_dim": int(features.shape[1]),
         "encoder_trained": False,
         "probe_selection_uses_test": False,
         "model_metadata": model_metadata,

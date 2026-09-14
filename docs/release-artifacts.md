@@ -1,0 +1,117 @@
+# VLA-SafeBench outcome MVP release artifacts
+
+This file indexes the frozen task-4 Outcome Prediction release. Large rollout data,
+videos, feature caches, and model weights remain outside Git. Paths below are relative
+to the project root on the experiment host.
+
+## Frozen identity and data
+
+- Split manifest: `docs/manifests/week1_task4_split.json`
+- Rollouts: `artifacts/week1/task4/episodes/`
+- Outcome dataset: `artifacts/datasets/week1_task4_outcome.npz`
+- Frozen ResNet-50 feature cache: `artifacts/features/week1_task4_frozen_vision.npz`
+- Cohort: 50 episodes, 18 success / 32 failure
+- Split: 30 train / 10 validation / 10 test, grouped by `initial_state_id`
+- Checkpoints: steps 0, 40, 80, 120
+
+The manifest records the task, seeds, initial states, project revision, LeRobot tree
+digest, and policy-weights digest. Predictor inputs exclude label-only simulator state.
+
+## Frozen result artifacts
+
+- Initial-proprio baseline: `artifacts/results/week1_task4_difficulty_baseline.json`
+- Temporal MLP: `artifacts/results/week1_task4_temporal_mlp.json`
+- Frozen dual-camera vision: `artifacts/results/week1_task4_frozen_vision.json`
+- Temporal bootstrap: `artifacts/results/week1_task4_temporal_vs_difficulty_bootstrap.json`
+- Vision bootstrap: `artifacts/results/week1_task4_frozen_vision_bootstrap.json`
+- Camera ablation reports: `artifacts/results/week1_task4_frozen_vision_{main,wrist,dual}.json`
+- Camera ablation bootstrap: `artifacts/results/week1_task4_camera_ablation_bootstrap.json`
+- Offline decision utility: `artifacts/results/week1_task4_outcome_utility.json`
+- Timing audit: `artifacts/results/week1_task4_timing_audit.json`
+- RGB/error and LOEO audit: `artifacts/audits/week2_step80/`
+- False-negative audit: `artifacts/audits/week2_fn_013117405943Z/`
+
+## Display artifacts
+
+- Test risk curves: `artifacts/visualizations/week1_task4/test_outcome_risk_curves.png`
+- Risk-overlay video:
+  `artifacts/visualizations/week1_task4/smolvla-20260911T014308102939Z_outcome_risk_overlay.mp4`
+- Render metadata: `artifacts/visualizations/week1_task4/render_metadata.json`
+
+The overlay video is 360×360, 20 FPS, and 280 frames. Its trigger is an offline
+counterfactual marker; the recorded rollout continued and no closed-loop intervention
+was performed.
+
+## Reproduce evaluation from frozen inputs
+
+Activate the recorded environment and expose the source package:
+
+```bash
+source /root/autodl-tmp/envs/vlasafe312/bin/activate
+export PYTHONPATH=/root/autodl-tmp/vlasafe/src
+cd /root/autodl-tmp/vlasafe
+```
+
+Rebuild the outcome windows and train the baselines:
+
+```bash
+python scripts/build_outcome_dataset.py \
+  docs/manifests/week1_task4_split.json \
+  --output artifacts/datasets/week1_task4_outcome.npz \
+  --window-size 16 --checkpoint-steps 0 40 80 120
+
+python scripts/train_difficulty_baseline.py \
+  artifacts/datasets/week1_task4_outcome.npz \
+  --output artifacts/results/week1_task4_difficulty_baseline.json
+
+python scripts/train_temporal_mlp.py \
+  artifacts/datasets/week1_task4_outcome.npz \
+  --output artifacts/results/week1_task4_temporal_mlp.json \
+  --device cuda
+
+python scripts/train_frozen_vision_baseline.py \
+  artifacts/features/week1_task4_frozen_vision.npz \
+  --cameras dual \
+  --output artifacts/results/week1_task4_frozen_vision.json \
+  --device cuda
+```
+
+Reproduce the offline utility and display artifacts:
+
+```bash
+python scripts/evaluate_outcome_utility.py \
+  artifacts/results/week1_task4_frozen_vision.json \
+  docs/manifests/week1_task4_split.json \
+  --output artifacts/results/week1_task4_outcome_utility.json \
+  --checkpoint-steps 0 40 80 120 \
+  --milliseconds-per-step 70.042
+
+python scripts/render_outcome_risk.py \
+  artifacts/results/week1_task4_frozen_vision.json \
+  docs/manifests/week1_task4_split.json \
+  artifacts/results/week1_task4_outcome_utility.json \
+  --output-dir artifacts/visualizations/week1_task4 \
+  --camera main_camera.mp4
+```
+
+## Integrity check before publishing
+
+Run this on the experiment host after all artifacts are frozen, store the output with
+the release, and do not edit the listed artifacts afterward:
+
+```bash
+sha256sum \
+  docs/manifests/week1_task4_split.json \
+  artifacts/datasets/week1_task4_outcome.npz \
+  artifacts/features/week1_task4_frozen_vision.npz \
+  artifacts/results/week1_task4_*.json \
+  artifacts/visualizations/week1_task4/* \
+  > artifacts/release-sha256.txt
+```
+
+## Claim boundary
+
+This release supports held-out initial-state episode outcome prediction on one LIBERO
+task and an offline efficiency analysis. It does not establish held-out task
+generalization, impending unsafe-event detection, safe-stop effectiveness, A1/A2 fault
+coverage, or command-effect consistency performance.

@@ -15,8 +15,8 @@
 | 正式 Week-1 cohort | **50 episodes；18 success / 32 failure；全部固定 provenance** |
 | 冻结 split | **30 train / 10 validation / 10 test；initial state 分组不相交** |
 | Week-1 结论 | temporal MLP 在 step 120 显著优于 initial-proprio difficulty baseline；step 0–80 尚无可靠优势 |
-| Week-2 结论 | frozen checkpoint vision 在 step 80 已显著超过 initial-frame 与 initial-proprio difficulty baselines |
-| 当前剩余 | 冻结主结果协议；完成离线 decision utility、必要消融与结果可视化 |
+| Week-2 结论 | learned-signal gate 通过；vision 与 temporal 主要读取 execution-progress 信号，不支持独立的早期失败前兆主张 |
+| 当前剩余 | 冻结主结果表、README 最终叙事与可复现 release |
 
 ## 2. 阶段闸门
 
@@ -242,18 +242,67 @@ step 120 的 Brier 差值为 -0.143、ECE 差值为 -0.078，但置信区间均�
 | 80 | **0.982 / 0.952** | **0.100 / 0.096** | vs initial-proprio：AUPRC +0.183，[0.031, 0.450]；AUROC +0.500，[0.125, 0.857] |
 | 120 | 0.982 / 0.952 | 0.100 / 0.101 | 与 temporal MLP 排序相同，无额外提升 |
 
-在 step 80，checkpoint vision 相对 initial-frame vision 的 AUPRC、AUROC、Brier、ECE 四项 CI 均支持改善；相对 temporal MLP 的 AUPRC/AUROC 区间下界为 0，不能称为严格显著的排序提升，但 Brier 与 ECE 的 CI 严格低于 0。结合 temporal MLP 在 step 80 相对 initial-proprio 的排序 CI 跨 0，而 vision 的 CI 严格高于 0，证据支持：**视觉上下文使 outcome-discriminative signal 从 late stage（step 120）提前到 step 80。**
+在 step 80，checkpoint vision 相对 initial-frame vision 的 AUPRC、AUROC、Brier、ECE 四项 CI 均支持改善；相对 temporal MLP 的 AUPRC/AUROC 配对区间包含 0，不能用“vision 显著超过 difficulty、temporal 未显著超过 difficulty”间接推出 vision 显著超过 temporal。Brier 与 ECE 的直接配对区间支持改善，但这是概率误差与校准优势，不证明排序意义上的更早失败识别。
 
-该结论仍只适用于 task 4 的 held-out initial states；test 仅 10 episodes，且失败全部跑满 280 步。它不是 impending unsafe-event detection，也不授权 safe stop。
+冻结审计后定档为 **B：vision 主要读取任务执行进度 / 是否接近成功构型，而不是独立的早期 failure precursor。** Step-80 RGB 中，高风险失败尚未形成成功轨迹常见的目标接近/操作构型，低风险成功的腕部视野已被目标占据；唯一 false negative 在 step 80 视觉上同样呈现顺利推进，却最终失败，直接限制了“提前预警”的解释。Vision-step80 与 temporal-step120 概率不相同，但错排的是同一 failure/success pair，因而在 10 个 test episode 上得到完全相同的 AUPRC/AUROC 与 LOEO 排名结果。
 
-**Week-2 learned-signal gate：GO。** 不执行 negative-result pivot，也不升级 Transformer。
+LOEO 的 vision 与 temporal 结果均为：AUPRC 0.976–1.000，AUROC 0.929–1.000；删除错排 pair 任一端后两项均变为 1.0。结果没有因删除普通单个 episode 而崩溃，但 test 只有 7×3=21 个正负配对，一个 pair 就决定 AUROC 的一个 0.0476 台阶，不足以支撑精确到 checkpoint 的“信号提前”主张。
+
+逐 episode 概率审计得到 Pearson `r = 0.9998`、Spearman `ρ = 0.9515`。Vision-step80 与 temporal-step120 的概率值并不相同，但共同错排 failure `smolvla-20260911T013117405943Z` 与 success `smolvla-20260911T014100736108Z`；两条 pipeline 不应作为相互独立的证据链，更可能在测量同一种 execution-progress 潜在信号。
+
+上述 false negative 未触发可用的 self-collision 或 joint-violation event，最终以 `max_steps` 结束。它在 step 80 与成功轨迹视觉上高度相似；约在 step 120–160 进入近完成构型后仍未满足成功条件，随后持续小幅调整，最低的 16-step 状态运动窗口集中于 step 268–277，最终在 280-step horizon 超时。因此首次可靠分叉约在 step 120–160，而非 step 80；现有证据不支持把 step-80 score 解释为独立失败前兆。
+
+可保留的结论是：vision 在 step 80 已能可靠读取与最终 outcome 相关的 execution progress，并显著超过初始难度基线。它仍只适用于 task 4 的 held-out initial states；test 仅 10 episodes，且失败全部跑满 280 步。它不是 impending unsafe-event detection，也不授权 safe stop。
+
+**Week-2 learned-signal gate：GO。** 不执行 negative-result pivot，也不升级 Transformer。审计显示两类模型很可能读取同一种 execution-progress 信号；增加参数更可能重拟合该信号，而不是发现新的早期失败前兆。
 
 ### 下一步
 
-1. 冻结当前主表方法与 checkpoint，不再根据 test 修改模型。
-2. 用 validation 选择 outcome threshold，计算 test saved steps/time、false terminations 与 sacrificed successes。
+1. 保持当前方法与 0/40/80/120 checkpoint 冻结，不再根据 test 修改模型。
+2. 用 validation 选择 outcome threshold，计算 test saved steps/time、false terminations 与 sacrificed successes；定位为 efficiency / faster confirmation，不表述为 safety warning。
 3. 做最小必要消融：主相机 / 腕部相机 / 双相机；避免扩展模型矩阵。
 4. 生成按 checkpoint 展示 risk 与最终 outcome 的可视化；措辞保持 outcome/progress diagnosis。
+
+### RQ1（A1/A2）状态与后续验证
+
+**未测试。** 现有 artifact validator 与正常 rollout 验证不等于 A1 故障的运行时拦截实验；`1/32` 自然失败事件覆盖率也不能回答 A1/A2 配置故障检出率。当前没有 A2 配对注入、command-effect consistency 覆盖率或学习监控的 A2 故障检测结果。现有 learned predictor 预测最终 episode outcome，不能直接充当 A2 故障检测器。
+
+优先完成 Outcome 主表、离线 decision utility、最小相机消融、可视化及可复现 release；RQ1 保持 supporting result，不阻塞当前主线。主线稳定后，先做 A1 的 shape/dtype/NaN/时间戳等注入单测，明确区分执行前规则拦截与事后 artifact 校验；再选 1–2 类当前 SmolVLA + LIBERO 接口可注入、数值合法的 A2 故障（如动作维度置换、主/腕相机映射错位或 chunk 执行长度错误）做 stress test。单位混用须先核实控制维度语义；当前接口没有独立目标坐标配置入口，不把“错误目标坐标”列为首轮案例。
+
+每个注入案例配同 seed、同 initial state 的正常对照，预先固定注入点、前 N 步检出窗口及 validation 阈值；按故障类型分别报告检出数/总数、正常对照误报数/总数和首次报警步数。规则监控与 command-effect consistency 分列；只有建立独立的 A2 故障标签、训练/验证切分和冻结阈值后，才报告学习监控的 A2 覆盖率。A1、A2、B 不合并指标，也不对从 t=0 注入的故障报告 unsafe-event lead time。
+
+### 最小相机消融（2026-09-14）
+
+使用同一 frozen ResNet-50 feature cache、冻结 split、checkpoint 和 validation 选 L2 协议，分别训练 main-only、wrist-only 与 dual-camera linear probe。Dual-camera 复跑与原结果一致。Step 80 的 test 点估计如下（10 episodes）：
+
+| 相机输入 | AUPRC | AUROC | Brier | ECE |
+| --- | ---: | ---: | ---: | ---: |
+| Main only | 0.844 | 0.667 | 0.306 | 0.330 |
+| Wrist only | 1.000 | 1.000 | 0.001 | 0.017 |
+| Dual camera | 0.982 | 0.952 | 0.100 | 0.096 |
+
+配对 episode bootstrap 显示，wrist 与 dual 相对 main 的 Brier/ECE 差值 95% CI 均严格低于 0，支持二者在该 test 上具有更低概率误差和校准误差；AUPRC/AUROC 差值区间下界为 0，不能称为严格的排序提升。Wrist 相对 dual 的 AUPRC +0.018（CI [0, 0.107]）、AUROC +0.048（[0, 0.250]），Brier -0.099（[-0.296, 0.000]）、ECE -0.079（[-0.263, 0.008]），所有区间均触及或跨过 0，因此没有可靠证据表明 wrist 优于 dual。
+
+结论限定为：step-80 outcome/progress 信号主要可由腕部视角读出；双相机没有显示出相对 wrist-only 的可靠增益，main-only 明显更弱的证据主要体现在 Brier/ECE。该消融是机制诊断，不用于在 test 上重新选择主模型；正式主结果仍保留预注册的 dual-camera pipeline。结果 artifact：`artifacts/results/week1_task4_camera_ablation_bootstrap.json`。
+
+### Offline outcome decision utility（2026-09-14）
+
+使用冻结的 dual-camera predictor 与 0/40/80/120 checkpoint。阈值只在 validation 上选择：要求零 sacrificed validation successes，在此约束下最大化失败轨迹节省步数；test 不参与选择。选定阈值为 `0.9998072982`。
+
+| Split | 检出的失败 | Sacrificed successes | 节省步数 | 估算 wall time |
+| --- | ---: | ---: | ---: | ---: |
+| Validation | 5/6 | 0/4 | 1,115 | 78.10 s |
+| Test | 4/7 | 0/3 | 756 | 52.95 s |
+
+Test 中 3 条失败在 step 80 首次超过阈值，各节省 199 步；1 条在 step 120 首次超过阈值，节省 159 步；另外 3 条失败始终未达到阈值。按全部 7 条 test failure 计，平均每条节省 108 步。已审计的近完成后超时 false negative `smolvla-20260911T013117405943Z` 未被该策略提前终止，与此前的机制分析一致。
+
+该结果定位为 **offline faster confirmation / efficiency**：在已记录轨迹不受干预的反事实假设下，保守阈值可提前确认一部分最终失败并减少后续 rollout。`52.95 s` 使用实测 `70.042 ms/step` 线性换算，只是 wall-time 估计。阈值非常接近 1，反映概率饱和且不应视为可迁移的通用阈值；test 仅 7 failures / 3 successes，`0/3` sacrificed successes 不足以证明真实误停率接近零。该分析不证明闭环干预效果，不称为 safe stop、impending warning 或安全改进。结果 artifact：`artifacts/results/week1_task4_outcome_utility.json`。
+
+### Outcome-risk 可视化（2026-09-14）
+
+已生成 10 条 held-out test episode 在 step 0/40/80/120 的 frozen dual-camera outcome-risk 曲线，以及失败 episode `smolvla-20260911T014308102939Z` 的风险叠加视频。该 episode 在离线策略中于 step 80 首次超过 validation 阈值；视频仍完整播放原始 280-step rollout，并明确标注风险语义为最终 episode failure probability、触发点为 offline counterfactual，不表现为真实 safe-stop 干预。
+
+产物为 `artifacts/visualizations/week1_task4/test_outcome_risk_curves.png`、`artifacts/visualizations/week1_task4/smolvla-20260911T014308102939Z_outcome_risk_overlay.mp4` 与 `render_metadata.json`。FFprobe 验证输出视频为 360×360、20 FPS、280 帧；渲染器已禁止 ImageIO 将画面隐式缩放到 368×368。
 
 ## 9. 复现环境
 
