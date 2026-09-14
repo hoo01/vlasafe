@@ -11,7 +11,7 @@ VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来�
 | **Day 0–3 / Week 1** | **完成** | SmolVLA + LIBERO 闭环；从首步启用同步日志和双相机视频；20-episode 性能/成本验收；50 条 task-4 自然 rollout；事件覆盖统计；冻结 30/10/10 group-disjoint split；确定 Outcome 主线 | 无 Week-1 阻塞项 |
 | **Week 2** | **完成** | Initial-proprio difficulty baseline；16-step state/action temporal MLP；冻结 ResNet-50 双相机 predictor；paired episode bootstrap；输入泄漏测试；RGB/error、LOEO 和关键 false-negative 审计；形成 execution-progress 假设 | 不再增加 Transformer 或继续调参 |
 | **Week 3** | **完成** | 主/腕/双相机消融；offline utility；risk 曲线与视频；定量进度控制实验 | 无 Week-3 阻塞项 |
-| **Week 4** | **进行中** | v0.1 可复现快照；完成度和 claim audit；A1 case table；60 条 A2 配对 rollout；command-effect evaluation | 将 RQ1 artifact 加入 release checksum |
+| **Week 4** | **完成** | 完成度和 claim audit；A1 case table；60 条 A2 配对 rollout；command-effect evaluation；21-file release checksum | 无 Week-4 阻塞项 |
 
 Week 1–2 回答了“系统能否运行、数据支持哪条主线、学习模型是否存在信号”。Week 3 要回答“这个信号能否在独立数据中复现，以及控制进度后是否仍成立”。Week 4 才是完整项目的最终收口。当前 v0.1 不能替代后两步。
 
@@ -165,7 +165,7 @@ A2 使用 20 组相同 seed 和 initial state 的三路配对 rollout：normal�
 
 ## 9. 当前状态与下一阶段
 
-2026-09-14 冻结的 18-file checksum 是 **task-4 Outcome v0.1 阶段快照**，不是四周项目终点。它完成了单任务 pipeline 和主假设审计，但证据仍然偏薄。
+2026-09-14 最终 release checksum 包含 21 个文件并通过 21/21 校验：原 18-file Outcome v0.1 快照、进度控制报告和两个 RQ1 报告。大体积配对 rollout 留在实验主机，并由 A2 report 中的 episode ID、seed 和逐条结果索引。
 
 进度控制实验已经完成，结果属于“当前样本不足以区分”：进度解释得到定量支持，vision 的额外信息没有得到可靠统计证据。当前进入 Week 4 文档、主表和 release 收口。
 
@@ -186,7 +186,7 @@ Week 4 的 RQ1 supporting study 已完成：A1 case table 为 11/11；A2 的协�
 | Held-out 指标、校准与 bootstrap | **完成** | 10 条 test episode；小样本限制保留 |
 | 机制审计与进度控制 | **完成** | RGB/error、LOEO、残差化和进度匹配 |
 | 风险叠加视频 | **完成** | outcome-risk offline overlay |
-| 可复现阶段 release | **完成** | 18-file v0.1 checksum 18/18 |
+| 可复现 release | **完成** | 21-file checksum 21/21 |
 | 2–3 个正式任务 | **未完成** | 当前只有 task 4，不声称 task generalization |
 | A1 运行时规则覆盖 | **完成（有界案例集）** | 11/11 deterministic cases；不外推到未测试协议错误 |
 | A2 / command-effect consistency | **完成（supporting study）** | 20 组配对 cohort；动作置换 10/10、normal 误报 1/10；相机结果仅为间接响应 |

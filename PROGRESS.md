@@ -4,7 +4,7 @@
 
 ## 当前判断
 
-项目已完成 **task-4 Outcome v0.1 阶段快照**，尚未完成完整四周计划。
+项目已完成四周计划的有界 release；未完成项保留为明确限制，不作为发布阻塞项。
 
 当前证据支持：冻结视觉和状态/动作历史能够在 held-out initial states 上预测 task 4 的最终 outcome；执行进度可以解释大部分排序能力。现有 10 条 test episode 不足以判断 vision-step80 是否还包含进度之外的信息。
 
@@ -66,7 +66,7 @@ Wrist/dual 相对 main 的 Brier/ECE 改善得到配对区间支持；wrist 与 
 - 估算节省 52.95 s，按 `70.042 ms/step` 换算。
 - 已生成 10 条 test risk 曲线。
 - 已生成 360×360、20 FPS、280 帧 outcome-risk overlay video。
-- 18 个 v0.1 artifact 的 SHA-256 检查为 18/18 通过。
+- 最终 21 个 release artifact 的 SHA-256 检查为 21/21 通过。
 
 这些是 offline faster-confirmation 结果，不是安全干预结果。
 
@@ -104,10 +104,10 @@ Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均
 
 ## 下一步执行顺序
 
-### 1. 文档与最终收口
+### 已完成的收口
 
-- 将两个 RQ1 result JSON 加入 release checksum；A2 report 保留全部 paired episode ID、seed 和逐条结果。
-- 保留 v0.1 artifact，不用新分析反向修改冻结预测。
+- 两个 RQ1 result JSON 已加入 21-file release checksum；A2 report 保留全部 paired episode ID、seed 和逐条结果。
+- 保留 v0.1 artifact，没有用新分析反向修改冻结预测。
 
 ### 明确延期
 

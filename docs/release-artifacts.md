@@ -143,6 +143,9 @@ sha256sum \
   > artifacts/release-sha256.txt
 ```
 
+The final 2026-09-14 manifest contains 21 entries and passed `sha256sum -c` for
+all 21 files.
+
 ## Claim boundary
 
 This release supports held-out initial-state episode outcome prediction on one LIBERO

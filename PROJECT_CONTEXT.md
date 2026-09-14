@@ -16,7 +16,7 @@ That experience motivated a simulator-first project about distinguishing deploym
 
 ## Current project state
 
-- Status (2026-09-14): task-4 Outcome v0.1 is frozen as an 18-file, 18/18 checksum-verified stage snapshot. The quantitative progress-control analysis is complete; Week 4 documentation and final release integration remain.
+- Status (2026-09-14): the bounded four-week release is complete and checksum-verified (21/21 files). It includes the frozen task-4 Outcome v0.1 snapshot, quantitative progress control, and an A1/A2 deployment-diagnostics supporting study.
 - Canonical specification: `README.md` in this directory.
 - Platform: SmolVLA + LIBERO `libero_spatial` task 4 on RTX 4090 D.
 - Frozen natural cohort: 50 episodes, 18 successes / 32 failures; group-disjoint train/validation/test = 30/10/10 by `initial_state_id`.
