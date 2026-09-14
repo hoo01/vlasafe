@@ -11,7 +11,7 @@ VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来�
 | **Day 0–3 / Week 1** | **完成** | SmolVLA + LIBERO 闭环；从首步启用同步日志和双相机视频；20-episode 性能/成本验收；50 条 task-4 自然 rollout；事件覆盖统计；冻结 30/10/10 group-disjoint split；确定 Outcome 主线 | 无 Week-1 阻塞项 |
 | **Week 2** | **完成** | Initial-proprio difficulty baseline；16-step state/action temporal MLP；冻结 ResNet-50 双相机 predictor；paired episode bootstrap；输入泄漏测试；RGB/error、LOEO 和关键 false-negative 审计；形成 execution-progress 假设 | 不再增加 Transformer 或继续调参 |
 | **Week 3** | **完成** | 主/腕/双相机消融；offline utility；risk 曲线与视频；定量进度控制实验 | 无 Week-3 阻塞项 |
-| **Week 4** | **进行中** | v0.1 可复现快照；完成度和 claim audit | 将进度控制结果纳入最终主表、结论和 release |
+| **Week 4** | **进行中** | v0.1 可复现快照；完成度和 claim audit；A1/A2 supporting study 实现 | 运行配对故障 cohort，冻结 RQ1 结果并更新 release |
 
 Week 1–2 回答了“系统能否运行、数据支持哪条主线、学习模型是否存在信号”。Week 3 要回答“这个信号能否在独立数据中复现，以及控制进度后是否仍成立”。Week 4 才是完整项目的最终收口。当前 v0.1 不能替代后两步。
 
@@ -32,7 +32,7 @@ Week 1–2 回答了“系统能否运行、数据支持哪条主线、学习模
 3. **RQ2b（Impending Failure Detection）：** 对具有明确事件时刻的危险事件，能否预测未来 `K` 步内是否发生？
 4. **RQ3（Utility / Control）：** 预测结果能否节省无效 rollout 计算，或在有可靠 Impending 标签时支持安全干预？
 
-当前完成的是 **RQ2a 的单任务阶段结果和离线 efficiency 分析**。RQ1、RQ2b 和真实闭环干预尚未完成。
+当前完成的是 **RQ2a 的单任务阶段结果和离线 efficiency 分析**。RQ1 的实验代码已经就绪、正式数据尚未生成；RQ2b 和真实闭环干预尚未完成。
 
 ## 2. Outcome 与 Impending 的区别
 
@@ -155,7 +155,9 @@ Test 中 3 条失败在 step 80、1 条在 step 120 首次触发。时间按实�
 
 进度控制实验已经完成，结果属于“当前样本不足以区分”：进度解释得到定量支持，vision 的额外信息没有得到可靠统计证据。当前进入 Week 4 文档、主表和 release 收口。
 
-独立 confirmatory cohort、第二任务和 RQ1 supporting study 延期。Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking 不进入当前阶段。
+Week 4 增加一个有界的 RQ1 supporting study：A1 用确定性 case table 验证协议监控；A2 对同 seed、同 initial state 的正常、动作 `x/y` 置换和双相机映射置换进行配对 rollout。Command-effect 阈值只由正常 calibration episodes 确定，随后冻结并报告 evaluation cohort 的正常误报率、故障检出率与首次报警步数。相机置换是 command-effect 的负对照；本阶段不训练专门的 learned A2 monitor。
+
+独立 confirmatory cohort 和第二任务延期。Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking 不进入当前阶段。
 
 ### 原始目标完成度核对
 
@@ -172,8 +174,8 @@ Test 中 3 条失败在 step 80、1 条在 step 120 首次触发。时间按实�
 | 风险叠加视频 | **完成** | outcome-risk offline overlay |
 | 可复现阶段 release | **完成** | 18-file v0.1 checksum 18/18 |
 | 2–3 个正式任务 | **未完成** | 当前只有 task 4，不声称 task generalization |
-| A1 运行时规则覆盖 | **未完成** | validator 不等于主动故障拦截实验 |
-| A2 / command-effect consistency | **未完成** | 尚无注入数据或覆盖率结果 |
+| A1 运行时规则覆盖 | **实现完成，实验待跑** | shape、dtype、NaN/Inf、range 和 timestamp deterministic case table |
+| A2 / command-effect consistency | **实现完成，实验待跑** | 配对 `action_swap_xy` / `camera_swap` rollout 与 normal-only threshold calibration |
 | Impending detector / safe stop | **不适用当前主线** | event-positive 数据不足，按门槛主动放弃 |
 
 ## 10. 复现
@@ -193,7 +195,7 @@ python -m unittest discover -s tests -v
 - Test 只有 10 条 episode，7 条失败全部是 280-step timeout。
 - Outcome predictor 没有明确 failure timestamp，不能报告 unsafe lead time。
 - Self-collision/joint-violation 标签覆盖不足，workspace/impact 尚未冻结。
-- RQ1 的主动故障注入、command-effect consistency 和 A2 learned monitor 尚未测试。
+- RQ1 的正式注入 cohort 尚未生成；当前 supporting study 也不包含 learned A2 monitor。
 - Offline utility 没有执行真实闭环干预。
 - 当前结果不能支持 held-out task、物体或平台泛化主张。
 

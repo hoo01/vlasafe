@@ -21,6 +21,8 @@ from lerobot.envs.configs import LiberoEnv as LiberoEnvConfig
 from lerobot.policies import make_pre_post_processors
 from lerobot.policies.smolvla.modeling_smolvla import SmolVLAPolicy
 from lerobot.utils.constants import ACTION
+from vlasafe.faults import FAULT_MODES, fault_action, fault_observation
+from vlasafe.monitors import validate_action_for_execution, validate_observation_timestamp
 from vlasafe.rollout import EpisodeMetadata, SidecarRecorder, StepRecord
 from vlasafe.rollout.sim_diagnostics import SimDiagnostics
 
@@ -53,6 +55,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--task-id", type=int, default=0)
     parser.add_argument("--num-episodes", type=int, default=1)
+    parser.add_argument("--fault-mode", choices=FAULT_MODES, default="none")
     parser.add_argument(
         "--provenance",
         type=Path,
@@ -102,6 +105,7 @@ def _record_episode(
             "benchmark_episode_index": episode_index,
             "task_description": task_description[0],
             "video_enabled": not args.no_video,
+            "fault_mode": args.fault_mode,
             "vlasafe_revision": vlasafe_revision,
             "provenance": provenance,
         },
@@ -123,10 +127,14 @@ def _record_episode(
         chunk_offset = 0
         success = False
         num_steps = 0
+        previous_observation_timestamp_ns: int | None = None
 
         rollout_started = time.perf_counter()
         for step_id in range(args.max_steps):
-            observation_timestamp_ns = time.monotonic_ns()
+            observation_timestamp_ns = validate_observation_timestamp(
+                time.monotonic_ns(), previous_observation_timestamp_ns
+            )
+            previous_observation_timestamp_ns = observation_timestamp_ns
             if not args.no_video:
                 main_frames.append(np.asarray(raw_obs["pixels"]["image"][0]).copy())
                 wrist_frames.append(np.asarray(raw_obs["pixels"]["image2"][0]).copy())
@@ -135,7 +143,8 @@ def _record_episode(
             queried_policy = not action_queue
 
             if queried_policy:
-                observation = preprocess_observation(raw_obs)
+                policy_raw_obs = fault_observation(raw_obs, args.fault_mode)
+                observation = preprocess_observation(policy_raw_obs)
                 observation["task"] = task_description
                 observation = env_preprocessor(observation)
                 observation = preprocessor(observation)
@@ -155,12 +164,11 @@ def _record_episode(
             if active_chunk is None:
                 raise RuntimeError("policy did not produce an action chunk")
             predicted_action = np.asarray(action_queue.popleft(), dtype=np.float32)[None, :]
-            action_numpy = np.clip(
-                predicted_action,
-                env.action_space.low,
-                env.action_space.high,
-            ).astype(np.float32, copy=False)
-            clip_delta = float(np.max(np.abs(action_numpy - predicted_action)))
+            actuator_action = fault_action(predicted_action, args.fault_mode)
+            action_numpy, action_monitor = validate_action_for_execution(
+                actuator_action, env.action_space.low, env.action_space.high
+            )
+            clip_delta = float(action_monitor["action_clip_linf"])
             action_executed_ns = time.monotonic_ns()
             next_obs, reward, terminated, truncated, info = env.step(action_numpy)
             step_finished_ns = time.monotonic_ns()
@@ -191,8 +199,11 @@ def _record_episode(
                         "policy_queried": queried_policy,
                         "chunk_id": chunk_id,
                         "chunk_offset": chunk_offset,
-                        "action_clipped": clip_delta > 0.0,
-                        "action_clip_linf": clip_delta,
+                        "fault_mode": args.fault_mode,
+                        "intended_action": predicted_action[0].astype(float).tolist(),
+                        "action_monitor": action_monitor,
+                        "action_clipped": action_monitor["action_clipped"],
+                        "action_clip_linf": action_monitor["action_clip_linf"],
                     },
                     label_only=diagnostics.sample(next_obs),
                 )
@@ -354,6 +365,7 @@ def main() -> None:
         "vlasafe_revision": vlasafe_revision,
         "provenance": provenance,
         "video_enabled": not args.no_video,
+        "fault_mode": args.fault_mode,
         "num_episodes": len(episodes),
         "successes": sum(ep["success"] for ep in episodes),
         "success_rate": sum(ep["success"] for ep in episodes) / len(episodes),

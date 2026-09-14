@@ -8,7 +8,7 @@
 
 当前证据支持：冻结视觉和状态/动作历史能够在 held-out initial states 上预测 task 4 的最终 outcome；执行进度可以解释大部分排序能力。现有 10 条 test episode 不足以判断 vision-step80 是否还包含进度之外的信息。
 
-当前证据不支持：独立失效前兆、Impending Failure Detection、safe stop、RQ1 覆盖率或任务级泛化。
+当前证据不支持：独立失效前兆、Impending Failure Detection、safe stop、RQ1 覆盖率或任务级泛化。RQ1 实验实现已完成，但在正式 artifact 生成前仍不报告覆盖率。
 
 ## 已完成
 
@@ -90,22 +90,28 @@ Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均
 | Failure 全为 280-step timeout | Outcome 很可能被完成进度和时长结构驱动 |
 | Test 只有 10 episodes | 进度控制只有两对较近的 vision success/failure 匹配 |
 | 只有一个正式任务 | 当前研究必须定位为单任务方法论研究 |
-| RQ1 未测试 | 没有 A1/A2 注入、command-effect consistency 或 learned A2 coverage |
+| RQ1 正式实验待跑 | A1 case table 与 A2 注入/command-effect evaluator 已实现；尚无正式 paired cohort，且本阶段不含 learned A2 monitor |
 | Impending 数据不足 | 不能评测事件预警、lead time 或 safe stop |
 
 ## 下一步执行顺序
 
-### 1. 文档与最终收口
+### 1. RQ1 supporting study
 
-- 对照原始四周目标逐项标记完成、部分完成和未完成。
-- 根据进度控制结果更新机制结论和最终主表。
+- 运行 A1 deterministic case table。
+- 以同 seed、同 initial state 生成 normal、`action_swap_xy`、`camera_swap` 配对 cohort。
+- 只用 normal calibration episodes 冻结 command-effect 阈值；报告 evaluation normal 误报率、两类故障检出率与首次报警步数。
+- 将 `camera_swap` 作为 command-effect negative control，不把 range clipping warning 计作语义故障检出。
+
+### 2. 文档与最终收口
+
+- 将 RQ1 结果加入完成度表、限制和 release manifest。
 - 保留 v0.1 artifact，不用新分析反向修改冻结预测。
 
 ### 明确延期
 
 - 独立 confirmatory cohort。
 - 第二个任务。
-- RQ1 A1/A2 fault-injection supporting study。
+- 专门训练的 learned A2 monitor。
 - Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking。
 
 ## 冻结边界
