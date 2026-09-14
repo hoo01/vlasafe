@@ -6,7 +6,7 @@
 
 项目已完成 **task-4 Outcome v0.1 阶段快照**，尚未完成完整四周计划。
 
-当前证据支持：冻结视觉和状态/动作历史能够在 held-out initial states 上预测 task 4 的最终 outcome。定性审计提示模型可能主要读取执行进度；该机制解释尚待进度控制实验定量验证。
+当前证据支持：冻结视觉和状态/动作历史能够在 held-out initial states 上预测 task 4 的最终 outcome；执行进度可以解释大部分排序能力。现有 10 条 test episode 不足以判断 vision-step80 是否还包含进度之外的信息。
 
 当前证据不支持：独立失效前兆、Impending Failure Detection、safe stop、RQ1 覆盖率或任务级泛化。
 
@@ -70,27 +70,32 @@ Wrist/dual 相对 main 的 Brier/ECE 改善得到配对区间支持；wrist 与 
 
 这些是 offline faster-confirmation 结果，不是安全干预结果。
 
+### 进度控制实验
+
+进度 proxy 定义为 frozen dual-camera features 在 train 数据中从平均 step 0 指向平均 step 120 的投影方向，不使用 outcome label 或 test 数据定义。Risk 对 progress 的线性关系只在 train 上拟合，冻结 test 只评一次。
+
+| Model | Raw AUROC | Progress-only | Residualized risk | Partial r |
+| --- | ---: | ---: | ---: | ---: |
+| Vision step 80 | 0.952 | 0.905 | 0.714 | 0.552 |
+| Temporal step 120 | 0.952 | 1.000 | 0.381 | -0.202 |
+
+Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均无法排除无额外信号。Vision 只有两对 success/failure 在 0.5 train SD 内，虽均排序正确但 `n=2`；temporal 的最近匹配仍相差 1.61–2.08 SD。
+
+结论：进度解释得到定量支持；数据缺少足够 outcome overlap，无法可靠检验 vision 的进度外信号。
+
 ## 当前缺口
 
 | 缺口 | 为什么重要 |
 | --- | --- |
 | Failure 全为 280-step timeout | Outcome 很可能被完成进度和时长结构驱动 |
-| 没有进度匹配评测 | 尚未严格分离进度与进度之外的失败信息 |
-| Test 只有 10 episodes | 进度控制分析可能没有足够的匹配成功/失败对 |
+| Test 只有 10 episodes | 进度控制只有两对较近的 vision success/failure 匹配 |
 | 只有一个正式任务 | 当前研究必须定位为单任务方法论研究 |
 | RQ1 未测试 | 没有 A1/A2 注入、command-effect consistency 或 learned A2 coverage |
 | Impending 数据不足 | 不能评测事件预警、lead time 或 safe stop |
 
 ## 下一步执行顺序
 
-### 1. 进度控制实验（当前唯一研究任务）
-
-- 定义部署可得或仅用于分层评测的进度 proxy。
-- 比较进度相近但 outcome 不同的 episode。
-- 检查控制进度后 predictor 是否仍有可靠排序信号。
-- 若样本不足以形成有效匹配，将“当前数据无法区分进度与额外失败信息”作为正式限制。
-
-### 2. 文档与最终收口
+### 1. 文档与最终收口
 
 - 对照原始四周目标逐项标记完成、部分完成和未完成。
 - 根据进度控制结果更新机制结论和最终主表。

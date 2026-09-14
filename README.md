@@ -10,8 +10,8 @@ VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来�
 | --- | --- | --- | --- |
 | **Day 0–3 / Week 1** | **完成** | SmolVLA + LIBERO 闭环；从首步启用同步日志和双相机视频；20-episode 性能/成本验收；50 条 task-4 自然 rollout；事件覆盖统计；冻结 30/10/10 group-disjoint split；确定 Outcome 主线 | 无 Week-1 阻塞项 |
 | **Week 2** | **完成** | Initial-proprio difficulty baseline；16-step state/action temporal MLP；冻结 ResNet-50 双相机 predictor；paired episode bootstrap；输入泄漏测试；RGB/error、LOEO 和关键 false-negative 审计；形成 execution-progress 假设 | 不再增加 Transformer 或继续调参 |
-| **Week 3** | **进行中** | 主/腕/双相机消融；validation-thresholded offline utility；test risk 曲线；360×360 outcome-risk 叠加视频；18-file v0.1 checksum | **进度控制实验：定量检验控制执行进度后是否仍有 outcome 信号** |
-| **Week 4** | **未开始** | v0.1 已提供可复现阶段快照 | 统一完成度表述；根据进度控制结果冻结最终主表、结论、demo 和 release |
+| **Week 3** | **完成** | 主/腕/双相机消融；offline utility；risk 曲线与视频；定量进度控制实验 | 无 Week-3 阻塞项 |
+| **Week 4** | **进行中** | v0.1 可复现快照；完成度和 claim audit | 将进度控制结果纳入最终主表、结论和 release |
 
 Week 1–2 回答了“系统能否运行、数据支持哪条主线、学习模型是否存在信号”。Week 3 要回答“这个信号能否在独立数据中复现，以及控制进度后是否仍成立”。Week 4 才是完整项目的最终收口。当前 v0.1 不能替代后两步。
 
@@ -113,7 +113,18 @@ Paired episode bootstrap 支持 vision-step80 相对 initial-proprio 的排序�
 - Vision-step80 与 temporal-step120 错排同一对 failure/success，概率高度相关（Pearson `0.9998`，Spearman `0.9515`）。
 - 关键 false negative 在 step 80 看起来仍顺利推进，之后进入近完成构型，却持续微调至 step 280 超时；可靠分叉约在 step 120–160。
 
-因此当前最稳妥的工作假设是：**模型主要读取 outcome-associated execution progress**。保留“预测最终结果”的测量结论，撤回“视觉更早发现独立失效前兆”的机制解释。下一步必须用进度控制实验判断：控制进度后信号消失、部分保留，还是现有样本不足以区分两种解释。
+定量进度控制使用 train-only、无 outcome label 的 frozen-feature 时间方向作为 progress proxy。结果如下：
+
+| Model | Raw AUROC | Progress-only AUROC | Progress-residualized AUROC | Partial correlation |
+| --- | ---: | ---: | ---: | ---: |
+| Vision, step 80 | 0.952 | 0.905 | 0.714 | 0.552 |
+| Temporal, step 120 | 0.952 | 1.000 | 0.381 | -0.202 |
+
+Temporal-step120 的排序几乎完全可由进度代理解释。Vision-step80 的残差点估计仍为正，但 residual AUROC 的 95% CI 为 `[0.111, 1.000]`，partial correlation CI 为 `[-0.232, 1.000]`，无法排除无额外信号。
+
+进度匹配进一步暴露数据重叠不足：vision-step80 只有 2 对 success/failure 的距离小于 0.5 个 train SD（两对均排对），第三对相差 2.0 SD；temporal-step120 的三对距离为 1.61–2.08 SD，没有真正接近的匹配对。`2/2` 只是描述性结果，不能据此声称视觉学到进度之外的信息。
+
+因此最终机制结论是：**执行进度可以解释大部分已观察到的 outcome 排序能力；现有 10 条 test episode 不足以判断 vision-step80 是否还包含进度之外的信息。**
 
 ## 8. Supporting results
 
@@ -142,9 +153,28 @@ Test 中 3 条失败在 step 80、1 条在 step 120 首次触发。时间按实�
 
 2026-09-14 冻结的 18-file checksum 是 **task-4 Outcome v0.1 阶段快照**，不是四周项目终点。它完成了单任务 pipeline 和主假设审计，但证据仍然偏薄。
 
-当前只推进一项研究工作：**进度控制实验**。使用现有 50 条轨迹构造预先定义的进度代理，比较进度相近但最终 outcome 不同的 episode，并检验加入冻结 outcome risk 后是否仍改善 held-out 判别或概率误差。三种结果都如实报告：信号消失、信号部分保留，或样本不足以区分。
+进度控制实验已经完成，结果属于“当前样本不足以区分”：进度解释得到定量支持，vision 的额外信息没有得到可靠统计证据。当前进入 Week 4 文档、主表和 release 收口。
 
-独立 confirmatory cohort、第二任务和 RQ1 supporting study 延期。它们分别只能增强 task-4 稳定性、增加一个独立任务 regime 或展开另一条故障诊断战线，当前都不如进度控制实验直接回答主结论。Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking 同样不进入当前阶段。
+独立 confirmatory cohort、第二任务和 RQ1 supporting study 延期。Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking 不进入当前阶段。
+
+### 原始目标完成度核对
+
+| 原始目标 | 状态 | 证据或缺口 |
+| --- | --- | --- |
+| SmolVLA + LIBERO 闭环 | **完成** | task 4 正式 rollout 与同步 artifact |
+| 日志从第一条 rollout 进入执行路径 | **完成** | 稳定 episode/step/frame ID、原子完成协议 |
+| 50 episodes / 20 failures gate | **完成** | 50 episodes，32 failures |
+| Outcome/Impending 数据分流 | **完成** | event coverage 1/32，选择 Outcome |
+| 冻结无泄漏 split | **完成** | 30/10/10，按 initial state 分组 |
+| 强 baseline 与 learned predictor | **完成** | initial-proprio、temporal、frozen vision |
+| Held-out 指标、校准与 bootstrap | **完成** | 10 条 test episode；小样本限制保留 |
+| 机制审计与进度控制 | **完成** | RGB/error、LOEO、残差化和进度匹配 |
+| 风险叠加视频 | **完成** | outcome-risk offline overlay |
+| 可复现阶段 release | **完成** | 18-file v0.1 checksum 18/18 |
+| 2–3 个正式任务 | **未完成** | 当前只有 task 4，不声称 task generalization |
+| A1 运行时规则覆盖 | **未完成** | validator 不等于主动故障拦截实验 |
+| A2 / command-effect consistency | **未完成** | 尚无注入数据或覆盖率结果 |
+| Impending detector / safe stop | **不适用当前主线** | event-positive 数据不足，按门槛主动放弃 |
 
 ## 10. 复现
 

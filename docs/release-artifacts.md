@@ -27,6 +27,7 @@ digest, and policy-weights digest. Predictor inputs exclude label-only simulator
 - Camera ablation reports: `artifacts/results/week1_task4_frozen_vision_{main,wrist,dual}.json`
 - Camera ablation bootstrap: `artifacts/results/week1_task4_camera_ablation_bootstrap.json`
 - Offline decision utility: `artifacts/results/week1_task4_outcome_utility.json`
+- Progress-control analysis: `artifacts/results/week1_task4_progress_control.json`
 - Timing audit: `artifacts/results/week1_task4_timing_audit.json`
 - RGB/error and LOEO audit: `artifacts/audits/week2_step80/`
 - False-negative audit: `artifacts/audits/week2_fn_013117405943Z/`
@@ -92,6 +93,13 @@ python scripts/render_outcome_risk.py \
   artifacts/results/week1_task4_outcome_utility.json \
   --output-dir artifacts/visualizations/week1_task4 \
   --camera main_camera.mp4
+
+python scripts/analyze_progress_control.py \
+  artifacts/features/week1_task4_frozen_vision.npz \
+  artifacts/results/week1_task4_frozen_vision.json \
+  artifacts/results/week1_task4_temporal_mlp.json \
+  --output artifacts/results/week1_task4_progress_control.json \
+  --samples 10000 --seed 20260914
 ```
 
 ## Integrity check before publishing

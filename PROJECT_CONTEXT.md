@@ -16,7 +16,7 @@ That experience motivated a simulator-first project about distinguishing deploym
 
 ## Current project state
 
-- Status (2026-09-14): task-4 Outcome v0.1 is frozen as an 18-file, 18/18 checksum-verified stage snapshot. It is not the end of the four-week project. The only remaining research experiment in the current scope is a quantitative progress-control analysis using the existing 50 episodes.
+- Status (2026-09-14): task-4 Outcome v0.1 is frozen as an 18-file, 18/18 checksum-verified stage snapshot. The quantitative progress-control analysis is complete; Week 4 documentation and final release integration remain.
 - Canonical specification: `README.md` in this directory.
 - Platform: SmolVLA + LIBERO `libero_spatial` task 4 on RTX 4090 D.
 - Frozen natural cohort: 50 episodes, 18 successes / 32 failures; group-disjoint train/validation/test = 30/10/10 by `initial_state_id`.
@@ -28,7 +28,8 @@ That experience motivated a simulator-first project about distinguishing deploym
 - The main/wrist/dual-camera ablation is complete. At step 80, main/wrist/dual test AUPRC is 0.844/1.000/0.982 and AUROC is 0.667/1.000/0.952. Paired bootstrap supports lower Brier/ECE for wrist and dual versus main, but does not support a reliable wrist-versus-dual difference. Keep the preregistered dual-camera pipeline as the main model.
 - Validation selected an offline outcome threshold of 0.9998072982 under a zero-sacrificed-validation-success constraint. On test it identified 4/7 failures, observed 0/3 sacrificed successes, and counterfactually saved 756 recorded steps (52.95 seconds at the measured 70.042 ms/step). This is an offline efficiency/faster-confirmation result, not a safety intervention.
 - The test risk plot and a 360x360, 20 FPS, 280-frame outcome-risk overlay video are complete. The overlay explicitly marks the step-80 trigger as offline counterfactual and continues the recorded trajectory.
-- Next: define a train-only, outcome-label-free execution-progress proxy from the frozen features; residualize frozen risk against it on train; evaluate residual ranking and progress-matched success/failure pairs once on test. Report signal disappearance, partial retention, or insufficient matched data without changing frozen predictions. Independent recollection, a second task, and RQ1 are deferred. Do not reopen model selection, frame outcome-based termination as a safety intervention, or upgrade to Transformer.
+- Progress control uses a train-only, outcome-label-free frozen-feature time axis. Progress-only test AUROC is 0.905 at vision-step80 and 1.000 at temporal-step120; progress-residualized AUROC is 0.714 and 0.381 respectively. Vision residual AUROC CI [0.111, 1.000] and partial-correlation CI [-0.232, 1.000] are inconclusive. Only two vision success/failure pairs are within 0.5 train SD; no temporal pairs are close. Final interpretation: progress explains much of the observed ranking, while the current 10-episode test cannot determine whether vision retains progress-independent information.
+- Next: integrate the progress-control result into the final table/release and complete the claim audit. Independent recollection, a second task, and RQ1 are deferred. Do not reopen model selection, frame outcome-based termination as a safety intervention, or upgrade to Transformer.
 
 ## Locked research definitions
 

@@ -164,6 +164,21 @@ def analyze_model(
     matches = closest_one_to_one_matches(
         episode_ids[test], test_outcome, test_progress, test_risk
     )
+    train_progress_sd = float(np.std(model_progress[train], ddof=1))
+    if train_progress_sd <= 0:
+        raise ValueError("train progress proxy has zero standard deviation")
+    for row in matches:
+        row["progress_gap_train_sd"] = row["absolute_progress_gap"] / train_progress_sd
+    overlap = {
+        str(caliper): {
+            "pairs": sum(row["progress_gap_train_sd"] <= caliper for row in matches),
+            "correct": sum(
+                row["progress_gap_train_sd"] <= caliper and row["risk_orders_pair_correctly"]
+                for row in matches
+            ),
+        }
+        for caliper in (0.25, 0.5, 1.0)
+    }
     return {
         "name": name,
         "checkpoint": checkpoint,
@@ -184,6 +199,8 @@ def analyze_model(
             "closest_one_to_one_matches": matches,
             "matched_pairs": len(matches),
             "matched_pairs_correct": sum(row["risk_orders_pair_correctly"] for row in matches),
+            "train_progress_sd": train_progress_sd,
+            "matched_overlap_by_caliper_train_sd": overlap,
         },
         "episode_bootstrap": bootstrap_metrics(
             test_outcome,
