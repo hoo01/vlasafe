@@ -12,6 +12,8 @@ from vlasafe.monitors import (
     validate_observation_timestamp,
 )
 
+from scripts.evaluate_a2_consistency import wilson_interval
+
 
 class FaultInjectionTest(unittest.TestCase):
     def test_action_swap_xy_preserves_valid_shape_and_values(self) -> None:
@@ -67,6 +69,15 @@ class RuntimeActionMonitorTest(unittest.TestCase):
             validate_observation_timestamp(100.0, None)
         with self.assertRaisesRegex(TimestampProtocolError, "regressed"):
             validate_observation_timestamp(99, 100)
+
+
+class IntervalTest(unittest.TestCase):
+    def test_wilson_interval_handles_boundary_counts(self) -> None:
+        self.assertEqual(wilson_interval(0, 10)[0], 0.0)
+        self.assertEqual(wilson_interval(10, 10)[1], 1.0)
+        low, high = wilson_interval(1, 10)
+        self.assertLess(low, 0.1)
+        self.assertGreater(high, 0.1)
 
 
 if __name__ == "__main__":

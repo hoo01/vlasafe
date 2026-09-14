@@ -16,6 +16,20 @@ from vlasafe.monitors.command_effect import (
 )
 
 
+def wilson_interval(successes: int, total: int, z: float = 1.959963984540054) -> list[float]:
+    if total <= 0:
+        raise ValueError("total must be positive")
+    proportion = successes / total
+    denominator = 1.0 + z * z / total
+    centre = (proportion + z * z / (2.0 * total)) / denominator
+    radius = z * np.sqrt(
+        proportion * (1.0 - proportion) / total + z * z / (4.0 * total * total)
+    ) / denominator
+    lower = 0.0 if successes == 0 else float(max(0.0, centre - radius))
+    upper = 1.0 if successes == total else float(min(1.0, centre + radius))
+    return [lower, upper]
+
+
 def load_cohort(root: Path, expected_mode: str, detection_horizon: int) -> dict[int, dict[str, Any]]:
     cohort = {}
     for episode_dir in sorted(root.iterdir()):
@@ -75,16 +89,22 @@ def summarize(cohort: dict[int, dict[str, Any]], ids: list[int], threshold: floa
             "consistency_first_alarm_step": first,
         })
     consistency_steps = [row["consistency_first_alarm_step"] for row in rows if row["consistency_first_alarm_step"] is not None]
+    consistency_detections = sum(row["consistency_alarm"] for row in rows)
+    protocol_detections = sum(row["protocol_rule_alarm"] for row in rows)
+    range_warnings = sum(row["range_warning"] for row in rows)
     return {
         "episodes": len(rows),
         "successes": sum(row["success"] for row in rows),
-        "consistency_detections": sum(row["consistency_alarm"] for row in rows),
-        "consistency_detection_rate": sum(row["consistency_alarm"] for row in rows) / len(rows),
+        "consistency_detections": consistency_detections,
+        "consistency_detection_rate": consistency_detections / len(rows),
+        "consistency_detection_ci95_wilson": wilson_interval(consistency_detections, len(rows)),
         "consistency_first_alarm_median": float(np.median(consistency_steps)) if consistency_steps else None,
-        "protocol_rule_detections": sum(row["protocol_rule_alarm"] for row in rows),
-        "protocol_rule_detection_rate": sum(row["protocol_rule_alarm"] for row in rows) / len(rows),
-        "range_warnings": sum(row["range_warning"] for row in rows),
-        "range_warning_rate": sum(row["range_warning"] for row in rows) / len(rows),
+        "protocol_rule_detections": protocol_detections,
+        "protocol_rule_detection_rate": protocol_detections / len(rows),
+        "protocol_rule_detection_ci95_wilson": wilson_interval(protocol_detections, len(rows)),
+        "range_warnings": range_warnings,
+        "range_warning_rate": range_warnings / len(rows),
+        "range_warning_ci95_wilson": wilson_interval(range_warnings, len(rows)),
         "details": rows,
     }
 
