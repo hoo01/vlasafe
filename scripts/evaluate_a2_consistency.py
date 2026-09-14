@@ -16,7 +16,7 @@ from vlasafe.monitors.command_effect import (
 )
 
 
-def load_cohort(root: Path, expected_mode: str) -> dict[int, dict[str, Any]]:
+def load_cohort(root: Path, expected_mode: str, detection_horizon: int) -> dict[int, dict[str, Any]]:
     cohort = {}
     for episode_dir in sorted(root.iterdir()):
         if not episode_dir.is_dir() or not (episode_dir / "COMPLETE").exists():
@@ -28,18 +28,21 @@ def load_cohort(root: Path, expected_mode: str) -> dict[int, dict[str, Any]]:
             raise ValueError(f"{episode_dir}: fault_mode={mode}, expected {expected_mode}")
         initial_state_id = int(metadata["initial_state_id"])
         rows = [json.loads(line) for line in (episode_dir / "steps.jsonl").read_text(encoding="utf-8").splitlines()]
-        errors = consistency_errors(rows)
+        if len(rows) <= detection_horizon:
+            raise ValueError(f"{episode_dir}: need at least {detection_horizon + 1} rows to evaluate {detection_horizon} actions")
+        early_rows = rows[: detection_horizon + 1]
+        errors = consistency_errors(early_rows)
         score = episode_consistency_score(errors)
         if not np.isfinite(score):
             raise ValueError(f"{episode_dir}: insufficient active commands for consistency score")
         range_alarm_steps = [
             int(row["step_id"])
-            for row in rows
+            for row in rows[:detection_horizon]
             if row.get("deploy_metadata", {}).get("action_monitor", {}).get("range_violation")
         ]
         protocol_alarm_steps = [
             int(row["step_id"])
-            for row in rows
+            for row in rows[:detection_horizon]
             if row.get("deploy_metadata", {}).get("action_monitor", {}).get("schema_valid") is False
         ]
         cohort[initial_state_id] = {
@@ -92,15 +95,18 @@ def main() -> None:
     parser.add_argument("--action-swap-root", type=Path, required=True)
     parser.add_argument("--camera-swap-root", type=Path, required=True)
     parser.add_argument("--calibration-count", type=int, default=10)
+    parser.add_argument("--detection-horizon", type=int, default=40)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.calibration_count <= 0:
         raise ValueError("calibration-count must be positive")
+    if args.detection_horizon <= 2:
+        raise ValueError("detection-horizon must exceed the three-step window")
 
     cohorts = {
-        "normal": load_cohort(args.normal_root, "none"),
-        "action_swap_xy": load_cohort(args.action_swap_root, "action_swap_xy"),
-        "camera_swap": load_cohort(args.camera_swap_root, "camera_swap"),
+        "normal": load_cohort(args.normal_root, "none", args.detection_horizon),
+        "action_swap_xy": load_cohort(args.action_swap_root, "action_swap_xy", args.detection_horizon),
+        "camera_swap": load_cohort(args.camera_swap_root, "camera_swap", args.detection_horizon),
     }
     common_ids = sorted(set.intersection(*(set(value) for value in cohorts.values())))
     if len(common_ids) <= args.calibration_count:
@@ -123,6 +129,7 @@ def main() -> None:
             "calibration_ids": calibration_ids,
             "evaluation_ids": evaluation_ids,
             "window": 3,
+            "detection_horizon_actions": args.detection_horizon,
             "faults_start_at_step": 0,
             "lead_time_reported": False,
         },

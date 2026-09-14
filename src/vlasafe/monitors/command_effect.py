@@ -58,7 +58,7 @@ def window_scores(
         if any(right != left + 1 for left, right in zip(steps, steps[1:])):
             continue
         result.append({
-            "step": steps[0],
+            "step": steps[-1] + 1,
             "score": float(np.mean([float(row["error"]) for row in window])),
         })
     return result

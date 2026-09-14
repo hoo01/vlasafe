@@ -99,7 +99,7 @@ Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均
 
 - 运行 A1 deterministic case table。
 - 以同 seed、同 initial state 生成 normal、`action_swap_xy`、`camera_swap` 配对 cohort。
-- 只用 normal calibration episodes 冻结 command-effect 阈值；报告 evaluation normal 误报率、两类故障检出率与首次报警步数。
+- 只用 normal calibration episodes 冻结 command-effect 阈值；报告 evaluation cohort 前 40 步的 normal 误报率、两类故障检出率与首次报警步数。
 - 将 `camera_swap` 作为 command-effect negative control，不把 range clipping warning 计作语义故障检出。
 
 ### 2. 文档与最终收口

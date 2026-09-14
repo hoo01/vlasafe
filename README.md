@@ -155,7 +155,7 @@ Test 中 3 条失败在 step 80、1 条在 step 120 首次触发。时间按实�
 
 进度控制实验已经完成，结果属于“当前样本不足以区分”：进度解释得到定量支持，vision 的额外信息没有得到可靠统计证据。当前进入 Week 4 文档、主表和 release 收口。
 
-Week 4 增加一个有界的 RQ1 supporting study：A1 用确定性 case table 验证协议监控；A2 对同 seed、同 initial state 的正常、动作 `x/y` 置换和双相机映射置换进行配对 rollout。Command-effect 阈值只由正常 calibration episodes 确定，随后冻结并报告 evaluation cohort 的正常误报率、故障检出率与首次报警步数。相机置换是 command-effect 的负对照；本阶段不训练专门的 learned A2 monitor。
+Week 4 增加一个有界的 RQ1 supporting study：A1 用确定性 case table 验证协议监控；A2 对同 seed、同 initial state 的正常、动作 `x/y` 置换和双相机映射置换进行配对 rollout。Command-effect 阈值只由正常 calibration episodes 确定，随后冻结并报告 evaluation cohort 的前 40 步正常误报率、故障检出率与首次报警步数。相机置换是 command-effect 的负对照；本阶段不训练专门的 learned A2 monitor。
 
 独立 confirmatory cohort 和第二任务延期。Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking 不进入当前阶段。
 

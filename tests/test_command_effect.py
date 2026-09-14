@@ -34,7 +34,7 @@ class CommandEffectTest(unittest.TestCase):
     def test_reversed_motion_triggers_consecutive_alarm(self) -> None:
         errors = consistency_errors(rows([-0.1, -0.1, -0.1]))
         self.assertAlmostEqual(episode_consistency_score(errors), 2.0)
-        self.assertEqual(first_alarm_step(errors, threshold=1.0), 0)
+        self.assertEqual(first_alarm_step(errors, threshold=1.0), 3)
 
     def test_nonconsecutive_active_steps_do_not_form_window(self) -> None:
         errors = consistency_errors(rows([-0.1, -0.1, -0.1, -0.1]))
