@@ -2,16 +2,16 @@
 
 VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来研究机器人策略失败时，系统能够观察到什么、预测什么，以及哪些结论不能从现有数据推出。
 
-当前核心发现是：冻结视觉特征可以较早预测 task 4 的最终成功或失败，但进一步审计表明，模型主要读取的是**任务执行进度**，现有证据不足以说明它发现了独立的**失效前兆**。因此风险分数目前只用于 Outcome Prediction 和离线效率分析，不能描述为即将发生危险或安全停止依据。
+当前核心发现是：冻结视觉特征可以较早预测 task 4 的最终成功或失败；RGB/error 和 LOEO 审计提示模型可能主要读取**任务执行进度**，但这一机制解释还没有经过进度控制实验的定量验证。风险分数目前只用于 Outcome Prediction 和离线效率分析，不能描述为即将发生危险或安全停止依据。
 
 ## 四周执行状态
 
 | 阶段 | 状态 | 已完成 | 尚未完成 |
 | --- | --- | --- | --- |
 | **Day 0–3 / Week 1** | **完成** | SmolVLA + LIBERO 闭环；从首步启用同步日志和双相机视频；20-episode 性能/成本验收；50 条 task-4 自然 rollout；事件覆盖统计；冻结 30/10/10 group-disjoint split；确定 Outcome 主线 | 无 Week-1 阻塞项 |
-| **Week 2** | **完成** | Initial-proprio difficulty baseline；16-step state/action temporal MLP；冻结 ResNet-50 双相机 predictor；paired episode bootstrap；输入泄漏测试；RGB/error、LOEO 和关键 false-negative 审计；确认主要信号是 execution progress | 不再增加 Transformer 或继续调参 |
-| **Week 3** | **进行中** | 主/腕/双相机消融；validation-thresholded offline utility；test risk 曲线；360×360 outcome-risk 叠加视频；18-file v0.1 checksum | 独立 confirmatory cohort；第二个 mixed-success 任务筛选；进度匹配评测 |
-| **Week 4** | **未开始** | v0.1 已提供可复现阶段快照 | 根据 Week-3 新证据冻结最终主表和结论；完成最终 demo/release；时间允许时加入 RQ1 supporting study |
+| **Week 2** | **完成** | Initial-proprio difficulty baseline；16-step state/action temporal MLP；冻结 ResNet-50 双相机 predictor；paired episode bootstrap；输入泄漏测试；RGB/error、LOEO 和关键 false-negative 审计；形成 execution-progress 假设 | 不再增加 Transformer 或继续调参 |
+| **Week 3** | **进行中** | 主/腕/双相机消融；validation-thresholded offline utility；test risk 曲线；360×360 outcome-risk 叠加视频；18-file v0.1 checksum | **进度控制实验：定量检验控制执行进度后是否仍有 outcome 信号** |
+| **Week 4** | **未开始** | v0.1 已提供可复现阶段快照 | 统一完成度表述；根据进度控制结果冻结最终主表、结论、demo 和 release |
 
 Week 1–2 回答了“系统能否运行、数据支持哪条主线、学习模型是否存在信号”。Week 3 要回答“这个信号能否在独立数据中复现，以及控制进度后是否仍成立”。Week 4 才是完整项目的最终收口。当前 v0.1 不能替代后两步。
 
@@ -113,7 +113,7 @@ Paired episode bootstrap 支持 vision-step80 相对 initial-proprio 的排序�
 - Vision-step80 与 temporal-step120 错排同一对 failure/success，概率高度相关（Pearson `0.9998`，Spearman `0.9515`）。
 - 关键 false negative 在 step 80 看起来仍顺利推进，之后进入近完成构型，却持续微调至 step 280 超时；可靠分叉约在 step 120–160。
 
-因此当前最稳妥的解释是：**模型主要读取 outcome-associated execution progress**。保留“预测最终结果”的测量结论，撤回“视觉更早发现独立失效前兆”的机制解释。
+因此当前最稳妥的工作假设是：**模型主要读取 outcome-associated execution progress**。保留“预测最终结果”的测量结论，撤回“视觉更早发现独立失效前兆”的机制解释。下一步必须用进度控制实验判断：控制进度后信号消失、部分保留，还是现有样本不足以区分两种解释。
 
 ## 8. Supporting results
 
@@ -142,14 +142,9 @@ Test 中 3 条失败在 step 80、1 条在 step 120 首次触发。时间按实�
 
 2026-09-14 冻结的 18-file checksum 是 **task-4 Outcome v0.1 阶段快照**，不是四周项目终点。它完成了单任务 pipeline 和主假设审计，但证据仍然偏薄。
 
-接下来的优先级是：
+当前只推进一项研究工作：**进度控制实验**。使用现有 50 条轨迹构造预先定义的进度代理，比较进度相近但最终 outcome 不同的 episode，并检验加入冻结 outcome risk 后是否仍改善 held-out 判别或概率误差。三种结果都如实报告：信号消失、信号部分保留，或样本不足以区分。
 
-1. **独立 confirmatory cohort：** 保持现有 cohort、test 和阈值不动，用新 seed/initial states 检查 step-80 vision、step-120 temporal 和 offline utility 是否复现。
-2. **第二个混合成功率任务：** 先用 10–20 条 rollout 筛选，再作为独立 regime 报告；不声称 held-out task generalization。
-3. **进度控制实验：** 比较进度相近但最终 outcome 不同的轨迹，检验去除进度差异后是否还存在预测信号。
-4. **RQ1 supporting study：** 实现 A1 运行时注入、两类 A2 stress test 和最小 command-effect consistency，分别报告检出率与误报率。
-
-不扩展 Transformer、π0.5、RoboTwin、recovery 或 adaptive chunking，除非上述验证先建立更强证据。
+独立 confirmatory cohort、第二任务和 RQ1 supporting study 延期。它们分别只能增强 task-4 稳定性、增加一个独立任务 regime 或展开另一条故障诊断战线，当前都不如进度控制实验直接回答主结论。Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking 同样不进入当前阶段。
 
 ## 10. 复现
 
@@ -171,3 +166,7 @@ python -m unittest discover -s tests -v
 - RQ1 的主动故障注入、command-effect consistency 和 A2 learned monitor 尚未测试。
 - Offline utility 没有执行真实闭环干预。
 - 当前结果不能支持 held-out task、物体或平台泛化主张。
+
+## 12. 项目定位
+
+这是一个关于 VLA 失败预测的**单任务方法论研究**。核心贡献是泄漏受控的闭环数据与评测流程，以及两次基于证据的结论收缩：先因 unsafe-event 覆盖不足从 Impending 转向 Outcome，再因机制审计撤回“独立失效前兆”的解释。项目不把当前结果包装成可泛化的失败检测方法。

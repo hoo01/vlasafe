@@ -6,7 +6,7 @@
 
 项目已完成 **task-4 Outcome v0.1 阶段快照**，尚未完成完整四周计划。
 
-当前证据支持：冻结视觉和状态/动作历史能够在 held-out initial states 上预测 task 4 的最终 outcome；模型主要读取执行进度。
+当前证据支持：冻结视觉和状态/动作历史能够在 held-out initial states 上预测 task 4 的最终 outcome。定性审计提示模型可能主要读取执行进度；该机制解释尚待进度控制实验定量验证。
 
 当前证据不支持：独立失效前兆、Impending Failure Detection、safe stop、RQ1 覆盖率或任务级泛化。
 
@@ -74,40 +74,34 @@ Wrist/dual 相对 main 的 Brier/ECE 改善得到配对区间支持；wrist 与 
 
 | 缺口 | 为什么重要 |
 | --- | --- |
-| 没有独立 confirmatory cohort | 当前主要结论依赖 10 条 test episode |
-| 只有一个正式任务 | 无法判断信号是否只属于 task 4 |
 | Failure 全为 280-step timeout | Outcome 很可能被完成进度和时长结构驱动 |
 | 没有进度匹配评测 | 尚未严格分离进度与进度之外的失败信息 |
+| Test 只有 10 episodes | 进度控制分析可能没有足够的匹配成功/失败对 |
+| 只有一个正式任务 | 当前研究必须定位为单任务方法论研究 |
 | RQ1 未测试 | 没有 A1/A2 注入、command-effect consistency 或 learned A2 coverage |
 | Impending 数据不足 | 不能评测事件预警、lead time 或 safe stop |
 
 ## 下一步执行顺序
 
-### 1. 独立 confirmatory cohort
-
-- 保持 v0.1 cohort、test、checkpoint 和阈值不变。
-- 使用新 seed 和 initial states 收集独立轨迹。
-- 直接复验 vision-step80、temporal-step120 和固定 utility policy。
-- 不用 confirmatory 数据重新选择模型或阈值。
-
-### 2. 第二任务
-
-- 对候选任务各跑 10–20 条筛选 mixed-success regime。
-- 冻结任务后再收集正式 cohort。
-- 单独报告结果，不把两个任务混成一个指标，也不声称 task-level generalization。
-
-### 3. 进度控制实验
+### 1. 进度控制实验（当前唯一研究任务）
 
 - 定义部署可得或仅用于分层评测的进度 proxy。
 - 比较进度相近但 outcome 不同的 episode。
 - 检查控制进度后 predictor 是否仍有可靠排序信号。
+- 若样本不足以形成有效匹配，将“当前数据无法区分进度与额外失败信息”作为正式限制。
 
-### 4. RQ1 supporting study
+### 2. 文档与最终收口
 
-- A1：shape、dtype、NaN/Inf、timestamp 和显式 range 注入。
-- A2：优先动作维度置换与主/腕相机映射错位。
-- 实现最小 command-effect consistency。
-- 报告前 N 步检出率、正常对照误报率和首次报警步数。
+- 对照原始四周目标逐项标记完成、部分完成和未完成。
+- 根据进度控制结果更新机制结论和最终主表。
+- 保留 v0.1 artifact，不用新分析反向修改冻结预测。
+
+### 明确延期
+
+- 独立 confirmatory cohort。
+- 第二个任务。
+- RQ1 A1/A2 fault-injection supporting study。
+- Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking。
 
 ## 冻结边界
 
