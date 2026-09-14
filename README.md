@@ -4,6 +4,17 @@ VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来�
 
 当前核心发现是：冻结视觉特征可以较早预测 task 4 的最终成功或失败，但进一步审计表明，模型主要读取的是**任务执行进度**，现有证据不足以说明它发现了独立的**失效前兆**。因此风险分数目前只用于 Outcome Prediction 和离线效率分析，不能描述为即将发生危险或安全停止依据。
 
+## 四周执行状态
+
+| 阶段 | 状态 | 已完成 | 尚未完成 |
+| --- | --- | --- | --- |
+| **Day 0–3 / Week 1** | **完成** | SmolVLA + LIBERO 闭环；从首步启用同步日志和双相机视频；20-episode 性能/成本验收；50 条 task-4 自然 rollout；事件覆盖统计；冻结 30/10/10 group-disjoint split；确定 Outcome 主线 | 无 Week-1 阻塞项 |
+| **Week 2** | **完成** | Initial-proprio difficulty baseline；16-step state/action temporal MLP；冻结 ResNet-50 双相机 predictor；paired episode bootstrap；输入泄漏测试；RGB/error、LOEO 和关键 false-negative 审计；确认主要信号是 execution progress | 不再增加 Transformer 或继续调参 |
+| **Week 3** | **进行中** | 主/腕/双相机消融；validation-thresholded offline utility；test risk 曲线；360×360 outcome-risk 叠加视频；18-file v0.1 checksum | 独立 confirmatory cohort；第二个 mixed-success 任务筛选；进度匹配评测 |
+| **Week 4** | **未开始** | v0.1 已提供可复现阶段快照 | 根据 Week-3 新证据冻结最终主表和结论；完成最终 demo/release；时间允许时加入 RQ1 supporting study |
+
+Week 1–2 回答了“系统能否运行、数据支持哪条主线、学习模型是否存在信号”。Week 3 要回答“这个信号能否在独立数据中复现，以及控制进度后是否仍成立”。Week 4 才是完整项目的最终收口。当前 v0.1 不能替代后两步。
+
 ## 1. 研究问题
 
 | Regime | 含义 | 示例 | 合适的处理方式 |
