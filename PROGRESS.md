@@ -8,7 +8,7 @@
 
 当前证据支持：冻结视觉和状态/动作历史能够在 held-out initial states 上预测 task 4 的最终 outcome；执行进度可以解释大部分排序能力。现有 10 条 test episode 不足以判断 vision-step80 是否还包含进度之外的信息。
 
-当前证据不支持：独立失效前兆、Impending Failure Detection、safe stop、RQ1 覆盖率或任务级泛化。RQ1 实验实现已完成，但在正式 artifact 生成前仍不报告覆盖率。
+当前证据不支持：独立失效前兆、Impending Failure Detection、safe stop、未测试 A2 类型的覆盖率或任务级泛化。
 
 ## 已完成
 
@@ -83,6 +83,15 @@ Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均
 
 结论：进度解释得到定量支持；数据缺少足够 outcome overlap，无法可靠检验 vision 的进度外信号。
 
+### RQ1 supporting study
+
+- A1：11/11 预定义协议案例得到预期处理。
+- A2：20 组同 seed/initial-state 三路配对 rollout；前 10 组 normal calibration，后 10 组 evaluation；统一统计前 40 步。
+- Normal：command-effect 1/10，95% Wilson CI `[0.018, 0.404]`，success 6/10。
+- `action_swap_xy`：command-effect 10/10，CI `[0.722, 1.000]`，首次报警中位 step 3，success 0/10。
+- `camera_swap`：command-effect 7/10，CI `[0.397, 0.892]`，首次报警中位 step 29，success 0/10；只解释为闭环异常的间接响应。
+- 协议规则对两类 A2 均为 0/10。Range warning 在 normal 为 10/10，不能用作 A2 检测。
+
 ## 当前缺口
 
 | 缺口 | 为什么重要 |
@@ -90,21 +99,14 @@ Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均
 | Failure 全为 280-step timeout | Outcome 很可能被完成进度和时长结构驱动 |
 | Test 只有 10 episodes | 进度控制只有两对较近的 vision success/failure 匹配 |
 | 只有一个正式任务 | 当前研究必须定位为单任务方法论研究 |
-| RQ1 正式实验待跑 | A1 case table 与 A2 注入/command-effect evaluator 已实现；尚无正式 paired cohort，且本阶段不含 learned A2 monitor |
+| RQ1 范围有限 | 只测试一个任务、两类 A2、10 组 evaluation pairs；无 learned A2 monitor |
 | Impending 数据不足 | 不能评测事件预警、lead time 或 safe stop |
 
 ## 下一步执行顺序
 
-### 1. RQ1 supporting study
+### 1. 文档与最终收口
 
-- 运行 A1 deterministic case table。
-- 以同 seed、同 initial state 生成 normal、`action_swap_xy`、`camera_swap` 配对 cohort。
-- 只用 normal calibration episodes 冻结 command-effect 阈值；报告 evaluation cohort 前 40 步的 normal 误报率、两类故障检出率与首次报警步数。
-- 将 `camera_swap` 作为 command-effect negative control，不把 range clipping warning 计作语义故障检出。
-
-### 2. 文档与最终收口
-
-- 将 RQ1 结果加入完成度表、限制和 release manifest。
+- 将两个 RQ1 result JSON 加入 release checksum；A2 report 保留全部 paired episode ID、seed 和逐条结果。
 - 保留 v0.1 artifact，不用新分析反向修改冻结预测。
 
 ### 明确延期

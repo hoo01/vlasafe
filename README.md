@@ -11,7 +11,7 @@ VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来�
 | **Day 0–3 / Week 1** | **完成** | SmolVLA + LIBERO 闭环；从首步启用同步日志和双相机视频；20-episode 性能/成本验收；50 条 task-4 自然 rollout；事件覆盖统计；冻结 30/10/10 group-disjoint split；确定 Outcome 主线 | 无 Week-1 阻塞项 |
 | **Week 2** | **完成** | Initial-proprio difficulty baseline；16-step state/action temporal MLP；冻结 ResNet-50 双相机 predictor；paired episode bootstrap；输入泄漏测试；RGB/error、LOEO 和关键 false-negative 审计；形成 execution-progress 假设 | 不再增加 Transformer 或继续调参 |
 | **Week 3** | **完成** | 主/腕/双相机消融；offline utility；risk 曲线与视频；定量进度控制实验 | 无 Week-3 阻塞项 |
-| **Week 4** | **进行中** | v0.1 可复现快照；完成度和 claim audit；A1/A2 supporting study 实现 | 运行配对故障 cohort，冻结 RQ1 结果并更新 release |
+| **Week 4** | **进行中** | v0.1 可复现快照；完成度和 claim audit；A1 case table；60 条 A2 配对 rollout；command-effect evaluation | 将 RQ1 artifact 加入 release checksum |
 
 Week 1–2 回答了“系统能否运行、数据支持哪条主线、学习模型是否存在信号”。Week 3 要回答“这个信号能否在独立数据中复现，以及控制进度后是否仍成立”。Week 4 才是完整项目的最终收口。当前 v0.1 不能替代后两步。
 
@@ -32,7 +32,7 @@ Week 1–2 回答了“系统能否运行、数据支持哪条主线、学习模
 3. **RQ2b（Impending Failure Detection）：** 对具有明确事件时刻的危险事件，能否预测未来 `K` 步内是否发生？
 4. **RQ3（Utility / Control）：** 预测结果能否节省无效 rollout 计算，或在有可靠 Impending 标签时支持安全干预？
 
-当前完成的是 **RQ2a 的单任务阶段结果和离线 efficiency 分析**。RQ1 的实验代码已经就绪、正式数据尚未生成；RQ2b 和真实闭环干预尚未完成。
+当前完成的是 **RQ2a 的单任务阶段结果和离线 efficiency 分析，以及 RQ1 的有界 supporting study**。RQ1 尚未包含 learned A2 monitor；RQ2b 和真实闭环干预尚未完成。
 
 ## 2. Outcome 与 Impending 的区别
 
@@ -149,13 +149,27 @@ Validation 在零 sacrificed-success 约束下选择阈值 `0.9998072982`，随�
 
 Test 中 3 条失败在 step 80、1 条在 step 120 首次触发。时间按实测 `70.042 ms/step` 换算。该结果只是已记录轨迹上的反事实效率上界，不能当作通用阈值、闭环 safe stop 或安全改进证据。
 
+### A1/A2 部署故障诊断
+
+A1 使用 11 个预定义 deterministic cases，覆盖合法动作、shape、dtype、NaN/Inf、上下界和时间戳类型/负值/倒退，结果为 **11/11**。这是对所列案例的完整覆盖，不是对所有可能协议错误的统计泛化率。
+
+A2 使用 20 组相同 seed 和 initial state 的三路配对 rollout：normal、`action_swap_xy` 和 `camera_swap`。前 10 组 normal 只用于冻结三步 command-effect 窗口阈值 `0.259284`，后 10 组用于一次性评测；三种 regime 都只统计前 40 步。
+
+| Evaluation regime | Task success | Protocol rule | Command-effect | 95% Wilson CI | Median first alarm |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Normal | 6/10 | 0/10 | 1/10 | [0.018, 0.404] | 36 |
+| `action_swap_xy` | 0/10 | 0/10 | **10/10** | [0.722, 1.000] | **3** |
+| `camera_swap` | 0/10 | 0/10 | 7/10 | [0.397, 0.892] | 29 |
+
+协议规则对两类 A2 都是 0/10，说明合法数值的语义错误会通过 A1 schema/range checks。Command-effect 对动作维度置换有直接诊断意义；`camera_swap` 的 7/10 只表示错误视觉使闭环进入异常 command/effect 分布，不能解释为相机映射分类能力。Range clipping warning 在 normal 为 10/10、动作置换为 9/10、相机置换为 1/10，因此不能作为语义故障报警器。
+
 ## 9. 当前状态与下一阶段
 
 2026-09-14 冻结的 18-file checksum 是 **task-4 Outcome v0.1 阶段快照**，不是四周项目终点。它完成了单任务 pipeline 和主假设审计，但证据仍然偏薄。
 
 进度控制实验已经完成，结果属于“当前样本不足以区分”：进度解释得到定量支持，vision 的额外信息没有得到可靠统计证据。当前进入 Week 4 文档、主表和 release 收口。
 
-Week 4 增加一个有界的 RQ1 supporting study：A1 用确定性 case table 验证协议监控；A2 对同 seed、同 initial state 的正常、动作 `x/y` 置换和双相机映射置换进行配对 rollout。Command-effect 阈值只由正常 calibration episodes 确定，随后冻结并报告 evaluation cohort 的前 40 步正常误报率、故障检出率与首次报警步数。相机置换是 command-effect 的负对照；本阶段不训练专门的 learned A2 monitor。
+Week 4 的 RQ1 supporting study 已完成：A1 case table 为 11/11；A2 的协议规则无法识别两类数值合法故障，command-effect 在 10 条 evaluation pairs 中对动作 `x/y` 置换检出 10/10，正常误报 1/10。相机置换结果只作为间接异常响应报告。本阶段不训练专门的 learned A2 monitor。
 
 独立 confirmatory cohort 和第二任务延期。Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking 不进入当前阶段。
 
@@ -174,8 +188,8 @@ Week 4 增加一个有界的 RQ1 supporting study：A1 用确定性 case table �
 | 风险叠加视频 | **完成** | outcome-risk offline overlay |
 | 可复现阶段 release | **完成** | 18-file v0.1 checksum 18/18 |
 | 2–3 个正式任务 | **未完成** | 当前只有 task 4，不声称 task generalization |
-| A1 运行时规则覆盖 | **实现完成，实验待跑** | shape、dtype、NaN/Inf、range 和 timestamp deterministic case table |
-| A2 / command-effect consistency | **实现完成，实验待跑** | 配对 `action_swap_xy` / `camera_swap` rollout 与 normal-only threshold calibration |
+| A1 运行时规则覆盖 | **完成（有界案例集）** | 11/11 deterministic cases；不外推到未测试协议错误 |
+| A2 / command-effect consistency | **完成（supporting study）** | 20 组配对 cohort；动作置换 10/10、normal 误报 1/10；相机结果仅为间接响应 |
 | Impending detector / safe stop | **不适用当前主线** | event-positive 数据不足，按门槛主动放弃 |
 
 ## 10. 复现
@@ -195,7 +209,7 @@ python -m unittest discover -s tests -v
 - Test 只有 10 条 episode，7 条失败全部是 280-step timeout。
 - Outcome predictor 没有明确 failure timestamp，不能报告 unsafe lead time。
 - Self-collision/joint-violation 标签覆盖不足，workspace/impact 尚未冻结。
-- RQ1 的正式注入 cohort 尚未生成；当前 supporting study 也不包含 learned A2 monitor。
+- RQ1 只测试两类 A2 故障、一个任务和 10 组 evaluation pairs，且不包含 learned A2 monitor。
 - Offline utility 没有执行真实闭环干预。
 - 当前结果不能支持 held-out task、物体或平台泛化主张。
 

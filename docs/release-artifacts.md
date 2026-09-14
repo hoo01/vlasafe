@@ -32,6 +32,18 @@ digest, and policy-weights digest. Predictor inputs exclude label-only simulator
 - RGB/error and LOEO audit: `artifacts/audits/week2_step80/`
 - False-negative audit: `artifacts/audits/week2_fn_013117405943Z/`
 
+## RQ1 supporting study
+
+- A1 protocol case table: `artifacts/results/rq1_a1_monitor.json`
+- A2 paired rollouts: `artifacts/rq1/task4/{none,action_swap_xy,camera_swap}/`
+- A2 command-effect report: `artifacts/results/rq1_task4_a2_consistency.json`
+- Protocol: 20 paired initial states; first 10 normal pairs calibrate the threshold;
+  the remaining 10 pairs are evaluated over the first 40 actions.
+- A1 predefined cases: 11/11 passed.
+- A2 evaluation: normal 1/10, action-swap 10/10, and camera-swap 7/10
+  command-effect alarms. The camera result is an indirect closed-loop anomaly signal,
+  not direct camera-mapping classification.
+
 ## Display artifacts
 
 - Test risk curves: `artifacts/visualizations/week1_task4/test_outcome_risk_curves.png`
@@ -102,6 +114,20 @@ python scripts/analyze_progress_control.py \
   --samples 10000 --seed 20260914
 ```
 
+Reproduce the RQ1 reports from the recorded paired cohort:
+
+```bash
+python scripts/evaluate_a1_monitor.py \
+  --output artifacts/results/rq1_a1_monitor.json
+
+python scripts/evaluate_a2_consistency.py \
+  --normal-root artifacts/rq1/task4/none \
+  --action-swap-root artifacts/rq1/task4/action_swap_xy \
+  --camera-swap-root artifacts/rq1/task4/camera_swap \
+  --calibration-count 10 --detection-horizon 40 \
+  --output artifacts/results/rq1_task4_a2_consistency.json
+```
+
 ## Integrity check before publishing
 
 Run this on the experiment host after all artifacts are frozen, store the output with
@@ -120,6 +146,6 @@ sha256sum \
 ## Claim boundary
 
 This release supports held-out initial-state episode outcome prediction on one LIBERO
-task and an offline efficiency analysis. It does not establish held-out task
-generalization, impending unsafe-event detection, safe-stop effectiveness, A1/A2 fault
-coverage, or command-effect consistency performance.
+task, an offline efficiency analysis, and a bounded A1/A2 supporting study. It does not
+establish held-out task generalization, impending unsafe-event detection, safe-stop
+effectiveness, learned A2 monitoring, or coverage beyond the explicitly tested fault cases.
