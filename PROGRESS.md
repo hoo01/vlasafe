@@ -1,12 +1,12 @@
 # VLA-SafeBench Progress
 
-> 最后更新：2026-09-11。这里只保留影响当前决策、阶段闸门和复现的事实；完整研究边界见 `README.md`。
+> 最后更新：2026-09-14。这里只保留影响当前决策、阶段闸门和复现的事实；完整研究边界见 `README.md`。
 
 ## 1. 当前状态
 
 | 项目 | 当前结论 |
 | --- | --- |
-| 阶段 | **Week 2 learned-signal gate 已通过**；进入 decision utility 与最小消融 |
+| 阶段 | **Outcome Prediction MVP release 已冻结** |
 | Policy / Simulator | SmolVLA + LIBERO，闭环 rollout 已跑通 |
 | 当前主任务 | `libero_spatial` task 4 |
 | 正式 benchmark | **20/20 验证通过；8 成功 / 12 失败（40% success）** |
@@ -16,7 +16,7 @@
 | 冻结 split | **30 train / 10 validation / 10 test；initial state 分组不相交** |
 | Week-1 结论 | temporal MLP 在 step 120 显著优于 initial-proprio difficulty baseline；step 0–80 尚无可靠优势 |
 | Week-2 结论 | learned-signal gate 通过；vision 与 temporal 主要读取 execution-progress 信号，不支持独立的早期失败前兆主张 |
-| 当前剩余 | 冻结主结果表、README 最终叙事与可复现 release |
+| 当前剩余 | 无阻塞项；RQ1、Impending 与多任务泛化均为后续扩展 |
 
 ## 2. 阶段闸门
 
@@ -303,6 +303,10 @@ Test 中 3 条失败在 step 80 首次超过阈值，各节省 199 步；1 条�
 已生成 10 条 held-out test episode 在 step 0/40/80/120 的 frozen dual-camera outcome-risk 曲线，以及失败 episode `smolvla-20260911T014308102939Z` 的风险叠加视频。该 episode 在离线策略中于 step 80 首次超过 validation 阈值；视频仍完整播放原始 280-step rollout，并明确标注风险语义为最终 episode failure probability、触发点为 offline counterfactual，不表现为真实 safe-stop 干预。
 
 产物为 `artifacts/visualizations/week1_task4/test_outcome_risk_curves.png`、`artifacts/visualizations/week1_task4/smolvla-20260911T014308102939Z_outcome_risk_overlay.mp4` 与 `render_metadata.json`。FFprobe 验证输出视频为 360×360、20 FPS、280 帧；渲染器已禁止 ImageIO 将画面隐式缩放到 368×368。
+
+### Release freeze（2026-09-14）
+
+主结果表、最终 README、复现脚本和 artifact 索引已收口。实验主机生成 `artifacts/release-sha256.txt`，覆盖冻结 split manifest、Outcome dataset、frozen-vision feature cache、全部主结果/消融/utility JSON 以及风险曲线和叠加视频，共 18 个文件；`sha256sum -c` 验证 18/18 通过。该清单是本次 Outcome MVP release 的完整性边界。
 
 ## 9. 复现环境
 

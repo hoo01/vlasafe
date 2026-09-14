@@ -16,7 +16,7 @@ That experience motivated a simulator-first project about distinguishing deploym
 
 ## Current project state
 
-- Status (2026-09-14): the Outcome Prediction MVP experiments are complete; the remaining work is release integrity/indexing and final documentation.
+- Status (2026-09-14): the Outcome Prediction MVP release is frozen. The main table, documentation, reproducibility scripts, artifact index, and visualization are complete; the 18-file release checksum manifest passes 18/18 checks.
 - Canonical specification: `README.md` in this directory.
 - Platform: SmolVLA + LIBERO `libero_spatial` task 4 on RTX 4090 D.
 - Frozen natural cohort: 50 episodes, 18 successes / 32 failures; group-disjoint train/validation/test = 30/10/10 by `initial_state_id`.
@@ -28,7 +28,7 @@ That experience motivated a simulator-first project about distinguishing deploym
 - The main/wrist/dual-camera ablation is complete. At step 80, main/wrist/dual test AUPRC is 0.844/1.000/0.982 and AUROC is 0.667/1.000/0.952. Paired bootstrap supports lower Brier/ECE for wrist and dual versus main, but does not support a reliable wrist-versus-dual difference. Keep the preregistered dual-camera pipeline as the main model.
 - Validation selected an offline outcome threshold of 0.9998072982 under a zero-sacrificed-validation-success constraint. On test it identified 4/7 failures, observed 0/3 sacrificed successes, and counterfactually saved 756 recorded steps (52.95 seconds at the measured 70.042 ms/step). This is an offline efficiency/faster-confirmation result, not a safety intervention.
 - The test risk plot and a 360x360, 20 FPS, 280-frame outcome-risk overlay video are complete. The overlay explicitly marks the step-80 trigger as offline counterfactual and continues the recorded trajectory.
-- Next: freeze the release artifact hashes and finish documentation. Do not reopen model selection, frame outcome-based termination as a safety intervention, or upgrade to Transformer.
+- Next work, if explicitly resumed, is post-MVP scope: RQ1 A1/A2 fault injection, Impending data expansion, or multi-task evaluation. Do not reopen the frozen model selection, frame outcome-based termination as a safety intervention, or upgrade to Transformer merely to improve this release.
 
 ## Locked research definitions
 
