@@ -51,8 +51,25 @@ Step 80 的 outcome risk 为 0.8，只表示模型认为整条 episode 最终失
 A1/A2 故障通常从 `t=0` 就存在，因此也不报告 lead time。它们应报告前 `N` 步检出率、正常对照误报率和首次报警步数。
 
 ## 3. 系统与数据边界
+当前平台为 **SmolVLA + LIBERO `libero_spatial` task 4**。这里的 LIBERO 提供语言条件操作任务、视觉观测、连续控制接口、可重复的初始状态和自动成功判定；robosuite/MuJoCo 提供闭环仿真。项目使用 LeRobot 的环境适配与 SmolVLA 预处理链路，但训练监控器的数据来自本项目实际执行策略后采集的 rollout，并非直接使用 LIBERO 的离线示范作为失败预测数据。
 
-当前平台为 **SmolVLA + LIBERO `libero_spatial` task 4**。Rollout 路径从第一步开始同步记录：
+### 为什么使用 LIBERO-Spatial
+
+LIBERO 官方包含四组 task suite：Spatial 侧重空间关系变化，Object 侧重操作对象变化，Goal 侧重任务目标变化，LIBERO-100 则包含知识因素相互交织的 100 个任务，并进一步划分为 LIBERO-90 和 LIBERO-10。本项目没有进行跨 suite 性能比较，选择 Spatial 是四周 MVP 的预先范围控制，不能据此声称它优于其他 suite。
+
+Spatial 适合当前研究的原因是：先固定在一个以空间关系为主要变化来源的 suite 中，可以减少跨物体类别、跨目标语义和长程子任务结构同时变化造成的混杂；同时，任务能够在 RTX 4090 上快速闭环执行，正式采集约为每秒 30 多个控制步。需要注意，**suite、task 和 initial state 是三个不同层级**：
+
+- `libero_spatial` 是 suite，规定这一组任务主要考察空间关系；
+- task 4 是默认 task order 下的一条固定语言任务：从木柜顶层抽屉中取出黑碗并放到盘子上；
+- initial state 是执行同一 task 4 时的一种起始场景配置。
+
+因此，held-out initial-state 评测指：训练、validation 和 test 使用同一 task 4，但按 `initial_state_id` 隔离不同起始配置，使模型不能在训练中见到 test 的初始状态。它只检验同一任务内对未见初始配置的适应能力；其他 LIBERO suite 同样可以这样切分，这不是 Spatial 独有的性质，也不构成 held-out task 或跨 suite 泛化。
+
+### 为什么最终使用 task 4
+
+任务选择发生在 Spatial suite 内。项目先对 task 1–9 各运行一条初筛，再对有代表性的候选扩测：task 5 连同初筛共 6/6 失败，过难；task 7 连同初筛共 6/6 成功，过易；task 4 的五条扩测为 1/5 成功、4/5 失败，首次确认了同一任务内的混合 outcome。因此正式采集选择 task 4，而没有把一个全成功任务和另一个全失败任务混合，否则 predictor 可能仅凭 task identity 完成分类。最终 task-4 自然 cohort 为 50 条，其中 18 条成功、32 条失败。
+
+Rollout 路径从第一步开始同步记录：
 
 - 主相机和腕部相机 RGB；
 - proprioception；
