@@ -2,7 +2,7 @@
 
 VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来研究机器人策略失败时，系统能够观察到什么、预测什么，以及哪些结论不能从现有数据推出。
 
-当前核心发现是：冻结视觉特征可以较早预测 task 4 的最终成功或失败；RGB/error 和 LOEO 审计提示模型可能主要读取**任务执行进度**，但这一机制解释还没有经过进度控制实验的定量验证。风险分数目前只用于 Outcome Prediction 和离线效率分析，不能描述为即将发生危险或安全停止依据。
+当前核心发现是：冻结视觉特征可以较早预测 task 4 的最终成功或失败；RGB/error、LOEO 和定量进度控制共同表明，**任务执行进度可以解释大部分已观察到的预测能力**。由于 test 只有 10 条 episode、进度相近且结果相反的轨迹太少，现有数据仍无法判断视觉模型是否还读取了进度之外的 outcome 信号。风险分数只用于 Outcome Prediction 和离线效率分析，不能描述为即将发生危险或安全停止依据。
 
 ## 四周执行状态
 
@@ -167,7 +167,7 @@ A2 使用 20 组相同 seed 和 initial state 的三路配对 rollout：normal�
 
 2026-09-14 最终 release checksum 包含 21 个文件并通过 21/21 校验：原 18-file Outcome v0.1 快照、进度控制报告和两个 RQ1 报告。大体积配对 rollout 留在实验主机，并由 A2 report 中的 episode ID、seed 和逐条结果索引。
 
-进度控制实验已经完成，结果属于“当前样本不足以区分”：进度解释得到定量支持，vision 的额外信息没有得到可靠统计证据。当前进入 Week 4 文档、主表和 release 收口。
+进度控制实验已经完成，结果属于“当前样本不足以区分”：进度解释得到定量支持，vision 的额外信息没有得到可靠统计证据。该结果已纳入最终文档和 release。
 
 Week 4 的 RQ1 supporting study 已完成：A1 case table 为 11/11；A2 的协议规则无法识别两类数值合法故障，command-effect 在 10 条 evaluation pairs 中对动作 `x/y` 置换检出 10/10，正常误报 1/10。相机置换结果只作为间接异常响应报告。本阶段不训练专门的 learned A2 monitor。
 
