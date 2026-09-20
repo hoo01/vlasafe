@@ -55,6 +55,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--task-id", type=int, default=0)
     parser.add_argument("--num-episodes", type=int, default=1)
+    parser.add_argument(
+        "--initial-state-start",
+        type=int,
+        default=0,
+        help="First LIBERO preset init-state index; used for held-out confirmation cohorts.",
+    )
     parser.add_argument("--fault-mode", choices=FAULT_MODES, default="none")
     parser.add_argument(
         "--provenance",
@@ -86,13 +92,14 @@ def _record_episode(
 ) -> dict[str, Any]:
     episode_started = time.perf_counter()
     seed = args.seed + episode_index
+    initial_state_id = args.initial_state_start + episode_index
     episode_id = datetime.now(timezone.utc).strftime("smolvla-%Y%m%dT%H%M%S%fZ")
     metadata = EpisodeMetadata(
         episode_id=episode_id,
         task="libero_spatial",
         task_id=args.task_id,
         seed=seed,
-        initial_state_id=episode_index,
+        initial_state_id=initial_state_id,
         policy_id=str(checkpoint),
         policy_revision=provenance["policy_revision"],
         lerobot_revision=provenance["lerobot_revision"],
@@ -103,6 +110,7 @@ def _record_episode(
             "observation_width": 360,
             "control_mode": "relative",
             "benchmark_episode_index": episode_index,
+            "libero_initial_state_id": initial_state_id,
             "task_description": task_description[0],
             "video_enabled": not args.no_video,
             "fault_mode": args.fault_mode,
@@ -117,6 +125,13 @@ def _record_episode(
     clipped_steps = 0
     try:
         policy.reset()
+        wrapper = env.envs[0]
+        actual_initial_state_id = int(wrapper.init_state_id)
+        if actual_initial_state_id != initial_state_id:
+            raise RuntimeError(
+                "LIBERO init-state cursor mismatch before reset: "
+                f"expected={initial_state_id}, actual={actual_initial_state_id}"
+            )
         raw_obs, _ = env.reset(seed=seed)
         diagnostics = SimDiagnostics.from_vector_env(env)
         main_frames: list[np.ndarray] = []
@@ -262,7 +277,7 @@ def _record_episode(
         return {
             "episode_id": episode_id,
             "episode_index": episode_index,
-            "initial_state_id": episode_index,
+            "initial_state_id": initial_state_id,
             "seed": seed,
             "success": success,
             "num_steps": num_steps,
@@ -290,6 +305,8 @@ def main() -> None:
     args = parse_args()
     if args.num_episodes <= 0:
         raise ValueError("--num-episodes must be positive")
+    if args.initial_state_start < 0:
+        raise ValueError("--initial-state-start must be non-negative")
     os.environ.setdefault("MUJOCO_GL", "egl")
     os.environ.setdefault("PYOPENGL_PLATFORM", "egl")
     checkpoint = args.checkpoint.resolve()
@@ -319,6 +336,16 @@ def main() -> None:
             episode_length=args.max_steps,
         )
         env = cfg.create_envs(n_envs=1, use_async_envs=False)["libero_spatial"][args.task_id]
+        wrapper = env.envs[0]
+        available_initial_states = len(wrapper._init_states)
+        initial_state_stop = args.initial_state_start + args.num_episodes
+        if initial_state_stop > available_initial_states:
+            raise ValueError(
+                "requested LIBERO init-state range exceeds available presets: "
+                f"[{args.initial_state_start}, {initial_state_stop}) vs "
+                f"{available_initial_states} states"
+            )
+        wrapper.init_state_id = args.initial_state_start
         policy = SmolVLAPolicy.from_pretrained(checkpoint).to("cuda").eval()
         env_preprocessor, env_postprocessor = make_env_pre_post_processors(
             env_cfg=cfg, policy_cfg=policy.config
@@ -362,6 +389,8 @@ def main() -> None:
         "task": "libero_spatial",
         "task_id": args.task_id,
         "seed_start": args.seed,
+        "initial_state_start": args.initial_state_start,
+        "initial_state_stop_exclusive": args.initial_state_start + len(episodes),
         "vlasafe_revision": vlasafe_revision,
         "provenance": provenance,
         "video_enabled": not args.no_video,

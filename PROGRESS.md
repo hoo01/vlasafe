@@ -126,9 +126,9 @@ Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均
 
 ### 3. 新数据决策（等待前两项）
 
-- 只有确认存在真正未使用的 init states 后，才采独立 calibration/confirmation cohort。
+- 已确认 task 4 共有 50 个 LIBERO preset states；v0.1 仅使用 0–29。v0.2 使用 30–49 采 20 条独立 confirmation episodes。
 - 新 cohort 采集前冻结模型、progress proxy、阈值、checkpoint 和指标。
-- 若 task 4 没有未使用状态，则筛选第二个同任务内具有混合 outcome 的任务，单独复现方法；不得把不同 task 的成功/失败直接混合。
+- confirmation cohort 只评测冻结的 v0.1 predictor，不重新训练、调阈值或选择 checkpoint；结果单独报告，不并入 v0.1 test。
 
 ### v0.1 已完成的收口
 
