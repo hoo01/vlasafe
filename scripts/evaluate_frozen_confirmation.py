@@ -97,6 +97,7 @@ def main() -> None:
     predictions = []
     results = {}
     for checkpoint in sorted(np.unique(vision_data["checkpoint_step"]).astype(int)):
+        checkpoint = int(checkpoint)
         vision_selected = vision_data["checkpoint_step"].astype(int) == checkpoint
         labels = vision_data["failure"][vision_selected].astype(int)
         episode_ids = vision_data["episode_id"][vision_selected]
