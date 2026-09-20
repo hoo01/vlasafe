@@ -117,9 +117,17 @@ def render(data: dict[str, dict[str, list[float]]], output_base: Path) -> None:
     fig.tight_layout(rect=(0, 0.05, 1, 0.93))
 
     output_base.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(output_base.with_suffix(".png"), dpi=200, bbox_inches="tight")
-    fig.savefig(output_base.with_suffix(".svg"), bbox_inches="tight")
+    png_path = output_base.with_suffix(".png")
+    svg_path = output_base.with_suffix(".svg")
+    fig.savefig(png_path, dpi=200, bbox_inches="tight")
+    fig.savefig(svg_path, bbox_inches="tight")
     plt.close(fig)
+    # Matplotlib emits trailing spaces in SVG path data; normalize for clean Git diffs.
+    svg_text = svg_path.read_text(encoding="utf-8")
+    svg_path.write_text(
+        "\n".join(line.rstrip() for line in svg_text.splitlines()) + "\n",
+        encoding="utf-8",
+    )
 
 
 def main() -> None:
