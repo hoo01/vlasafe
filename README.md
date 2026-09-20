@@ -151,6 +151,18 @@ Predictor 只允许读取真实部署可得的 RGB、proprioception、历史动�
 
 模型选择和 L2 正则只使用 validation，test 只评一次。所有差值按完整 episode 做 paired bootstrap，不把同一 episode 内相关的滑动窗口当作独立样本——否则有效样本量会被严重高估。
 
+AUROC 衡量总体排序，AUPRC 在 failure/success 不平衡时强调失败类的 precision-recall；两者都不能说明输出的 `0.8` 是否真能解释为 80% failure probability。因此同时报告 Brier score 衡量概率平方误差，并以 ECE 辅助检查置信度与经验失败率是否一致。Brier/ECE 越低越好；ECE 依赖分箱且当前样本很少，只作为辅助证据，不单独用于模型选择或结论升级。
+
+### v0.2 发布后审计方法
+
+v0.2 不重新打开模型选择，而是针对 v0.1 的三个关键疑点做固定协议验证：
+
+1. **Initial-state identity audit：** 按原 collector session 顺序重放 50 条 v0.1 episode，在每次 reset 前读取 LIBERO wrapper 的真实 `init_state_id` 和对应 preset-state fingerprint，并比较重放首帧与原视频首帧。完整 MuJoCo state 只用于审计 fingerprint，不进入 predictor 或 normalization。
+2. **Temporal checkpoint-feature ablation：** 保持 dataset、split、16-step history、MLP、优化器、训练 seed 和 early stopping 不变，只移除 `checkpoint_step / 280`。对有无该特征的同一批 test episode 按 checkpoint 做 paired bootstrap；差值定义为 `without - with`。该实验只解释特征依赖，不用 test 结果选择替代模型。
+3. **Independent initial-state confirmation：** 在 v0.1 未使用的 task-4 preset states 30–49 上采集 20 条新 rollout。采集前冻结 v0.1 temporal/vision 权重、normalization、相机配置、checkpoint 和指标；确认集不参与训练、选模、阈值选择或校准，也不并入原 test。评测按完整 episode bootstrap 报告 AUPRC、AUROC、Brier 和 ECE。
+
+这三项依次回答：原 split 的 initial-state 身份是否真实、temporal 排序是否由显式 checkpoint 特征制造、原 outcome association 能否在独立 initial states 上复现。它们不回答 held-out task 泛化，也不把 Outcome Prediction 升级为 Impending Failure Detection。
+
 ### 为什么没有 privileged-state oracle
 
 即使重新采集完整物体真值，30 条训练 episode 和 10 条 test episode 也不足以让高维 oracle 模型形成可信的信息上界——结果更可能由小样本过拟合支配，而不是揭示真实的信息天花板。
