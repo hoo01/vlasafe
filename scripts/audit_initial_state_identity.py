@@ -70,6 +70,17 @@ def _manifest_rows(path: Path) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda row: str(row["episode_id"]))
 
 
+def _create_env(task_id: int) -> Any:
+    cfg = LiberoEnvConfig(
+        task="libero_spatial",
+        task_ids=[task_id],
+        observation_height=360,
+        observation_width=360,
+        episode_length=280,
+    )
+    return cfg.create_envs(n_envs=1, use_async_envs=False)["libero_spatial"][task_id]
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("manifest", type=Path)
@@ -86,17 +97,20 @@ def main() -> None:
     rows = _manifest_rows(args.manifest)
     if args.limit is not None:
         rows = rows[: args.limit]
-    cfg = LiberoEnvConfig(
-        task="libero_spatial",
-        task_ids=[args.task_id],
-        observation_height=360,
-        observation_width=360,
-        episode_length=280,
-    )
-    env = cfg.create_envs(n_envs=1, use_async_envs=False)["libero_spatial"][args.task_id]
+    env = None
+    previous_claimed_id = None
+    collector_session = -1
     audited = []
     try:
         for row in rows:
+            claimed_id = int(row["initial_state_id"])
+            if env is None or (
+                previous_claimed_id is not None and claimed_id <= previous_claimed_id
+            ):
+                if env is not None:
+                    env.close()
+                env = _create_env(args.task_id)
+                collector_session += 1
             observation, _ = env.reset(seed=int(row["seed"]))
             state = _flat_state(_simulator(env))
             episode_path = Path(row["path"])
@@ -112,16 +126,19 @@ def main() -> None:
                 {
                     "episode_id": row["episode_id"],
                     "split": row["split"],
+                    "reconstructed_collector_session": collector_session,
                     "seed": int(row["seed"]),
-                    "claimed_initial_state_id": int(row["initial_state_id"]),
+                    "claimed_initial_state_id": claimed_id,
                     "replay_state_fingerprint": _fingerprint(state, args.state_decimals),
                     "replay_state_size": int(state.size),
                     "recorded_vs_replay_main_frame": main_error,
                     "recorded_vs_replay_wrist_frame": wrist_error,
                 }
             )
+            previous_claimed_id = claimed_id
     finally:
-        env.close()
+        if env is not None:
+            env.close()
 
     by_claimed: dict[int, set[str]] = {}
     by_fingerprint: dict[str, set[int]] = {}
