@@ -55,10 +55,10 @@ A1/A2 故障通常从 `t=0` 就存在，因此也不报告 lead time。它们应
 
 ### 为什么使用 LIBERO-Spatial
 
-LIBERO 官方包含四组 task suite：Spatial 侧重空间泛化，Object 侧重跨物体泛化，Goal 侧重语言目标理解，LIBERO-Long Long和前三组不是同一个性质——它不控制单一变量，而是增加任务长度和步骤复杂度。
+LIBERO 官方原始 benchmark 包含四组 task suite：Spatial 侧重空间关系变化，Object 侧重操作对象变化，Goal 侧重任务目标变化，LIBERO-100 则包含知识因素相互交织的 100 个任务，并划分为 LIBERO-90 和 LIBERO-10。后续 VLA 评测中常把包含长程任务的 LIBERO-10 称为 LIBERO-Long；它与前三组控制单一变化来源的设计目的不同。
 本项目没有进行跨 suite 性能比较，选择 Spatial 是四周 MVP 的预先范围控制，不能据此声称它优于其他 suite。
 
-Spatial 适合当前研究的原因是：先固定在一个以空间关系为主要变化来源的 suite 中，可以减少跨物体类别、跨目标语义和长程子任务结构同时变化造成的混杂；同时，任务能够在 RTX 4090 上快速闭环执行，正式采集约为每秒 30 多个控制步。需要注意，**suite、task 和 initial state 是三个不同层级**：
+Spatial 适合当前研究的原因是：先固定在一个以空间关系为主要变化来源的 suite 中，可以减少跨物体类别、跨目标语义和长程子任务结构同时变化造成的混杂。环境控制频率为 20 Hz；离线仿真无需等待真实时间，在 RTX 4090 上实测采集吞吐约为 30–33 个仿真步/秒。需要注意，**suite、task 和 initial state 是三个不同层级**：
 
 - `libero_spatial` 是 suite，规定这一组任务主要考察空间关系；
 - task 4 是默认 task order 下的一条固定语言任务：从木柜顶层抽屉中取出黑碗并放到盘子上；
