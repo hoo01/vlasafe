@@ -4,7 +4,11 @@ import unittest
 
 import numpy as np
 
-from vlasafe.outcome_dataset import build_history_window, flatten_proprioception
+from vlasafe.outcome_dataset import (
+    build_history_window,
+    flatten_proprioception,
+    normalize_and_flatten_temporal,
+)
 
 
 def proprio() -> dict[str, list[float]]:
@@ -53,6 +57,27 @@ class OutcomeDatasetTest(unittest.TestCase):
     def test_rejects_checkpoint_outside_episode(self) -> None:
         with self.assertRaises(IndexError):
             build_history_window([step(0)], 1, 1)
+
+    def test_checkpoint_progress_ablation_changes_only_explicit_feature(self) -> None:
+        data = {
+            "split": np.asarray(["train", "test"]),
+            "mask": np.ones((2, 2), dtype=np.float32),
+            "state": np.zeros((2, 2, 25), dtype=np.float32),
+            "action": np.zeros((2, 2, 7), dtype=np.float32),
+            "timing": np.zeros((2, 2, 2), dtype=np.float32),
+            "checkpoint_step": np.asarray([40, 80]),
+        }
+        with_progress, with_stats = normalize_and_flatten_temporal(
+            data, include_checkpoint_progress=True
+        )
+        without_progress, without_stats = normalize_and_flatten_temporal(
+            data, include_checkpoint_progress=False
+        )
+        self.assertEqual(with_progress.shape[1], without_progress.shape[1] + 1)
+        np.testing.assert_array_equal(with_progress[:, :-1], without_progress)
+        np.testing.assert_allclose(with_progress[:, -1], [40 / 280, 80 / 280])
+        self.assertTrue(with_stats["checkpoint_progress_feature"])
+        self.assertFalse(without_stats["checkpoint_progress_feature"])
 
 
 if __name__ == "__main__":

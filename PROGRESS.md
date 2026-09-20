@@ -1,14 +1,20 @@
 # VLA-SafeBench Progress
 
-> 最后更新：2026-09-14。README 负责解释项目；本文只记录完成状态、证据和下一步。
+> 最后更新：2026-09-20。README 负责解释项目；本文只记录完成状态、证据和下一步。
 
 ## 当前判断
 
-项目已完成四周计划的有界 release；未完成项保留为明确限制，不作为发布阻塞项。
+项目已完成并冻结四周计划的 v0.1 有界 release。现已启动 **v0.2 完整性审计**；新分析和新数据不得覆盖 v0.1 manifest、预测或 checksum。
 
 当前证据支持：冻结视觉和状态/动作历史能够在 held-out initial states 上预测 task 4 的最终 outcome；执行进度可以解释大部分排序能力。现有 10 条 test episode 不足以判断 vision-step80 是否还包含进度之外的信息。
 
 当前证据不支持：独立失效前兆、Impending Failure Detection、safe stop、未测试 A2 类型的覆盖率或任务级泛化。
+
+### v0.2 审计触发原因
+
+1. `policy_record.py` 将 `episode_index` 写为 `initial_state_id`，但环境通过 `env.reset(seed=seed)` 重置；必须确认该编号是否对应 LIBERO 实际使用的固定初始状态。核验前，“held-out initial state”属于待审计主张。
+2. Temporal MLP 显式输入 `checkpoint_step / 280`。该值在同一 checkpoint 内为常数，不直接产生该 checkpoint 内的排序，但可能影响跨 checkpoint 联合训练、概率尺度和校准，需要固定配置消融。
+3. Validation/test 各只有 10 条，不能通过继续调参解决校准与置信区间问题；若需要增强证据，必须使用冻结 pipeline 和真正独立的新 cohort。
 
 ## 已完成
 
@@ -104,15 +110,33 @@ Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均
 
 ## 下一步执行顺序
 
-### 已完成的收口
+### 1. Initial-state identity audit（进行中）
+
+- 检查固定 LeRobot/LIBERO revision 的 reset 与 init-state 选择逻辑。
+- 对重复 seed 和多个 seed 记录环境实际 init-state index；若接口不暴露编号，则对 reset 后完整 MuJoCo state 生成仅用于审计的 fingerprint。
+- 检查现有 metadata 中相同 `initial_state_id` 是否真的对应相同初始状态。
+- 若不成立：v0.1 只保留 held-out episode 结论；v0.2 使用真实 ID/fingerprint 重建 manifest，不覆盖 v0.1。
+
+### 2. Temporal checkpoint-progress ablation（进行中）
+
+- 保持数据、split、训练 seeds、MLP、优化器和 early stopping 不变。
+- 比较包含与移除 `checkpoint_step / 280` 的两个版本。
+- 按 episode、checkpoint 做 paired bootstrap，分别报告 AUPRC、AUROC、Brier 和 ECE 差值。
+- 该实验用于解释特征依赖和概率尺度，不根据 test 选择新主模型。
+
+### 3. 新数据决策（等待前两项）
+
+- 只有确认存在真正未使用的 init states 后，才采独立 calibration/confirmation cohort。
+- 新 cohort 采集前冻结模型、progress proxy、阈值、checkpoint 和指标。
+- 若 task 4 没有未使用状态，则筛选第二个同任务内具有混合 outcome 的任务，单独复现方法；不得把不同 task 的成功/失败直接混合。
+
+### v0.1 已完成的收口
 
 - 两个 RQ1 result JSON 已加入 21-file release checksum；A2 report 保留全部 paired episode ID、seed 和逐条结果。
 - 保留 v0.1 artifact，没有用新分析反向修改冻结预测。
 
-### 明确延期
+### 仍不进入 v0.2 的工作
 
-- 独立 confirmatory cohort。
-- 第二个任务。
 - 专门训练的 learned A2 monitor。
 - Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking。
 

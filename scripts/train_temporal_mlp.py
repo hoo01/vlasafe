@@ -10,6 +10,7 @@ import numpy as np
 import torch
 from torch import nn
 
+from vlasafe.outcome_dataset import normalize_and_flatten_temporal
 from vlasafe.outcome_metrics import binary_metrics
 
 
@@ -31,32 +32,6 @@ class TemporalMLP(nn.Module):
 
     def forward(self, features: torch.Tensor) -> torch.Tensor:
         return self.network(features).squeeze(-1)
-
-
-def _normalize_and_flatten(data: np.lib.npyio.NpzFile) -> tuple[np.ndarray, dict]:
-    train = data["split"] == "train"
-    mask = data["mask"].astype(np.float32)
-    channels = np.concatenate(
-        [data["state"], data["action"], data["timing"]], axis=-1
-    ).astype(np.float32)
-    valid_train = channels[train][mask[train].astype(bool)]
-    mean = valid_train.mean(axis=0)
-    std = valid_train.std(axis=0)
-    std[std < 1e-8] = 1.0
-    normalized = (channels - mean) / std
-    normalized *= mask[..., None]
-    progress = (data["checkpoint_step"].astype(np.float32) / 280.0)[:, None]
-    features = np.concatenate(
-        [normalized.reshape(len(normalized), -1), mask, progress], axis=1
-    )
-    stats = {
-        "channel_mean": mean.tolist(),
-        "channel_std": std.tolist(),
-        "feature_order": ["proprio_25", "executed_action_7", "timing_2"],
-        "feature_dim": int(features.shape[1]),
-        "progress_denominator": 280,
-    }
-    return features.astype(np.float32), stats
 
 
 def _fit_one(
@@ -132,10 +107,18 @@ def main() -> None:
     parser.add_argument("dataset", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument(
+        "--exclude-checkpoint-progress",
+        action="store_true",
+        help="Ablate the explicit checkpoint_step / 280 feature without changing the history window.",
+    )
     args = parser.parse_args()
 
     data = np.load(args.dataset)
-    features, normalization = _normalize_and_flatten(data)
+    features, normalization = normalize_and_flatten_temporal(
+        data,
+        include_checkpoint_progress=not args.exclude_checkpoint_progress,
+    )
     target = data["failure"].astype(np.int64)
     train = data["split"] == "train"
     validation = data["split"] == "validation"
@@ -158,6 +141,7 @@ def main() -> None:
     report = {
         "dataset": str(args.dataset),
         "model": "temporal_mlp_128_64_dropout_0.1_ensemble_5",
+        "checkpoint_progress_feature": not args.exclude_checkpoint_progress,
         "selection": "per-seed early stopping on validation BCE; fixed 5-seed ensemble",
         "training_seeds": list(TRAINING_SEEDS),
         "runs": runs,

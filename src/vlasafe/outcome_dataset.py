@@ -6,6 +6,38 @@ from typing import Any, Sequence
 
 import numpy as np
 
+
+def normalize_and_flatten_temporal(
+    data: Any, *, include_checkpoint_progress: bool = True
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Normalize temporal channels on train rows and optionally append checkpoint progress."""
+
+    train = data["split"] == "train"
+    mask = data["mask"].astype(np.float32)
+    channels = np.concatenate(
+        [data["state"], data["action"], data["timing"]], axis=-1
+    ).astype(np.float32)
+    valid_train = channels[train][mask[train].astype(bool)]
+    mean = valid_train.mean(axis=0)
+    std = valid_train.std(axis=0)
+    std[std < 1e-8] = 1.0
+    normalized = (channels - mean) / std
+    normalized *= mask[..., None]
+    feature_parts = [normalized.reshape(len(normalized), -1), mask]
+    if include_checkpoint_progress:
+        progress = (data["checkpoint_step"].astype(np.float32) / 280.0)[:, None]
+        feature_parts.append(progress)
+    features = np.concatenate(feature_parts, axis=1)
+    stats = {
+        "channel_mean": mean.tolist(),
+        "channel_std": std.tolist(),
+        "feature_order": ["proprio_25", "executed_action_7", "timing_2"],
+        "feature_dim": int(features.shape[1]),
+        "checkpoint_progress_feature": include_checkpoint_progress,
+        "progress_denominator": 280 if include_checkpoint_progress else None,
+    }
+    return features.astype(np.float32), stats
+
 from .predictor_inputs import select_deploy_inputs
 
 
