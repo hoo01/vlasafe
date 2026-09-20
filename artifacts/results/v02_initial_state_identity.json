@@ -1,0 +1,1198 @@
+{
+  "schema_version": "0.1.0",
+  "purpose": "privileged audit only; fingerprints are not predictor inputs",
+  "manifest": "docs/manifests/week1_task4_split.json",
+  "task": "libero_spatial",
+  "task_id": 4,
+  "state_fingerprint_round_decimals": 8,
+  "episodes": 50,
+  "claimed_ids": 30,
+  "replay_fingerprints": 50,
+  "claimed_vs_actual_init_state_id_mismatches": 0,
+  "claimed_ids_with_multiple_preset_fingerprints": {},
+  "claimed_ids_with_multiple_replay_fingerprints": {
+    "0": [
+      "1151ba3fb37996009d26d3f2bbeed6012c930d80fffb8ba349d54d5ba23060d4",
+      "dc14291cbf91e3510f2caef7e2038d9b4657cfc8b9756ce412f618cbbf31d060"
+    ],
+    "1": [
+      "12909d06fab028fffc303603924ab0aedc0298e416865cbf9f18745a0bb070ab",
+      "4f38fc2a671f0543a1e3dd1fda5a3b68016aeb65f93215aa7dbfe5e7b74bde47"
+    ],
+    "2": [
+      "d9b7ce26463a8f99f9f123c55976674fc09a5ebfc782f3184ce31ef8f7bb69ef",
+      "f07e331f1c1c3d0e7994dc5af56c790c5d81a778a268f45313d906a47711c9af"
+    ],
+    "3": [
+      "37978e5412d20818fafc5d2e84cc166061d7de8131952df4c1bc4baee984c1b6",
+      "48df425e199b54d8936ff43e6ab40e2aea9b320834c64ec9a6ec0affb99aba58"
+    ],
+    "4": [
+      "0ca7cd2cb3f0fb948db95172db25dcfb4f0ba29c2f180d3196c75fc8673d9efa",
+      "3f56e48419a8b33de35584f8e7ad92bf8d50184af2a5e6aaf937b4f745bf4d24"
+    ],
+    "5": [
+      "0898158c0e883ca174f53c35c4d4d2c7bbdf95a3cfe008524a2440e758e72113",
+      "39b094221bea62dcf82e0a0320f4e7bc6ec82444ce4a342a01102f432c401b10"
+    ],
+    "6": [
+      "866a68123b22da8f9a3a0d266e47bf364803f9016e30fd41e0df58d2fa15dced",
+      "aec6766aab78985f86d97a41eeb54bd6e9bcf9cee51a38ec1b20e4ff1f61baa1"
+    ],
+    "7": [
+      "df721751920e8c248741fed16c8fe0d3a0ddd4985d2f71a47a7f18d59c37a569",
+      "f6368740c0f441f5d7300126811d9cf6d9a1ca1462457f6d496dea771210fbc5"
+    ],
+    "8": [
+      "5a2eaf85d5744cfa1a8dd3f6c3d2081ce1938d7365b842c1f44acfaef97e87d9",
+      "83c0be23c86f1313a7c3b9961fe913d6220ab02b2998c44d1e0b6f3d754c20f6"
+    ],
+    "9": [
+      "03c61dc0da22c9bfa70a32198a3f4d57c39ec38300aa5db6228f9f0ca0e050ff",
+      "ef5feb72e76c8d169e6b791621b87fff9f62955646c6044d8f9a7adaff6c1e98"
+    ],
+    "10": [
+      "0eaeb4c325b970e74e7cc22c467f73807576869e12671fa4c4662ba8b2d4a832",
+      "39c9e3f31d98aa0eee32bfd0f3861a516dfeb80225ed8f973505fbfcb5ef872b"
+    ],
+    "11": [
+      "ba33bf451e58a7a955230604ab1ded082ea4c1268c22a8dd0c19a8e3a6605e2b",
+      "eb7790e8899e5e1f1ae6ddb3a2e2ae95055e8f8726ccaba1cd8a3eb0626ff789"
+    ],
+    "12": [
+      "e421e989437b079fb418af8b7bdf766273b207314680d48bfe5a5aaa22f638d4",
+      "e82add855d784f1f00898149bde0cf614f5eb40becfb85e3a3a98b3ad8c29072"
+    ],
+    "13": [
+      "ed2bec7d97817a05f14d0aca7b7cd494cbe4c2efe25afa61d5bbd8cd7ce83d5f",
+      "fb387f64885e4821347bafc69245d69cc167990b7b3b052d2d0d29ca32629c38"
+    ],
+    "14": [
+      "3bfa9070a976c4c531a5ff43ed2d2657e7168dc7f544a73c626237519b6ce9d5",
+      "fbff46dada4c86299e84b144460cc7585b599bedb79c4dc243e038a0e0ec1b21"
+    ],
+    "15": [
+      "015d19f24c418d288197429043aac7c97a4c3cd3da6cf3df085dab4f9fc7d3f6",
+      "0fc62a1eb31d6227b5dc37f56b7d6530aae25c8eda5da7891ffc1d8cb02d7b5d"
+    ],
+    "16": [
+      "081b466ac3d0a66dab20bd0703c524565c19b55718acad51c44fd83d962f956f",
+      "ee13c7ec2ff4d21866a8dddfe04e67d64a72b1d539fcb03f49bf54fc99d51911"
+    ],
+    "17": [
+      "3ddaf69bcde081de5008c186c2d1a1158b22bcadcda895fd4f794583eec7682c",
+      "6ded98022638c7c902f1ab22d7f3e8f8a10e6a88bea20f25aadfb523635c78ca"
+    ],
+    "18": [
+      "45406f4f480d6a7df98856d43a49b79d15487501bbe7db452e4f9a122e656b8e",
+      "706318f51dd32575c234f3c0851eed47cbadb67ef55000edbd8d93d788fb2dd5"
+    ],
+    "19": [
+      "3ac14c28926ef10ed3319bab26d9374855c7813552d617de2642046265aee1c8",
+      "ff06e7eda44339058d5b6148caf61adf1d52c8a268db95228b4ec321a481dba7"
+    ]
+  },
+  "replay_fingerprints_with_multiple_claimed_ids": {},
+  "details": [
+    {
+      "episode_id": "smolvla-20260911T012955337938Z",
+      "split": "test",
+      "reconstructed_collector_session": 0,
+      "seed": 1000,
+      "claimed_initial_state_id": 0,
+      "actual_initial_state_id_before_reset": 0,
+      "initial_state_id_after_reset": 1,
+      "preset_state_fingerprint": "4e0a26d43240d20206df86c69928ceea0b0380302e6a2a62dbd233d88fc0a561",
+      "replay_state_fingerprint": "dc14291cbf91e3510f2caef7e2038d9b4657cfc8b9756ce412f618cbbf31d060",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7383256172839505,
+        "rmse": 2.3743187240326815,
+        "max_abs": 46.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.807283950617284,
+        "rmse": 2.99839205879945,
+        "max_abs": 50.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013008503232Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1001,
+      "claimed_initial_state_id": 1,
+      "actual_initial_state_id_before_reset": 1,
+      "initial_state_id_after_reset": 2,
+      "preset_state_fingerprint": "3e129b7ffb9c2fddc81c6888c48027106a17457ae1b9842a14319ed2b72fec5f",
+      "replay_state_fingerprint": "12909d06fab028fffc303603924ab0aedc0298e416865cbf9f18745a0bb070ab",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.742042181069959,
+        "rmse": 2.3975950313087444,
+        "max_abs": 47.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8361008230452676,
+        "rmse": 3.0266979046084725,
+        "max_abs": 52.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013025870303Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1002,
+      "claimed_initial_state_id": 2,
+      "actual_initial_state_id_before_reset": 2,
+      "initial_state_id_after_reset": 3,
+      "preset_state_fingerprint": "79158e675c41efc1691b9a1fdf7c190ef18638c8351ac41accab86c260431191",
+      "replay_state_fingerprint": "f07e331f1c1c3d0e7994dc5af56c790c5d81a778a268f45313d906a47711c9af",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7338477366255145,
+        "rmse": 2.3700517002226755,
+        "max_abs": 50.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.780684156378601,
+        "rmse": 2.9496878540303197,
+        "max_abs": 50.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013043352862Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1003,
+      "claimed_initial_state_id": 3,
+      "actual_initial_state_id_before_reset": 3,
+      "initial_state_id_after_reset": 4,
+      "preset_state_fingerprint": "2879413f47d56c64f749290b840401c73e178cee1ae52670898a92e5b9fb15ce",
+      "replay_state_fingerprint": "37978e5412d20818fafc5d2e84cc166061d7de8131952df4c1bc4baee984c1b6",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7399382716049383,
+        "rmse": 2.3749972926127083,
+        "max_abs": 49.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8542232510288066,
+        "rmse": 3.1339997977840217,
+        "max_abs": 60.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013100252873Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1004,
+      "claimed_initial_state_id": 4,
+      "actual_initial_state_id_before_reset": 4,
+      "initial_state_id_after_reset": 5,
+      "preset_state_fingerprint": "cd031c0f71fec9f612bda97489d9e6380c3a06de51d4b95174cf646d033fe2d5",
+      "replay_state_fingerprint": "3f56e48419a8b33de35584f8e7ad92bf8d50184af2a5e6aaf937b4f745bf4d24",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7450462962962963,
+        "rmse": 2.3867669300961967,
+        "max_abs": 48.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8237577160493827,
+        "rmse": 3.0602964063388054,
+        "max_abs": 52.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013117405943Z",
+      "split": "test",
+      "reconstructed_collector_session": 0,
+      "seed": 1005,
+      "claimed_initial_state_id": 5,
+      "actual_initial_state_id_before_reset": 5,
+      "initial_state_id_after_reset": 6,
+      "preset_state_fingerprint": "c47207b995b1741d93e10f99f64aa962eff70cde7837c8c890b58a6eaec1b4bf",
+      "replay_state_fingerprint": "39b094221bea62dcf82e0a0320f4e7bc6ec82444ce4a342a01102f432c401b10",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7226543209876544,
+        "rmse": 2.352561864245631,
+        "max_abs": 50.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.782690329218107,
+        "rmse": 2.916783066460398,
+        "max_abs": 51.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013133660179Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1006,
+      "claimed_initial_state_id": 6,
+      "actual_initial_state_id_before_reset": 6,
+      "initial_state_id_after_reset": 7,
+      "preset_state_fingerprint": "84941cd39870f1f5119e33a7b16c6f665e9edaad37064333dc79dda22f45a4c1",
+      "replay_state_fingerprint": "866a68123b22da8f9a3a0d266e47bf364803f9016e30fd41e0df58d2fa15dced",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7340895061728394,
+        "rmse": 2.4006825589759244,
+        "max_abs": 43.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7719110082304528,
+        "rmse": 2.909439458549183,
+        "max_abs": 46.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013144885145Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1007,
+      "claimed_initial_state_id": 7,
+      "actual_initial_state_id_before_reset": 7,
+      "initial_state_id_after_reset": 8,
+      "preset_state_fingerprint": "bf153268ae9aabdb576344e57f71dc3b5d020d6a91a680515cbdf056a47c2e49",
+      "replay_state_fingerprint": "f6368740c0f441f5d7300126811d9cf6d9a1ca1462457f6d496dea771210fbc5",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.747281378600823,
+        "rmse": 2.386171473388181,
+        "max_abs": 52.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7549125514403292,
+        "rmse": 2.8763563628184055,
+        "max_abs": 57.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013154476913Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1008,
+      "claimed_initial_state_id": 8,
+      "actual_initial_state_id_before_reset": 8,
+      "initial_state_id_after_reset": 9,
+      "preset_state_fingerprint": "fa5d97baf83dd062e9cc68608a7c7679cd40879b1723e67d398b2c10e4224db7",
+      "replay_state_fingerprint": "5a2eaf85d5744cfa1a8dd3f6c3d2081ce1938d7365b842c1f44acfaef97e87d9",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7317721193415638,
+        "rmse": 2.35618822303882,
+        "max_abs": 43.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7736599794238683,
+        "rmse": 2.887711209384793,
+        "max_abs": 54.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013211863962Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1009,
+      "claimed_initial_state_id": 9,
+      "actual_initial_state_id_before_reset": 9,
+      "initial_state_id_after_reset": 10,
+      "preset_state_fingerprint": "be5fa9a631d3306ee6b6e3e0c0b16ca059dde383dd3fa824a0274b310550b139",
+      "replay_state_fingerprint": "ef5feb72e76c8d169e6b791621b87fff9f62955646c6044d8f9a7adaff6c1e98",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7373791152263374,
+        "rmse": 2.3908137163604883,
+        "max_abs": 46.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8664377572016462,
+        "rmse": 3.1712397940357206,
+        "max_abs": 61.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013221629537Z",
+      "split": "test",
+      "reconstructed_collector_session": 0,
+      "seed": 1010,
+      "claimed_initial_state_id": 10,
+      "actual_initial_state_id_before_reset": 10,
+      "initial_state_id_after_reset": 11,
+      "preset_state_fingerprint": "13bc338bae85123625670b4e38422f9c541ff54488c8a46fb017be50bdfb6ec4",
+      "replay_state_fingerprint": "0eaeb4c325b970e74e7cc22c467f73807576869e12671fa4c4662ba8b2d4a832",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.729750514403292,
+        "rmse": 2.3804442689749057,
+        "max_abs": 45.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.883258744855967,
+        "rmse": 3.1375845372507594,
+        "max_abs": 51.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013238778439Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1011,
+      "claimed_initial_state_id": 11,
+      "actual_initial_state_id_before_reset": 11,
+      "initial_state_id_after_reset": 12,
+      "preset_state_fingerprint": "9d2e2305d0bdcd982ebeea2e7942bd697cae38f5ac5ac62362ec33b918c59794",
+      "replay_state_fingerprint": "ba33bf451e58a7a955230604ab1ded082ea4c1268c22a8dd0c19a8e3a6605e2b",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7480015432098766,
+        "rmse": 2.3969754389947413,
+        "max_abs": 42.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.77056841563786,
+        "rmse": 2.9151005495508673,
+        "max_abs": 60.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013248561988Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1012,
+      "claimed_initial_state_id": 12,
+      "actual_initial_state_id_before_reset": 12,
+      "initial_state_id_after_reset": 13,
+      "preset_state_fingerprint": "617b59ae01252fa59eca3ebd9b8b3deb959bb4177af22889394001c71b0e41ae",
+      "replay_state_fingerprint": "e82add855d784f1f00898149bde0cf614f5eb40becfb85e3a3a98b3ad8c29072",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.727746913580247,
+        "rmse": 2.36096186892166,
+        "max_abs": 38.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.809647633744856,
+        "rmse": 3.021942644339732,
+        "max_abs": 58.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013258491859Z",
+      "split": "validation",
+      "reconstructed_collector_session": 0,
+      "seed": 1013,
+      "claimed_initial_state_id": 13,
+      "actual_initial_state_id_before_reset": 13,
+      "initial_state_id_after_reset": 14,
+      "preset_state_fingerprint": "6ae212a1c5608422a80eb40ac416259c9d51358e5524fc088dc2b075b64c1113",
+      "replay_state_fingerprint": "fb387f64885e4821347bafc69245d69cc167990b7b3b052d2d0d29ca32629c38",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7433924897119342,
+        "rmse": 2.395271941742131,
+        "max_abs": 44.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8113297325102882,
+        "rmse": 2.984306086669067,
+        "max_abs": 52.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013315261201Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1014,
+      "claimed_initial_state_id": 14,
+      "actual_initial_state_id_before_reset": 14,
+      "initial_state_id_after_reset": 15,
+      "preset_state_fingerprint": "96a4b33acb73b7d8104596cea043620e0de170022430c3cf117e01cfc83d255f",
+      "replay_state_fingerprint": "fbff46dada4c86299e84b144460cc7585b599bedb79c4dc243e038a0e0ec1b21",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7456352880658437,
+        "rmse": 2.3886870069734862,
+        "max_abs": 47.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8131635802469135,
+        "rmse": 3.05596293580609,
+        "max_abs": 54.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013332331208Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1015,
+      "claimed_initial_state_id": 15,
+      "actual_initial_state_id_before_reset": 15,
+      "initial_state_id_after_reset": 16,
+      "preset_state_fingerprint": "395edbe02d7db8bd4e986beea6e75a34fa32981c8c13550fdf0c445a0216b6f3",
+      "replay_state_fingerprint": "015d19f24c418d288197429043aac7c97a4c3cd3da6cf3df085dab4f9fc7d3f6",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7464248971193415,
+        "rmse": 2.3869156363692525,
+        "max_abs": 39.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8750308641975308,
+        "rmse": 3.188974382645418,
+        "max_abs": 50.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013349393426Z",
+      "split": "validation",
+      "reconstructed_collector_session": 0,
+      "seed": 1016,
+      "claimed_initial_state_id": 16,
+      "actual_initial_state_id_before_reset": 16,
+      "initial_state_id_after_reset": 17,
+      "preset_state_fingerprint": "effa3b7aa6c8ff6a93d85d5c5230d0218aea120da8e580cd7b8333955609f31d",
+      "replay_state_fingerprint": "081b466ac3d0a66dab20bd0703c524565c19b55718acad51c44fd83d962f956f",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7232278806584362,
+        "rmse": 2.3459760005297854,
+        "max_abs": 42.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8249614197530863,
+        "rmse": 3.0435880959719874,
+        "max_abs": 55.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013406446190Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1017,
+      "claimed_initial_state_id": 17,
+      "actual_initial_state_id_before_reset": 17,
+      "initial_state_id_after_reset": 18,
+      "preset_state_fingerprint": "20cedd408acb40a0593359511eedb3ee761236a2939fe8eac187e8a1d1af1922",
+      "replay_state_fingerprint": "3ddaf69bcde081de5008c186c2d1a1158b22bcadcda895fd4f794583eec7682c",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7263245884773664,
+        "rmse": 2.3383659352020976,
+        "max_abs": 44.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.81056841563786,
+        "rmse": 2.934090372989971,
+        "max_abs": 44.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013423454070Z",
+      "split": "validation",
+      "reconstructed_collector_session": 0,
+      "seed": 1018,
+      "claimed_initial_state_id": 18,
+      "actual_initial_state_id_before_reset": 18,
+      "initial_state_id_after_reset": 19,
+      "preset_state_fingerprint": "aefa93a5663e62c68f04b84a394576267cb529029be4f1661714c2052cfae440",
+      "replay_state_fingerprint": "706318f51dd32575c234f3c0851eed47cbadb67ef55000edbd8d93d788fb2dd5",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.750187757201646,
+        "rmse": 2.3874548882903315,
+        "max_abs": 38.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7675643004115227,
+        "rmse": 2.8772937709668165,
+        "max_abs": 49.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013433290458Z",
+      "split": "test",
+      "reconstructed_collector_session": 0,
+      "seed": 1019,
+      "claimed_initial_state_id": 19,
+      "actual_initial_state_id_before_reset": 19,
+      "initial_state_id_after_reset": 20,
+      "preset_state_fingerprint": "7930cf3ccbf41c9fdfeb9daef7d7390d317b2fb255e94d6004cdb6d32043fdca",
+      "replay_state_fingerprint": "ff06e7eda44339058d5b6148caf61adf1d52c8a268db95228b4ec321a481dba7",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7349871399176955,
+        "rmse": 2.375425562912522,
+        "max_abs": 45.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7691152263374486,
+        "rmse": 2.8975085082800973,
+        "max_abs": 50.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013450326711Z",
+      "split": "validation",
+      "reconstructed_collector_session": 0,
+      "seed": 1020,
+      "claimed_initial_state_id": 20,
+      "actual_initial_state_id_before_reset": 20,
+      "initial_state_id_after_reset": 21,
+      "preset_state_fingerprint": "4665e9f4e4f2eda2b781ea6f45a3ae2727fd7128b242cda06d3d4e07d9e83d47",
+      "replay_state_fingerprint": "a480dc652c11720475bc06495068f683bfbe5f2c98a6bda6fd7e0ac87b109baf",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7544161522633746,
+        "rmse": 2.4035430166572453,
+        "max_abs": 42.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.841682098765432,
+        "rmse": 3.087186447982864,
+        "max_abs": 83.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013507535948Z",
+      "split": "test",
+      "reconstructed_collector_session": 0,
+      "seed": 1021,
+      "claimed_initial_state_id": 21,
+      "actual_initial_state_id_before_reset": 21,
+      "initial_state_id_after_reset": 22,
+      "preset_state_fingerprint": "1d9b0d7d1016f2e97fd4db91003575cc455d56b101d46740afe200369bde6a16",
+      "replay_state_fingerprint": "caea80448eeed59b903333024dfa44278920c7f89274e4c24edbc53bc6486ae2",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7241615226337448,
+        "rmse": 2.3363296458316345,
+        "max_abs": 44.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8174768518518518,
+        "rmse": 3.0325009880951983,
+        "max_abs": 50.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013524645481Z",
+      "split": "validation",
+      "reconstructed_collector_session": 0,
+      "seed": 1022,
+      "claimed_initial_state_id": 22,
+      "actual_initial_state_id_before_reset": 22,
+      "initial_state_id_after_reset": 23,
+      "preset_state_fingerprint": "80bb9a6ecb5a254acd37a6ccd12459b403b7fb361fdcab67762eee4bd8bc8563",
+      "replay_state_fingerprint": "30f2c12f336de10f103dddf8342a75efcd7af2cbd921fef78c5b1d4d4f3e9e85",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7206841563786008,
+        "rmse": 2.3414705994099596,
+        "max_abs": 46.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8189994855967078,
+        "rmse": 3.035435016721778,
+        "max_abs": 46.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013542070305Z",
+      "split": "validation",
+      "reconstructed_collector_session": 0,
+      "seed": 1023,
+      "claimed_initial_state_id": 23,
+      "actual_initial_state_id_before_reset": 23,
+      "initial_state_id_after_reset": 24,
+      "preset_state_fingerprint": "4654522a51462cb306559bfebf3b4ab9ef866d5ca5bf7dff40ccab29875e2558",
+      "replay_state_fingerprint": "ac9747a3ac22714a9c2b4159844ce7d0aa3613972e7b03f631d886ee4a00c4f7",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7303420781893004,
+        "rmse": 2.378225014187471,
+        "max_abs": 38.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7666949588477365,
+        "rmse": 2.904892902979003,
+        "max_abs": 58.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013551918910Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1024,
+      "claimed_initial_state_id": 24,
+      "actual_initial_state_id_before_reset": 24,
+      "initial_state_id_after_reset": 25,
+      "preset_state_fingerprint": "417fc390fe077907482272db100ee8acbc43b9d5a98a65cbaab9ee267d8f7caf",
+      "replay_state_fingerprint": "21514a540c310330a0642a0151ecf144e5d8d8928114040583ae5b20e72a7643",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7351774691358024,
+        "rmse": 2.376576258388137,
+        "max_abs": 53.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8097427983539094,
+        "rmse": 2.9641140703795834,
+        "max_abs": 82.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013609135190Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1025,
+      "claimed_initial_state_id": 25,
+      "actual_initial_state_id_before_reset": 25,
+      "initial_state_id_after_reset": 26,
+      "preset_state_fingerprint": "e977e9093f092fff1b24a1fe367ba21dc2bdd6f531ed7b3066ce8611654c5f5d",
+      "replay_state_fingerprint": "2c92527196937b48ba2cbce5b6f67584f9d9f05ab8a95670ca872270dff5b84b",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7433436213991769,
+        "rmse": 2.3698965093481563,
+        "max_abs": 39.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.9026568930041152,
+        "rmse": 3.201852521260346,
+        "max_abs": 55.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013626499446Z",
+      "split": "test",
+      "reconstructed_collector_session": 0,
+      "seed": 1026,
+      "claimed_initial_state_id": 26,
+      "actual_initial_state_id_before_reset": 26,
+      "initial_state_id_after_reset": 27,
+      "preset_state_fingerprint": "a7313f1ed8dba5a9ed48e0c5f7afab000bb35e48e0f13b0f26c5fe2801fef81e",
+      "replay_state_fingerprint": "39d23895533b5f1a89fd38d9517b2e5f2352b4bfb675f615c0d51875c785e683",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7347273662551441,
+        "rmse": 2.356890563342307,
+        "max_abs": 44.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7936471193415637,
+        "rmse": 2.9407943833152075,
+        "max_abs": 52.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013643813835Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1027,
+      "claimed_initial_state_id": 27,
+      "actual_initial_state_id_before_reset": 27,
+      "initial_state_id_after_reset": 28,
+      "preset_state_fingerprint": "694b84fc6a8f4a6431b003a882d24a7dcb4de546477f0a08d307097a0686ab43",
+      "replay_state_fingerprint": "ef25f6e0bb7ea10ad004a56762966b954b57640ab6d85b0e7babe68c39203c53",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7337011316872428,
+        "rmse": 2.386076617695753,
+        "max_abs": 44.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.830380658436214,
+        "rmse": 3.0465937601023625,
+        "max_abs": 55.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013701491263Z",
+      "split": "validation",
+      "reconstructed_collector_session": 0,
+      "seed": 1028,
+      "claimed_initial_state_id": 28,
+      "actual_initial_state_id_before_reset": 28,
+      "initial_state_id_after_reset": 29,
+      "preset_state_fingerprint": "77fdcdf5bbea744b8e98b9c03d418b31ab1f149b65de033c61253668421464b8",
+      "replay_state_fingerprint": "2314d0d74924b9af70a1bdcb00fc71c9f56faa9b92598ae2300db795feada665",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7267824074074074,
+        "rmse": 2.338810260840753,
+        "max_abs": 51.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8508564814814814,
+        "rmse": 3.108460759311764,
+        "max_abs": 54.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T013711174099Z",
+      "split": "train",
+      "reconstructed_collector_session": 0,
+      "seed": 1029,
+      "claimed_initial_state_id": 29,
+      "actual_initial_state_id_before_reset": 29,
+      "initial_state_id_after_reset": 30,
+      "preset_state_fingerprint": "5cf14f2c03b2920cc388d3c2427d24e725772ebea7ca6288836e142bab8fd519",
+      "replay_state_fingerprint": "276a722bf215a28b5cc2daa227a0299827fb6317c8aab9d97d2c3b3aef9ad597",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7557458847736624,
+        "rmse": 2.4000364366232736,
+        "max_abs": 52.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8161445473251028,
+        "rmse": 2.933662562191941,
+        "max_abs": 55.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014100736108Z",
+      "split": "test",
+      "reconstructed_collector_session": 1,
+      "seed": 1030,
+      "claimed_initial_state_id": 0,
+      "actual_initial_state_id_before_reset": 0,
+      "initial_state_id_after_reset": 1,
+      "preset_state_fingerprint": "4e0a26d43240d20206df86c69928ceea0b0380302e6a2a62dbd233d88fc0a561",
+      "replay_state_fingerprint": "1151ba3fb37996009d26d3f2bbeed6012c930d80fffb8ba349d54d5ba23060d4",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7361805555555556,
+        "rmse": 2.3726574975800965,
+        "max_abs": 47.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7816435185185184,
+        "rmse": 2.94751455945332,
+        "max_abs": 47.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014114174706Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1031,
+      "claimed_initial_state_id": 1,
+      "actual_initial_state_id_before_reset": 1,
+      "initial_state_id_after_reset": 2,
+      "preset_state_fingerprint": "3e129b7ffb9c2fddc81c6888c48027106a17457ae1b9842a14319ed2b72fec5f",
+      "replay_state_fingerprint": "4f38fc2a671f0543a1e3dd1fda5a3b68016aeb65f93215aa7dbfe5e7b74bde47",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7429269547325104,
+        "rmse": 2.393105666808361,
+        "max_abs": 46.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8762654320987655,
+        "rmse": 3.111854243256859,
+        "max_abs": 53.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014131007536Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1032,
+      "claimed_initial_state_id": 2,
+      "actual_initial_state_id_before_reset": 2,
+      "initial_state_id_after_reset": 3,
+      "preset_state_fingerprint": "79158e675c41efc1691b9a1fdf7c190ef18638c8351ac41accab86c260431191",
+      "replay_state_fingerprint": "d9b7ce26463a8f99f9f123c55976674fc09a5ebfc782f3184ce31ef8f7bb69ef",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7421424897119342,
+        "rmse": 2.3727897447602695,
+        "max_abs": 50.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.814133230452675,
+        "rmse": 2.985900940062867,
+        "max_abs": 48.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014147825258Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1033,
+      "claimed_initial_state_id": 3,
+      "actual_initial_state_id_before_reset": 3,
+      "initial_state_id_after_reset": 4,
+      "preset_state_fingerprint": "2879413f47d56c64f749290b840401c73e178cee1ae52670898a92e5b9fb15ce",
+      "replay_state_fingerprint": "48df425e199b54d8936ff43e6ab40e2aea9b320834c64ec9a6ec0affb99aba58",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7416666666666667,
+        "rmse": 2.387925085506614,
+        "max_abs": 46.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.820954218106996,
+        "rmse": 3.0841577976795636,
+        "max_abs": 54.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014156927957Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1034,
+      "claimed_initial_state_id": 4,
+      "actual_initial_state_id_before_reset": 4,
+      "initial_state_id_after_reset": 5,
+      "preset_state_fingerprint": "cd031c0f71fec9f612bda97489d9e6380c3a06de51d4b95174cf646d033fe2d5",
+      "replay_state_fingerprint": "0ca7cd2cb3f0fb948db95172db25dcfb4f0ba29c2f180d3196c75fc8673d9efa",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7378575102880658,
+        "rmse": 2.3785840403561607,
+        "max_abs": 45.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8132638888888888,
+        "rmse": 3.0093163812242354,
+        "max_abs": 46.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014206507407Z",
+      "split": "test",
+      "reconstructed_collector_session": 1,
+      "seed": 1035,
+      "claimed_initial_state_id": 5,
+      "actual_initial_state_id_before_reset": 5,
+      "initial_state_id_after_reset": 6,
+      "preset_state_fingerprint": "c47207b995b1741d93e10f99f64aa962eff70cde7837c8c890b58a6eaec1b4bf",
+      "replay_state_fingerprint": "0898158c0e883ca174f53c35c4d4d2c7bbdf95a3cfe008524a2440e758e72113",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7349588477366256,
+        "rmse": 2.3656861992698097,
+        "max_abs": 43.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8015046296296295,
+        "rmse": 2.963530472271595,
+        "max_abs": 53.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014216008737Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1036,
+      "claimed_initial_state_id": 6,
+      "actual_initial_state_id_before_reset": 6,
+      "initial_state_id_after_reset": 7,
+      "preset_state_fingerprint": "84941cd39870f1f5119e33a7b16c6f665e9edaad37064333dc79dda22f45a4c1",
+      "replay_state_fingerprint": "aec6766aab78985f86d97a41eeb54bd6e9bcf9cee51a38ec1b20e4ff1f61baa1",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7282741769547325,
+        "rmse": 2.3695985795031906,
+        "max_abs": 43.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7803780864197531,
+        "rmse": 2.9155002076668337,
+        "max_abs": 48.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014232430175Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1037,
+      "claimed_initial_state_id": 7,
+      "actual_initial_state_id_before_reset": 7,
+      "initial_state_id_after_reset": 8,
+      "preset_state_fingerprint": "bf153268ae9aabdb576344e57f71dc3b5d020d6a91a680515cbdf056a47c2e49",
+      "replay_state_fingerprint": "df721751920e8c248741fed16c8fe0d3a0ddd4985d2f71a47a7f18d59c37a569",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7518955761316872,
+        "rmse": 2.384498010340305,
+        "max_abs": 53.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7508847736625515,
+        "rmse": 2.879473617305288,
+        "max_abs": 55.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014241734179Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1038,
+      "claimed_initial_state_id": 8,
+      "actual_initial_state_id_before_reset": 8,
+      "initial_state_id_after_reset": 9,
+      "preset_state_fingerprint": "fa5d97baf83dd062e9cc68608a7c7679cd40879b1723e67d398b2c10e4224db7",
+      "replay_state_fingerprint": "83c0be23c86f1313a7c3b9961fe913d6220ab02b2998c44d1e0b6f3d754c20f6",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.757798353909465,
+        "rmse": 2.409188087883209,
+        "max_abs": 44.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7702932098765432,
+        "rmse": 2.8893900918499495,
+        "max_abs": 56.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014258676660Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1039,
+      "claimed_initial_state_id": 9,
+      "actual_initial_state_id_before_reset": 9,
+      "initial_state_id_after_reset": 10,
+      "preset_state_fingerprint": "be5fa9a631d3306ee6b6e3e0c0b16ca059dde383dd3fa824a0274b310550b139",
+      "replay_state_fingerprint": "03c61dc0da22c9bfa70a32198a3f4d57c39ec38300aa5db6228f9f0ca0e050ff",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.732770061728395,
+        "rmse": 2.382435836366489,
+        "max_abs": 46.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8528703703703704,
+        "rmse": 3.1257369501417553,
+        "max_abs": 59.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014308102939Z",
+      "split": "test",
+      "reconstructed_collector_session": 1,
+      "seed": 1040,
+      "claimed_initial_state_id": 10,
+      "actual_initial_state_id_before_reset": 10,
+      "initial_state_id_after_reset": 11,
+      "preset_state_fingerprint": "13bc338bae85123625670b4e38422f9c541ff54488c8a46fb017be50bdfb6ec4",
+      "replay_state_fingerprint": "39c9e3f31d98aa0eee32bfd0f3861a516dfeb80225ed8f973505fbfcb5ef872b",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7254063786008231,
+        "rmse": 2.376690431547072,
+        "max_abs": 46.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8542798353909464,
+        "rmse": 3.108419801531228,
+        "max_abs": 49.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014324922851Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1041,
+      "claimed_initial_state_id": 11,
+      "actual_initial_state_id_before_reset": 11,
+      "initial_state_id_after_reset": 12,
+      "preset_state_fingerprint": "9d2e2305d0bdcd982ebeea2e7942bd697cae38f5ac5ac62362ec33b918c59794",
+      "replay_state_fingerprint": "eb7790e8899e5e1f1ae6ddb3a2e2ae95055e8f8726ccaba1cd8a3eb0626ff789",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.747011316872428,
+        "rmse": 2.3884054205002334,
+        "max_abs": 41.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7936882716049383,
+        "rmse": 2.9699125674733615,
+        "max_abs": 57.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014334375052Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1042,
+      "claimed_initial_state_id": 12,
+      "actual_initial_state_id_before_reset": 12,
+      "initial_state_id_after_reset": 13,
+      "preset_state_fingerprint": "617b59ae01252fa59eca3ebd9b8b3deb959bb4177af22889394001c71b0e41ae",
+      "replay_state_fingerprint": "e421e989437b079fb418af8b7bdf766273b207314680d48bfe5a5aaa22f638d4",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7284619341563785,
+        "rmse": 2.3623907207943975,
+        "max_abs": 48.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8288966049382716,
+        "rmse": 3.041303885011765,
+        "max_abs": 56.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014343827197Z",
+      "split": "validation",
+      "reconstructed_collector_session": 1,
+      "seed": 1043,
+      "claimed_initial_state_id": 13,
+      "actual_initial_state_id_before_reset": 13,
+      "initial_state_id_after_reset": 14,
+      "preset_state_fingerprint": "6ae212a1c5608422a80eb40ac416259c9d51358e5524fc088dc2b075b64c1113",
+      "replay_state_fingerprint": "ed2bec7d97817a05f14d0aca7b7cd494cbe4c2efe25afa61d5bbd8cd7ce83d5f",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7338451646090536,
+        "rmse": 2.3766390272491154,
+        "max_abs": 48.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8355118312757202,
+        "rmse": 3.026988089339652,
+        "max_abs": 58.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014400705066Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1044,
+      "claimed_initial_state_id": 14,
+      "actual_initial_state_id_before_reset": 14,
+      "initial_state_id_after_reset": 15,
+      "preset_state_fingerprint": "96a4b33acb73b7d8104596cea043620e0de170022430c3cf117e01cfc83d255f",
+      "replay_state_fingerprint": "3bfa9070a976c4c531a5ff43ed2d2657e7168dc7f544a73c626237519b6ce9d5",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.740270061728395,
+        "rmse": 2.370905068454112,
+        "max_abs": 49.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8350334362139917,
+        "rmse": 3.103205481314323,
+        "max_abs": 51.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014417974454Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1045,
+      "claimed_initial_state_id": 15,
+      "actual_initial_state_id_before_reset": 15,
+      "initial_state_id_after_reset": 16,
+      "preset_state_fingerprint": "395edbe02d7db8bd4e986beea6e75a34fa32981c8c13550fdf0c445a0216b6f3",
+      "replay_state_fingerprint": "0fc62a1eb31d6227b5dc37f56b7d6530aae25c8eda5da7891ffc1d8cb02d7b5d",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7458873456790123,
+        "rmse": 2.390269304007189,
+        "max_abs": 42.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8559825102880658,
+        "rmse": 3.1636990643149554,
+        "max_abs": 53.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014435252422Z",
+      "split": "validation",
+      "reconstructed_collector_session": 1,
+      "seed": 1046,
+      "claimed_initial_state_id": 16,
+      "actual_initial_state_id_before_reset": 16,
+      "initial_state_id_after_reset": 17,
+      "preset_state_fingerprint": "effa3b7aa6c8ff6a93d85d5c5230d0218aea120da8e580cd7b8333955609f31d",
+      "replay_state_fingerprint": "ee13c7ec2ff4d21866a8dddfe04e67d64a72b1d539fcb03f49bf54fc99d51911",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7275874485596707,
+        "rmse": 2.3534887858285147,
+        "max_abs": 43.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.807039609053498,
+        "rmse": 2.9905187109419376,
+        "max_abs": 55.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014452431149Z",
+      "split": "train",
+      "reconstructed_collector_session": 1,
+      "seed": 1047,
+      "claimed_initial_state_id": 17,
+      "actual_initial_state_id_before_reset": 17,
+      "initial_state_id_after_reset": 18,
+      "preset_state_fingerprint": "20cedd408acb40a0593359511eedb3ee761236a2939fe8eac187e8a1d1af1922",
+      "replay_state_fingerprint": "6ded98022638c7c902f1ab22d7f3e8f8a10e6a88bea20f25aadfb523635c78ca",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7426826131687243,
+        "rmse": 2.3840417016887407,
+        "max_abs": 43.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.8134079218106995,
+        "rmse": 2.980246609924601,
+        "max_abs": 56.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014509334954Z",
+      "split": "validation",
+      "reconstructed_collector_session": 1,
+      "seed": 1048,
+      "claimed_initial_state_id": 18,
+      "actual_initial_state_id_before_reset": 18,
+      "initial_state_id_after_reset": 19,
+      "preset_state_fingerprint": "aefa93a5663e62c68f04b84a394576267cb529029be4f1661714c2052cfae440",
+      "replay_state_fingerprint": "45406f4f480d6a7df98856d43a49b79d15487501bbe7db452e4f9a122e656b8e",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.7373611111111111,
+        "rmse": 2.370853538719255,
+        "max_abs": 37.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7567335390946501,
+        "rmse": 2.8928943030397205,
+        "max_abs": 48.0
+      }
+    },
+    {
+      "episode_id": "smolvla-20260911T014518928210Z",
+      "split": "test",
+      "reconstructed_collector_session": 1,
+      "seed": 1049,
+      "claimed_initial_state_id": 19,
+      "actual_initial_state_id_before_reset": 19,
+      "initial_state_id_after_reset": 20,
+      "preset_state_fingerprint": "7930cf3ccbf41c9fdfeb9daef7d7390d317b2fb255e94d6004cdb6d32043fdca",
+      "replay_state_fingerprint": "3ac14c28926ef10ed3319bab26d9374855c7813552d617de2642046265aee1c8",
+      "replay_state_size": 92,
+      "recorded_vs_replay_main_frame": {
+        "mae": 1.741381172839506,
+        "rmse": 2.394914343339685,
+        "max_abs": 38.0
+      },
+      "recorded_vs_replay_wrist_frame": {
+        "mae": 1.7823431069958848,
+        "rmse": 2.9350176666765915,
+        "max_abs": 45.0
+      }
+    }
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "schema_version": "0.1.0",
+  "with_progress_report": "artifacts/results/week1_task4_temporal_mlp.json",
+  "without_progress_report": "artifacts/results/v02_task4_temporal_no_checkpoint_progress.json",
+  "bootstrap_samples": 10000,
+  "bootstrap_seed": 20260920,
+  "unit": "episode paired within checkpoint_step",
+  "selection": "diagnostic ablation; test is not used to select a replacement model",
+  "checkpoints": {
+    "0": {
+      "episodes": 10,
+      "valid_bootstrap_samples": 9734,
+      "with_checkpoint_progress": {
+        "auprc": 0.6091836734693878,
+        "auroc": 0.2857142857142857,
+        "brier": 0.24647793904753462,
+        "ece": 0.03568740487098687
+      },
+      "without_checkpoint_progress": {
+        "auprc": 0.6091836734693878,
+        "auroc": 0.2857142857142857,
+        "brier": 0.23963362153297219,
+        "ece": 0.035681134462356545
+      },
+      "delta_without_minus_with": {
+        "auprc": {
+          "point": 0.0,
+          "ci95": [
+            -0.0071428571428571175,
+            0.00666666666666671
+          ]
+        },
+        "auroc": {
+          "point": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "brier": {
+          "point": -0.006844317514562437,
+          "ci95": [
+            -0.01455647197487969,
+            -0.00028678603104909074
+          ]
+        },
+        "ece": {
+          "point": -6.270408630326685e-06,
+          "ci95": [
+            -0.006649549901485488,
+            0.0034549213945865398
+          ]
+        }
+      }
+    },
+    "40": {
+      "episodes": 10,
+      "valid_bootstrap_samples": 9720,
+      "with_checkpoint_progress": {
+        "auprc": 0.855952380952381,
+        "auroc": 0.5714285714285714,
+        "brier": 0.23033688139707637,
+        "ece": 0.1666426301002502
+      },
+      "without_checkpoint_progress": {
+        "auprc": 0.8401360544217686,
+        "auroc": 0.5714285714285714,
+        "brier": 0.22841089029019787,
+        "ece": 0.1461202383041382
+      },
+      "delta_without_minus_with": {
+        "auprc": {
+          "point": -0.01581632653061238,
+          "ci95": [
+            -0.1333333333333333,
+            0.0625
+          ]
+        },
+        "auroc": {
+          "point": 0.0,
+          "ci95": [
+            -0.25,
+            0.25
+          ]
+        },
+        "brier": {
+          "point": -0.001925991106878494,
+          "ci95": [
+            -0.018516792380752167,
+            0.019666613579248374
+          ]
+        },
+        "ece": {
+          "point": -0.02052239179611201,
+          "ci95": [
+            -0.21694178745150566,
+            0.028658842891454636
+          ]
+        }
+      }
+    },
+    "80": {
+      "episodes": 10,
+      "valid_bootstrap_samples": 9705,
+      "with_checkpoint_progress": {
+        "auprc": 0.9087301587301587,
+        "auroc": 0.7619047619047619,
+        "brier": 0.22902694334185916,
+        "ece": 0.2517437510192394
+      },
+      "without_checkpoint_progress": {
+        "auprc": 0.9087301587301587,
+        "auroc": 0.7619047619047619,
+        "brier": 0.2471465734060001,
+        "ece": 0.2644728720188141
+      },
+      "delta_without_minus_with": {
+        "auprc": {
+          "point": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "auroc": {
+          "point": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "brier": {
+          "point": 0.01811963006414094,
+          "ci95": [
+            0.0042025250364117195,
+            0.03505818526410521
+          ]
+        },
+        "ece": {
+          "point": 0.012729120999574683,
+          "ci95": [
+            0.0035135820508003113,
+            0.025959901660680726
+          ]
+        }
+      }
+    },
+    "120": {
+      "episodes": 10,
+      "valid_bootstrap_samples": 9723,
+      "with_checkpoint_progress": {
+        "auprc": 0.9821428571428572,
+        "auroc": 0.9523809523809523,
+        "brier": 0.09564005802471763,
+        "ece": 0.09513045400381091
+      },
+      "without_checkpoint_progress": {
+        "auprc": 0.9821428571428572,
+        "auroc": 0.9523809523809523,
+        "brier": 0.09758215855632081,
+        "ece": 0.09905057363212107
+      },
+      "delta_without_minus_with": {
+        "auprc": {
+          "point": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "auroc": {
+          "point": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "brier": {
+          "point": 0.0019421005316031803,
+          "ci95": [
+            -0.0003148664848535876,
+            0.006121265346388088
+          ]
+        },
+        "ece": {
+          "point": 0.003920119628310154,
+          "ci95": [
+            -0.004807704342529196,
+            0.007241738820448512
+          ]
+        }
+      }
+    }
+  }
+}

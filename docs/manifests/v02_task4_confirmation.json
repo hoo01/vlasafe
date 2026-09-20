@@ -1,0 +1,186 @@
+{
+  "schema_version": "0.1.0",
+  "role": "independent_confirmation_only",
+  "selection": "preset before outcome inspection",
+  "identity": {
+    "task": "libero_spatial",
+    "task_id": 4,
+    "vlasafe_revision": "164cf6daae30d37a253b384a4fc2936bf75c129e",
+    "provenance": {
+      "lerobot_revision": "tree-sha256:a48da8638188f062ce74e13e1a3ef9060a362c6b914c905b14db62ebc475f39a",
+      "lerobot_tree_files": 1084,
+      "lerobot_tree_hash_algorithm": "sha256(relative_posix_path + NUL + sha256(file_bytes), sorted; excludes __pycache__, .pyc, .pyo, .DS_Store)",
+      "policy_revision": "model.safetensors-sha256:9a9f6413e42c0f332fccbce9a0dc796af2790f82cf002f791cdbf7e01e1afca8",
+      "policy_source": "lerobot/smolvla_libero with local observation.state metadata compatibility fix"
+    }
+  },
+  "totals": {
+    "episodes": 20,
+    "successes": 11,
+    "failures": 9
+  },
+  "splits": {
+    "confirmation": [
+      {
+        "episode_id": "smolvla-20260920T073625084584Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073625084584Z",
+        "seed": 2000,
+        "initial_state_id": 30,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260920T073646012864Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073646012864Z",
+        "seed": 2001,
+        "initial_state_id": 31,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260920T073702519215Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073702519215Z",
+        "seed": 2002,
+        "initial_state_id": 32,
+        "success": true,
+        "num_steps": 137
+      },
+      {
+        "episode_id": "smolvla-20260920T073711888534Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073711888534Z",
+        "seed": 2003,
+        "initial_state_id": 33,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260920T073727832127Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073727832127Z",
+        "seed": 2004,
+        "initial_state_id": 34,
+        "success": true,
+        "num_steps": 140
+      },
+      {
+        "episode_id": "smolvla-20260920T073737395485Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073737395485Z",
+        "seed": 2005,
+        "initial_state_id": 35,
+        "success": true,
+        "num_steps": 138
+      },
+      {
+        "episode_id": "smolvla-20260920T073746504165Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073746504165Z",
+        "seed": 2006,
+        "initial_state_id": 36,
+        "success": true,
+        "num_steps": 163
+      },
+      {
+        "episode_id": "smolvla-20260920T073757296780Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073757296780Z",
+        "seed": 2007,
+        "initial_state_id": 37,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260920T073813571666Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073813571666Z",
+        "seed": 2008,
+        "initial_state_id": 38,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260920T073830191817Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073830191817Z",
+        "seed": 2009,
+        "initial_state_id": 39,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260920T073847128374Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073847128374Z",
+        "seed": 2010,
+        "initial_state_id": 40,
+        "success": true,
+        "num_steps": 130
+      },
+      {
+        "episode_id": "smolvla-20260920T073856344247Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073856344247Z",
+        "seed": 2011,
+        "initial_state_id": 41,
+        "success": true,
+        "num_steps": 132
+      },
+      {
+        "episode_id": "smolvla-20260920T073905985356Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073905985356Z",
+        "seed": 2012,
+        "initial_state_id": 42,
+        "success": true,
+        "num_steps": 133
+      },
+      {
+        "episode_id": "smolvla-20260920T073915440870Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073915440870Z",
+        "seed": 2013,
+        "initial_state_id": 43,
+        "success": true,
+        "num_steps": 121
+      },
+      {
+        "episode_id": "smolvla-20260920T073924329498Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073924329498Z",
+        "seed": 2014,
+        "initial_state_id": 44,
+        "success": true,
+        "num_steps": 139
+      },
+      {
+        "episode_id": "smolvla-20260920T073934122360Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073934122360Z",
+        "seed": 2015,
+        "initial_state_id": 45,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260920T073951499574Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T073951499574Z",
+        "seed": 2016,
+        "initial_state_id": 46,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260920T074008403840Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T074008403840Z",
+        "seed": 2017,
+        "initial_state_id": 47,
+        "success": false,
+        "num_steps": 280
+      },
+      {
+        "episode_id": "smolvla-20260920T074026655478Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T074026655478Z",
+        "seed": 2018,
+        "initial_state_id": 48,
+        "success": true,
+        "num_steps": 138
+      },
+      {
+        "episode_id": "smolvla-20260920T074036545398Z",
+        "path": "artifacts/v02/confirmation_task4/smolvla-20260920T074036545398Z",
+        "seed": 2019,
+        "initial_state_id": 49,
+        "success": true,
+        "num_steps": 134
+      }
+    ]
+  }
+}

@@ -1,0 +1,1034 @@
+{
+  "schema_version": "0.1.0",
+  "role": "independent confirmation; no fitting or selection",
+  "temporal_dataset": "artifacts/v02/datasets/task4_confirmation_outcome.npz",
+  "vision_features": "artifacts/v02/features/task4_confirmation_frozen_vision.npz",
+  "temporal_model": "artifacts/results/week1_task4_temporal_mlp.pt",
+  "vision_model": "artifacts/results/week1_task4_frozen_vision.pt",
+  "reference_report": "artifacts/results/week1_task4_temporal_mlp.json",
+  "camera_selection": [
+    "main_camera",
+    "wrist_camera"
+  ],
+  "train_prevalence": 0.6333333333333333,
+  "results": {
+    "0": {
+      "episodes": 20,
+      "failure_rate": 0.45,
+      "prevalence": {
+        "auprc": {
+          "point": 0.45,
+          "ci95": [
+            0.25,
+            0.65
+          ]
+        },
+        "auroc": {
+          "point": 0.5,
+          "ci95": [
+            0.5,
+            0.5
+          ]
+        },
+        "brier": {
+          "point": 0.28111111111111103,
+          "ci95": [
+            0.22777777777777772,
+            0.3344444444444444
+          ]
+        },
+        "ece": {
+          "point": 0.18333333333333318,
+          "ci95": [
+            0.01666666666666683,
+            0.3833333333333332
+          ]
+        }
+      },
+      "temporal_mlp": {
+        "auprc": {
+          "point": 0.5271753482537797,
+          "ci95": [
+            0.26991884499168334,
+            0.8112624209940387
+          ]
+        },
+        "auroc": {
+          "point": 0.5050505050505051,
+          "ci95": [
+            0.23232323232323232,
+            0.77
+          ]
+        },
+        "brier": {
+          "point": 0.2750085758833757,
+          "ci95": [
+            0.21953041431309786,
+            0.3291834842976096
+          ]
+        },
+        "ece": {
+          "point": 0.17908361852169036,
+          "ci95": [
+            0.02108115181326864,
+            0.37989257574081425
+          ]
+        }
+      },
+      "frozen_vision": {
+        "auprc": {
+          "point": 0.4568209740036365,
+          "ci95": [
+            0.24635874613003098,
+            0.7888450249245704
+          ]
+        },
+        "auroc": {
+          "point": 0.43434343434343436,
+          "ci95": [
+            0.17582417582417584,
+            0.7171717171717171
+          ]
+        },
+        "brier": {
+          "point": 0.45010360737363897,
+          "ci95": [
+            0.28124248370236044,
+            0.6210991420096534
+          ]
+        },
+        "ece": {
+          "point": 0.511063399882863,
+          "ci95": [
+            0.32009235466364777,
+            0.6980872194463011
+          ]
+        }
+      }
+    },
+    "40": {
+      "episodes": 20,
+      "failure_rate": 0.45,
+      "prevalence": {
+        "auprc": {
+          "point": 0.45,
+          "ci95": [
+            0.25,
+            0.65
+          ]
+        },
+        "auroc": {
+          "point": 0.5,
+          "ci95": [
+            0.5,
+            0.5
+          ]
+        },
+        "brier": {
+          "point": 0.28111111111111103,
+          "ci95": [
+            0.22777777777777772,
+            0.3344444444444444
+          ]
+        },
+        "ece": {
+          "point": 0.18333333333333318,
+          "ci95": [
+            0.01666666666666683,
+            0.3833333333333332
+          ]
+        }
+      },
+      "temporal_mlp": {
+        "auprc": {
+          "point": 0.5715167548500881,
+          "ci95": [
+            0.32370692501942505,
+            0.8919223484848484
+          ]
+        },
+        "auroc": {
+          "point": 0.6161616161616161,
+          "ci95": [
+            0.34375,
+            0.86
+          ]
+        },
+        "brier": {
+          "point": 0.27247601137516325,
+          "ci95": [
+            0.19172981469668093,
+            0.3766831460991793
+          ]
+        },
+        "ece": {
+          "point": 0.14979318231344224,
+          "ci95": [
+            0.06550974585115908,
+            0.37874065052717915
+          ]
+        }
+      },
+      "frozen_vision": {
+        "auprc": {
+          "point": 0.8663919413919414,
+          "ci95": [
+            0.65,
+            1.0
+          ]
+        },
+        "auroc": {
+          "point": 0.8181818181818182,
+          "ci95": [
+            0.5655776515151516,
+            1.0
+          ]
+        },
+        "brier": {
+          "point": 0.2122051423449011,
+          "ci95": [
+            0.06922355324488762,
+            0.3768058197016984
+          ]
+        },
+        "ece": {
+          "point": 0.24425236711006845,
+          "ci95": [
+            0.09530323362980199,
+            0.4242312337345576
+          ]
+        }
+      }
+    },
+    "80": {
+      "episodes": 20,
+      "failure_rate": 0.45,
+      "prevalence": {
+        "auprc": {
+          "point": 0.45,
+          "ci95": [
+            0.25,
+            0.65
+          ]
+        },
+        "auroc": {
+          "point": 0.5,
+          "ci95": [
+            0.5,
+            0.5
+          ]
+        },
+        "brier": {
+          "point": 0.28111111111111103,
+          "ci95": [
+            0.22777777777777772,
+            0.3344444444444444
+          ]
+        },
+        "ece": {
+          "point": 0.18333333333333318,
+          "ci95": [
+            0.01666666666666683,
+            0.3833333333333332
+          ]
+        }
+      },
+      "temporal_mlp": {
+        "auprc": {
+          "point": 0.8742504409171077,
+          "ci95": [
+            0.6502643467643469,
+            1.0
+          ]
+        },
+        "auroc": {
+          "point": 0.8787878787878788,
+          "ci95": [
+            0.6904761904761905,
+            1.0
+          ]
+        },
+        "brier": {
+          "point": 0.15573749263809258,
+          "ci95": [
+            0.050413615344467276,
+            0.28371730392093075
+          ]
+        },
+        "ece": {
+          "point": 0.12457997649908067,
+          "ci95": [
+            0.06145574124529959,
+            0.31484981295652675
+          ]
+        }
+      },
+      "frozen_vision": {
+        "auprc": {
+          "point": 0.9390432098765431,
+          "ci95": [
+            0.7857142857142857,
+            1.0
+          ]
+        },
+        "auroc": {
+          "point": 0.9191919191919192,
+          "ci95": [
+            0.7472527472527473,
+            1.0
+          ]
+        },
+        "brier": {
+          "point": 0.10243464806470497,
+          "ci95": [
+            0.0001481217700106139,
+            0.25228824684377005
+          ]
+        },
+        "ece": {
+          "point": 0.11423803590418118,
+          "ci95": [
+            0.004680260643580966,
+            0.26162029371766143
+          ]
+        }
+      }
+    },
+    "120": {
+      "episodes": 20,
+      "failure_rate": 0.45,
+      "prevalence": {
+        "auprc": {
+          "point": 0.45,
+          "ci95": [
+            0.25,
+            0.65
+          ]
+        },
+        "auroc": {
+          "point": 0.5,
+          "ci95": [
+            0.5,
+            0.5
+          ]
+        },
+        "brier": {
+          "point": 0.28111111111111103,
+          "ci95": [
+            0.22777777777777772,
+            0.3344444444444444
+          ]
+        },
+        "ece": {
+          "point": 0.18333333333333318,
+          "ci95": [
+            0.01666666666666683,
+            0.3833333333333332
+          ]
+        }
+      },
+      "temporal_mlp": {
+        "auprc": {
+          "point": 0.8822649572649572,
+          "ci95": [
+            0.6713928571428571,
+            1.0
+          ]
+        },
+        "auroc": {
+          "point": 0.8282828282828283,
+          "ci95": [
+            0.5714285714285714,
+            1.0
+          ]
+        },
+        "brier": {
+          "point": 0.1395369588215117,
+          "ci95": [
+            0.03611655634843831,
+            0.2751156190445327
+          ]
+        },
+        "ece": {
+          "point": 0.13968726471066478,
+          "ci95": [
+            0.06521529139485209,
+            0.31574771240353583
+          ]
+        }
+      },
+      "frozen_vision": {
+        "auprc": {
+          "point": 0.9192982456140352,
+          "ci95": [
+            0.7441423499224251,
+            1.0
+          ]
+        },
+        "auroc": {
+          "point": 0.8787878787878788,
+          "ci95": [
+            0.6363636363636364,
+            1.0
+          ]
+        },
+        "brier": {
+          "point": 0.10000285990009643,
+          "ci95": [
+            5.45375774234693e-07,
+            0.2500026147944555
+          ]
+        },
+        "ece": {
+          "point": 0.10039884382992063,
+          "ci95": [
+            0.00034462152991689794,
+            0.2503259729015747
+          ]
+        }
+      }
+    }
+  },
+  "predictions": [
+    {
+      "episode_id": "smolvla-20260920T073625084584Z",
+      "checkpoint_step": 0,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.72376948595047,
+      "checkpoint_vision_probability": 0.8398359417915344
+    },
+    {
+      "episode_id": "smolvla-20260920T073646012864Z",
+      "checkpoint_step": 0,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6244736313819885,
+      "checkpoint_vision_probability": 0.952552318572998
+    },
+    {
+      "episode_id": "smolvla-20260920T073702519215Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6296327710151672,
+      "checkpoint_vision_probability": 0.35015395283699036
+    },
+    {
+      "episode_id": "smolvla-20260920T073711888534Z",
+      "checkpoint_step": 0,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6108571290969849,
+      "checkpoint_vision_probability": 0.19142018258571625
+    },
+    {
+      "episode_id": "smolvla-20260920T073727832127Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6315767168998718,
+      "checkpoint_vision_probability": 0.7490094304084778
+    },
+    {
+      "episode_id": "smolvla-20260920T073737395485Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6222947239875793,
+      "checkpoint_vision_probability": 0.9802001714706421
+    },
+    {
+      "episode_id": "smolvla-20260920T073746504165Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6047676801681519,
+      "checkpoint_vision_probability": 0.7437703609466553
+    },
+    {
+      "episode_id": "smolvla-20260920T073757296780Z",
+      "checkpoint_step": 0,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6326063275337219,
+      "checkpoint_vision_probability": 0.0
+    },
+    {
+      "episode_id": "smolvla-20260920T073813571666Z",
+      "checkpoint_step": 0,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6286519169807434,
+      "checkpoint_vision_probability": 0.9977778792381287
+    },
+    {
+      "episode_id": "smolvla-20260920T073830191817Z",
+      "checkpoint_step": 0,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6248979568481445,
+      "checkpoint_vision_probability": 0.9635564684867859
+    },
+    {
+      "episode_id": "smolvla-20260920T073847128374Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6022466421127319,
+      "checkpoint_vision_probability": 0.801828920841217
+    },
+    {
+      "episode_id": "smolvla-20260920T073856344247Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6293267011642456,
+      "checkpoint_vision_probability": 0.008488340303301811
+    },
+    {
+      "episode_id": "smolvla-20260920T073905985356Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6238380670547485,
+      "checkpoint_vision_probability": 0.9670580625534058
+    },
+    {
+      "episode_id": "smolvla-20260920T073915440870Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6393543481826782,
+      "checkpoint_vision_probability": 0.9997507929801941
+    },
+    {
+      "episode_id": "smolvla-20260920T073924329498Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6167265772819519,
+      "checkpoint_vision_probability": 0.8682852387428284
+    },
+    {
+      "episode_id": "smolvla-20260920T073934122360Z",
+      "checkpoint_step": 0,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6286365985870361,
+      "checkpoint_vision_probability": 0.7681360840797424
+    },
+    {
+      "episode_id": "smolvla-20260920T073951499574Z",
+      "checkpoint_step": 0,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6166931390762329,
+      "checkpoint_vision_probability": 0.47774773836135864
+    },
+    {
+      "episode_id": "smolvla-20260920T074008403840Z",
+      "checkpoint_step": 0,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6224607229232788,
+      "checkpoint_vision_probability": 6.202856894788056e-08
+    },
+    {
+      "episode_id": "smolvla-20260920T074026655478Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6410542726516724,
+      "checkpoint_vision_probability": 0.3121489882469177
+    },
+    {
+      "episode_id": "smolvla-20260920T074036545398Z",
+      "checkpoint_step": 0,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6278069615364075,
+      "checkpoint_vision_probability": 0.6048597097396851
+    },
+    {
+      "episode_id": "smolvla-20260920T073625084584Z",
+      "checkpoint_step": 40,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.8156834840774536,
+      "checkpoint_vision_probability": 0.9999998807907104
+    },
+    {
+      "episode_id": "smolvla-20260920T073646012864Z",
+      "checkpoint_step": 40,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.4598098397254944,
+      "checkpoint_vision_probability": 0.91288161277771
+    },
+    {
+      "episode_id": "smolvla-20260920T073702519215Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.5391650199890137,
+      "checkpoint_vision_probability": 0.0004711602523457259
+    },
+    {
+      "episode_id": "smolvla-20260920T073711888534Z",
+      "checkpoint_step": 40,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.5190099477767944,
+      "checkpoint_vision_probability": 0.9632084965705872
+    },
+    {
+      "episode_id": "smolvla-20260920T073727832127Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.4365646243095398,
+      "checkpoint_vision_probability": 0.8644199967384338
+    },
+    {
+      "episode_id": "smolvla-20260920T073737395485Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.38085898756980896,
+      "checkpoint_vision_probability": 0.9347442388534546
+    },
+    {
+      "episode_id": "smolvla-20260920T073746504165Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.5475466847419739,
+      "checkpoint_vision_probability": 0.0008675431599840522
+    },
+    {
+      "episode_id": "smolvla-20260920T073757296780Z",
+      "checkpoint_step": 40,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.43332308530807495,
+      "checkpoint_vision_probability": 0.008761739358305931
+    },
+    {
+      "episode_id": "smolvla-20260920T073813571666Z",
+      "checkpoint_step": 40,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6056087613105774,
+      "checkpoint_vision_probability": 0.9997395873069763
+    },
+    {
+      "episode_id": "smolvla-20260920T073830191817Z",
+      "checkpoint_step": 40,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.5785244107246399,
+      "checkpoint_vision_probability": 0.9999862909317017
+    },
+    {
+      "episode_id": "smolvla-20260920T073847128374Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.5915729403495789,
+      "checkpoint_vision_probability": 0.39997056126594543
+    },
+    {
+      "episode_id": "smolvla-20260920T073856344247Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.511278510093689,
+      "checkpoint_vision_probability": 0.4295879304409027
+    },
+    {
+      "episode_id": "smolvla-20260920T073905985356Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.5404640436172485,
+      "checkpoint_vision_probability": 0.5282595753669739
+    },
+    {
+      "episode_id": "smolvla-20260920T073915440870Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.41184425354003906,
+      "checkpoint_vision_probability": 0.008076800033450127
+    },
+    {
+      "episode_id": "smolvla-20260920T073924329498Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.790364146232605,
+      "checkpoint_vision_probability": 0.00018084865587297827
+    },
+    {
+      "episode_id": "smolvla-20260920T073934122360Z",
+      "checkpoint_step": 40,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.8172975778579712,
+      "checkpoint_vision_probability": 0.9452869892120361
+    },
+    {
+      "episode_id": "smolvla-20260920T073951499574Z",
+      "checkpoint_step": 40,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.8467373847961426,
+      "checkpoint_vision_probability": 0.9293752312660217
+    },
+    {
+      "episode_id": "smolvla-20260920T074008403840Z",
+      "checkpoint_step": 40,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.5614514350891113,
+      "checkpoint_vision_probability": 6.495020077323943e-09
+    },
+    {
+      "episode_id": "smolvla-20260920T074026655478Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.6160574555397034,
+      "checkpoint_vision_probability": 0.0012219016207382083
+    },
+    {
+      "episode_id": "smolvla-20260920T074036545398Z",
+      "checkpoint_step": 40,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9927010536193848,
+      "checkpoint_vision_probability": 0.0028330497443675995
+    },
+    {
+      "episode_id": "smolvla-20260920T073625084584Z",
+      "checkpoint_step": 80,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9222076535224915,
+      "checkpoint_vision_probability": 0.9518009424209595
+    },
+    {
+      "episode_id": "smolvla-20260920T073646012864Z",
+      "checkpoint_step": 80,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9826439619064331,
+      "checkpoint_vision_probability": 0.9998031258583069
+    },
+    {
+      "episode_id": "smolvla-20260920T073702519215Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.2301538735628128,
+      "checkpoint_vision_probability": 6.408414243708194e-09
+    },
+    {
+      "episode_id": "smolvla-20260920T073711888534Z",
+      "checkpoint_step": 80,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.35002222657203674,
+      "checkpoint_vision_probability": 8.734325973591694e-08
+    },
+    {
+      "episode_id": "smolvla-20260920T073727832127Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.08264656364917755,
+      "checkpoint_vision_probability": 2.5016258859977825e-06
+    },
+    {
+      "episode_id": "smolvla-20260920T073737395485Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.0386229008436203,
+      "checkpoint_vision_probability": 1.0608681044743662e-08
+    },
+    {
+      "episode_id": "smolvla-20260920T073746504165Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.1327565610408783,
+      "checkpoint_vision_probability": 9.72399502643384e-05
+    },
+    {
+      "episode_id": "smolvla-20260920T073757296780Z",
+      "checkpoint_step": 80,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.12161567062139511,
+      "checkpoint_vision_probability": 0.00014560202544089407
+    },
+    {
+      "episode_id": "smolvla-20260920T073813571666Z",
+      "checkpoint_step": 80,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.99787437915802,
+      "checkpoint_vision_probability": 0.9966061115264893
+    },
+    {
+      "episode_id": "smolvla-20260920T073830191817Z",
+      "checkpoint_step": 80,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9981401562690735,
+      "checkpoint_vision_probability": 0.999993085861206
+    },
+    {
+      "episode_id": "smolvla-20260920T073847128374Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.22133807837963104,
+      "checkpoint_vision_probability": 7.74218449350883e-08
+    },
+    {
+      "episode_id": "smolvla-20260920T073856344247Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9470993876457214,
+      "checkpoint_vision_probability": 0.21528324484825134
+    },
+    {
+      "episode_id": "smolvla-20260920T073905985356Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.05483999848365784,
+      "checkpoint_vision_probability": 1.2010736099909991e-05
+    },
+    {
+      "episode_id": "smolvla-20260920T073915440870Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.10656368732452393,
+      "checkpoint_vision_probability": 3.0303058906611113e-07
+    },
+    {
+      "episode_id": "smolvla-20260920T073924329498Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.16465020179748535,
+      "checkpoint_vision_probability": 2.4376893179578474e-06
+    },
+    {
+      "episode_id": "smolvla-20260920T073934122360Z",
+      "checkpoint_step": 80,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9056984186172485,
+      "checkpoint_vision_probability": 0.9994891881942749
+    },
+    {
+      "episode_id": "smolvla-20260920T073951499574Z",
+      "checkpoint_step": 80,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9987572431564331,
+      "checkpoint_vision_probability": 0.999940037727356
+    },
+    {
+      "episode_id": "smolvla-20260920T074008403840Z",
+      "checkpoint_step": 80,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.4222591817378998,
+      "checkpoint_vision_probability": 0.9826085567474365
+    },
+    {
+      "episode_id": "smolvla-20260920T074026655478Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.7094337344169617,
+      "checkpoint_vision_probability": 6.656356532630525e-08
+    },
+    {
+      "episode_id": "smolvla-20260920T074036545398Z",
+      "checkpoint_step": 80,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.04478646069765091,
+      "checkpoint_vision_probability": 2.113502523570787e-05
+    },
+    {
+      "episode_id": "smolvla-20260920T073625084584Z",
+      "checkpoint_step": 120,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.8597955703735352,
+      "checkpoint_vision_probability": 0.9991239905357361
+    },
+    {
+      "episode_id": "smolvla-20260920T073646012864Z",
+      "checkpoint_step": 120,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9996310472488403,
+      "checkpoint_vision_probability": 0.9999700784683228
+    },
+    {
+      "episode_id": "smolvla-20260920T073702519215Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.5748893618583679,
+      "checkpoint_vision_probability": 1.5238667216976864e-08
+    },
+    {
+      "episode_id": "smolvla-20260920T073711888534Z",
+      "checkpoint_step": 120,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.01200859248638153,
+      "checkpoint_vision_probability": 5.545925052530265e-09
+    },
+    {
+      "episode_id": "smolvla-20260920T073727832127Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.030870681628584862,
+      "checkpoint_vision_probability": 5.920116308288925e-08
+    },
+    {
+      "episode_id": "smolvla-20260920T073737395485Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.37684568762779236,
+      "checkpoint_vision_probability": 0.002164294011890888
+    },
+    {
+      "episode_id": "smolvla-20260920T073746504165Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.04404091089963913,
+      "checkpoint_vision_probability": 1.277208752981096e-06
+    },
+    {
+      "episode_id": "smolvla-20260920T073757296780Z",
+      "checkpoint_step": 120,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.07352789491415024,
+      "checkpoint_vision_probability": 4.5106227730684623e-07
+    },
+    {
+      "episode_id": "smolvla-20260920T073813571666Z",
+      "checkpoint_step": 120,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9998558163642883,
+      "checkpoint_vision_probability": 0.9999755620956421
+    },
+    {
+      "episode_id": "smolvla-20260920T073830191817Z",
+      "checkpoint_step": 120,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9930923581123352,
+      "checkpoint_vision_probability": 0.9985164999961853
+    },
+    {
+      "episode_id": "smolvla-20260920T073847128374Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.14646729826927185,
+      "checkpoint_vision_probability": 2.6619806803296342e-08
+    },
+    {
+      "episode_id": "smolvla-20260920T073856344247Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.041942935436964035,
+      "checkpoint_vision_probability": 2.4294962486237637e-07
+    },
+    {
+      "episode_id": "smolvla-20260920T073905985356Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.2937023341655731,
+      "checkpoint_vision_probability": 3.808419251072337e-07
+    },
+    {
+      "episode_id": "smolvla-20260920T073915440870Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.03289017826318741,
+      "checkpoint_vision_probability": 2.3172725960307616e-08
+    },
+    {
+      "episode_id": "smolvla-20260920T073924329498Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.03236271068453789,
+      "checkpoint_vision_probability": 3.9214356206684897e-07
+    },
+    {
+      "episode_id": "smolvla-20260920T073934122360Z",
+      "checkpoint_step": 120,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9999545812606812,
+      "checkpoint_vision_probability": 0.9999986886978149
+    },
+    {
+      "episode_id": "smolvla-20260920T073951499574Z",
+      "checkpoint_step": 120,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.9999070167541504,
+      "checkpoint_vision_probability": 0.9993440508842468
+    },
+    {
+      "episode_id": "smolvla-20260920T074008403840Z",
+      "checkpoint_step": 120,
+      "failure": 1,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.5117863416671753,
+      "checkpoint_vision_probability": 0.9929270148277283
+    },
+    {
+      "episode_id": "smolvla-20260920T074026655478Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.3321745693683624,
+      "checkpoint_vision_probability": 2.1553581142086387e-09
+    },
+    {
+      "episode_id": "smolvla-20260920T074036545398Z",
+      "checkpoint_step": 120,
+      "failure": 0,
+      "prevalence_probability": 0.6333333333333333,
+      "temporal_mlp_probability": 0.029305407777428627,
+      "checkpoint_vision_probability": 6.774423155775366e-08
+    }
+  ]
+}
