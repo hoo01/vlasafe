@@ -157,23 +157,25 @@ AUROC 衡量总体排序，AUPRC 在 failure/success 不平衡时强调失败类
 
 v0.2 不重新打开模型选择，而是针对 v0.1 的三个关键疑点做固定协议验证：
 
-1. **Initial-state identity audit：** 按原 collector session 顺序重放 50 条 v0.1 episode，在每次 reset 前读取 LIBERO wrapper 的真实 `init_state_id` 和对应 preset-state fingerprint，并比较重放首帧与原视频首帧。完整 MuJoCo state 只用于审计 fingerprint，不进入 predictor 或 normalization。
-2. **Temporal checkpoint-feature ablation：** 保持 dataset、split、16-step history、MLP、优化器、训练 seed 和 early stopping 不变，只移除 `checkpoint_step / 280`。对有无该特征的同一批 test episode 按 checkpoint 做 paired bootstrap；差值定义为 `without - with`。该实验只解释特征依赖，不用 test 结果选择替代模型。
-3. **Independent initial-state confirmation：** 在 v0.1 未使用的 task-4 preset states 30–49 上采集 20 条新 rollout。采集前冻结 v0.1 temporal/vision 权重、normalization、相机配置、checkpoint 和指标；确认集不参与训练、选模、阈值选择或校准，也不并入原 test。评测按完整 episode bootstrap 报告 AUPRC、AUROC、Brier 和 ECE。
+1. Initial-state identity audit：确认数据切分真的按初始状态隔离。
+按原 collector session 顺序重放 50 条 v0.1 episode，在每次 reset 前直接读取 LIBERO wrapper 的真实 init_state_id 和 preset-state fingerprint，并与原视频首帧核对。
+**目的：**确认 train / validation / test 中记录的 initial state 身份没有错，held-out initial-state split 是真实成立的。完整 MuJoCo state 只用于审计，不进入 predictor。
+
+2. Temporal checkpoint-feature ablation：确认 temporal MLP 不是靠“当前做到第几步”作弊。
+原 temporal MLP 输入中包含 checkpoint_step / 280。现在保持数据、split、16-step history、模型结构、优化器、训练 seed 和 early stopping 全部不变，只删除这一项，再与原模型在同一批 test episodes 上比较。
+**目的：**判断原来的排序能力到底来自 state/action history，还是主要由显式 checkpoint 信息制造出来。这个实验只用于解释模型依赖，不用 test 结果重新选模型。
+
+3. Independent initial-state confirmation：确认原来的 outcome signal 不是 10 条 test episode 偶然得到的。
+冻结 v0.1 已训练好的 temporal / vision predictor、normalization、相机配置、checkpoint 和评测指标，然后在 task 4 从未使用过的 preset states 30–49 上重新采集 20 条 rollout，并直接评测。
+**目的：**检查原来观察到的 outcome prediction 能力，能否在新的 held-out initial states 上再次出现。确认集不参与训练、选模、阈值选择或校准，也不并入原 test。
 
 这三项依次回答：原 split 的 initial-state 身份是否真实、temporal 排序是否由显式 checkpoint 特征制造、原 outcome association 能否在独立 initial states 上复现。它们不回答 held-out task 泛化，也不把 Outcome Prediction 升级为 Impending Failure Detection。
 
-### 为什么没有 privileged-state oracle
+## 6. 主结果与审计结论
 
-即使重新采集完整物体真值，30 条训练 episode 和 10 条 test episode 也不足以让高维 oracle 模型形成可信的信息上界——结果更可能由小样本过拟合支配，而不是揭示真实的信息天花板。
+### 6.1 v0.1 主结果
 
-## 6. 结果：v0.1 test 与 v0.2 confirmation
-
-以下是同一组 10 条 held-out initial-state test episodes 的结果。为避免把排序能力与概率校准混在一张宽表中，二者分开报告。
-
-### 排序能力
-
-每格依次为 **AUPRC / AUROC**：
+下表只回答一个问题：在冻结的 10 条 held-out initial-state test episodes 上，predictor 能否把最终失败排在成功之前？每格依次为 **AUPRC / AUROC**。
 
 | Method | Step 0 | Step 40 | Step 80 | Step 120 |
 | --- | --- | --- | --- | --- |
@@ -184,48 +186,31 @@ v0.2 不重新打开模型选择，而是针对 v0.1 的三个关键疑点做固
 
 AUPRC 的无排序信息起点等于 test failure prevalence，即 `7/10 = 0.700`；常数分数的 AUROC 为 `0.500`。这里的 constant probability 使用训练集失败率 `0.633`，不是始终输出 `1.0` 的 always-failure classifier。
 
-### 概率误差与校准
-
-每格依次为 **Brier / ECE**，越低越好：
-
-| Method | Step 0 | Step 40 | Step 80 | Step 120 |
-| --- | --- | --- | --- | --- |
-| Train-prevalence constant | 0.214 / 0.067 | 0.214 / 0.067 | 0.214 / 0.067 | 0.214 / 0.067 |
-| Initial-proprio difficulty | 0.238 / 0.173 | 0.238 / 0.173 | 0.238 / 0.173 | 0.238 / 0.173 |
-| State/action temporal MLP | 0.246 / 0.036 | 0.230 / 0.167 | 0.229 / 0.252 | **0.096 / 0.095** |
-| Frozen dual-camera vision | 0.563 / 0.636 | 0.377 / 0.399 | **0.100 / 0.096** | **0.100 / 0.101** |
-
-### 审计阶段补入的进度基线
-
-| Progress baseline | Audit checkpoint | AUPRC | AUROC |
-| --- | ---: | ---: | ---: |
-| Visual progress proxy for vision audit | 80 | — | 0.905 |
-| Visual progress proxy for temporal audit | 120 | — | 1.000 |
-
-Progress proxy 只产生用于排序的连续分数，没有拟合为失败概率，因此不报告 Brier/ECE。冻结 JSON 中包含其 AUPRC，但该数值尚未同步进仓库文档；这里暂记为“—”，避免脱离已校验 artifact 手工补数。
-
 Paired episode bootstrap 支持 vision-step80 相对 initial-proprio 的排序改善：AUPRC `+0.183 [0.031, 0.450]`，AUROC `+0.500 [0.125, 0.857]`。Temporal-step120 的对应差值为 AUPRC `+0.183 [0.033, 0.450]`、AUROC `+0.500 [0.143, 0.860]`。
 
-这些结果证明 task 4 的冻结 test 上存在与最终 outcome 相关的信号，但 test 只有 10 条，不能据此声称任务级泛化。
+完整的 Brier/ECE、逐 checkpoint bootstrap 和预测概率保留在冻结 result JSON 中。它们用于检查概率质量，不改变这里的主排序结论。
 
-### 独立 initial-state confirmation
+### 6.2 v0.2 独立确认集
 
 完成 v0.1 后，项目冻结原 predictor、normalization、checkpoint 和指标，在 task 4 尚未使用的 LIBERO preset states 30–49 上重新采集 20 条 rollout（11 success、9 failure）。这批数据不参与训练、选模或阈值选择，也不并入原 test。
 
-每格依次为 **AUPRC / AUROC**；括号内为 episode bootstrap 95% CI：
+| Frozen predictor | Checkpoint | AUPRC [95% CI] | AUROC [95% CI] |
+| --- | ---: | ---: | ---: |
+| Dual-camera vision | 80 | **0.939 [0.786, 1.000]** | **0.919 [0.747, 1.000]** |
+| State/action temporal MLP | 120 | **0.882 [0.671, 1.000]** | **0.828 [0.571, 1.000]** |
 
-| Frozen predictor | Step 0 | Step 40 | Step 80 | Step 120 |
-| --- | --- | --- | --- | --- |
-| Temporal MLP | 0.527 [0.270, 0.811] / 0.505 [0.232, 0.770] | 0.572 [0.324, 0.892] / 0.616 [0.344, 0.860] | 0.874 [0.650, 1.000] / 0.879 [0.690, 1.000] | **0.882 [0.671, 1.000] / 0.828 [0.571, 1.000]** |
-| Dual-camera vision | 0.457 [0.246, 0.789] / 0.434 [0.176, 0.717] | 0.866 [0.650, 1.000] / 0.818 [0.566, 1.000] | **0.939 [0.786, 1.000] / 0.919 [0.747, 1.000]** | 0.919 [0.744, 1.000] / 0.879 [0.636, 1.000] |
-
-确认集失败率为 0.45，因此无排序信息的 AUPRC 起点为 0.45、AUROC 为 0.50。Step 0 接近无排序信息；随着执行推进，两种冻结 predictor 的排序能力上升。该结果降低了原 10 条 test 偶然产生高分的可能性，并支持“同一 task 内、未见 preset initial states 上存在可复现的 outcome signal”。它仍不支持 held-out task 泛化，也没有控制视觉执行进度，因此不能升级为独立失效前兆结论。
+确认集失败率为 0.45，因此无排序信息的 AUPRC 起点为 0.45、AUROC 为 0.50。结果支持“同一 task 内、未见 preset initial states 上存在可复现的 outcome signal”，降低了原 10 条 test 偶然产生高分的可能性。
 
 确认集只复评了两个冻结 learned predictor，没有重新拟合 initial-proprio baseline 或 progress proxy。它回答的是“原 outcome 排序能否在新 initial states 上复现”，而不是重复机制识别实验；关于模型主要读取执行进度的判断仍来自 v0.1 train/test 上的 RGB、LOEO 和 progress-control 审计。
 
-### Temporal checkpoint 特征消融
+### 6.3 审计结论
 
-Temporal MLP 原输入包含 `checkpoint_step / 280`。该值在同一 checkpoint 内对所有 episode 相同，理论上不能单独产生排序；固定其余训练配置移除该特征后，test step 80 和 120 的 AUPRC/AUROC 均完全不变。Step 80 的 Brier 反而增加 0.018（95% CI [0.004, 0.035]）、ECE 增加 0.013（[0.004, 0.026]）。因此它主要提供跨 checkpoint 的概率偏置，而不是原排序结果的捷径；v0.1 模型保持冻结，不依据 test 消融结果更换版本。
+| 审计问题 | 关键结果 | 结论 |
+| --- | --- | --- |
+| 模型是否主要读取视觉执行进度？ | Progress-only AUROC：vision-step80 `0.905`；temporal-step120 `1.000` | 执行进度可以解释大部分排序能力；是否存在进度外视觉信号仍无法确定。 |
+| Temporal 排序是否由 `checkpoint_step / 280` 制造？ | 移除后 step 80/120 的 AUPRC、AUROC 均不变 | 显式 checkpoint 特征不产生同 checkpoint 内的排序，只影响概率尺度。 |
+
+因此保留的主张是：**冻结 predictor 能在同一 task 的未见 initial states 上复现 outcome 排序，但现有证据不能把它解释为独立失效前兆。** 完整进度控制、匹配对和置信区间见下一节；完整校准与消融数值见冻结 artifacts。
 
 ## 7. 模型实际读取了什么
 
