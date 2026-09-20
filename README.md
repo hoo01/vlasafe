@@ -129,11 +129,15 @@ Predictor 只允许读取真实部署可得的 RGB、proprioception、历史动�
 
 将最近 16 步的 proprioception、动作和 timing 历史展平，输入一个小型 MLP，不使用画面。
 
+具体输入为每步 25 维 proprioception、7 维实际执行动作和 2 维 timing，共 16 步；padding mask 与 `checkpoint_step / 280` 也作为显式特征。网络为 `input → 128 → 64 → 1`，隐藏层使用 ReLU 和 0.1 dropout，最终概率取 5 个固定训练 seed 模型的平均。v0.2 单独消融了 checkpoint 特征，确认它不产生同 checkpoint 内的排序能力。
+
 **回答什么**：抛开视觉，光凭机器人自身的运动学轨迹能否判断成败。如果能，说明失败信号已经体现在本体状态层面。
 
 ### 第 5 层：Frozen dual-camera vision
 
 用冻结的 `torchvision/resnet50 IMAGENET1K_V2` 提取主／腕相机特征，再训练 checkpoint-specific linear probe。
+
+每个相机产生 2048 维特征，双相机拼接为 4096 维；step 0、40、80、120 各自训练一个线性概率头。ResNet 权重全程冻结，L2 候选只按 validation AUPRC 选择，并以 validation Brier 处理并列。
 
 **回答什么**：视觉是否提供了本体状态之外的信息，尤其是更早的信息。
 
@@ -151,7 +155,7 @@ Predictor 只允许读取真实部署可得的 RGB、proprioception、历史动�
 
 即使重新采集完整物体真值，30 条训练 episode 和 10 条 test episode 也不足以让高维 oracle 模型形成可信的信息上界——结果更可能由小样本过拟合支配，而不是揭示真实的信息天花板。
 
-## 6. 当前主结果
+## 6. 结果：v0.1 test 与 v0.2 confirmation
 
 以下是同一组 10 条 held-out initial-state test episodes 的结果。为避免把排序能力与概率校准混在一张宽表中，二者分开报告。
 
@@ -204,6 +208,8 @@ Paired episode bootstrap 支持 vision-step80 相对 initial-proprio 的排序�
 | Dual-camera vision | 0.457 [0.246, 0.789] / 0.434 [0.176, 0.717] | 0.866 [0.650, 1.000] / 0.818 [0.566, 1.000] | **0.939 [0.786, 1.000] / 0.919 [0.747, 1.000]** | 0.919 [0.744, 1.000] / 0.879 [0.636, 1.000] |
 
 确认集失败率为 0.45，因此无排序信息的 AUPRC 起点为 0.45、AUROC 为 0.50。Step 0 接近无排序信息；随着执行推进，两种冻结 predictor 的排序能力上升。该结果降低了原 10 条 test 偶然产生高分的可能性，并支持“同一 task 内、未见 preset initial states 上存在可复现的 outcome signal”。它仍不支持 held-out task 泛化，也没有控制视觉执行进度，因此不能升级为独立失效前兆结论。
+
+确认集只复评了两个冻结 learned predictor，没有重新拟合 initial-proprio baseline 或 progress proxy。它回答的是“原 outcome 排序能否在新 initial states 上复现”，而不是重复机制识别实验；关于模型主要读取执行进度的判断仍来自 v0.1 train/test 上的 RGB、LOEO 和 progress-control 审计。
 
 ### Temporal checkpoint 特征消融
 
@@ -272,6 +278,8 @@ A2 使用 20 组相同 seed 和 initial state 的三路配对 rollout：normal�
 
 2026-09-14 最终 release checksum 包含 21 个文件并通过 21/21 校验：原 18-file Outcome v0.1 快照、进度控制报告和两个 RQ1 报告。大体积配对 rollout 留在实验主机，并由 A2 report 中的 episode ID、seed 和逐条结果索引。
 
+2026-09-20 的 v0.2 checksum 另列 10 个文件，覆盖 confirmation manifest、完整性审计、temporal 消融、确认集 dataset/feature metadata 与冻结评测结果；大型 NPZ/PT 仍只通过 SHA-256 追踪，不并入 Git。
+
 进度控制实验已经完成，结果属于“当前样本不足以区分”：进度解释得到定量支持，vision 的额外信息没有得到可靠统计证据。该结果已纳入最终文档和 release。
 
 Week 4 的 RQ1 supporting study 已完成：A1 case table 为 11/11；A2 的协议规则无法识别两类数值合法故障，command-effect 在 10 条 evaluation pairs 中对动作 `x/y` 置换检出 10/10，正常误报 1/10。相机置换结果只作为间接异常响应报告。本阶段不训练专门的 learned A2 monitor。
@@ -292,6 +300,7 @@ v0.2 已完成 20 条独立 initial-state confirmation cohort，并以冻结 v0.
 | 机制审计与进度控制 | **完成** | RGB/error、LOEO、残差化和进度匹配 |
 | 风险叠加视频 | **完成** | outcome-risk offline overlay |
 | 可复现 release | **完成** | 21-file checksum 21/21 |
+| v0.2 审计与独立确认 | **完成** | 20 条未见 preset states；10-file checksum 清单 |
 | 2–3 个正式任务 | **未完成** | 当前只有 task 4，不声称 task generalization |
 | A1 运行时规则覆盖 | **完成（有界案例集）** | 11/11 deterministic cases；不外推到未测试协议错误 |
 | A2 / command-effect consistency | **完成（supporting study）** | 20 组配对 cohort；动作置换 10/10、normal 误报 1/10；相机结果仅为间接响应 |

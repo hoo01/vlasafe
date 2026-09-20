@@ -16,7 +16,7 @@ That experience motivated a simulator-first project about distinguishing deploym
 
 ## Current project state
 
-- Status (2026-09-14): the bounded four-week release is complete and checksum-verified (21/21 files). It includes the frozen task-4 Outcome v0.1 snapshot, quantitative progress control, and an A1/A2 deployment-diagnostics supporting study.
+- Status (2026-09-20): the bounded four-week v0.1 release remains frozen and checksum-verified (21/21 files). A post-release v0.2 audit verified initial-state identity, ablated the temporal checkpoint feature, and evaluated the frozen predictors on 20 previously unused task-4 preset states.
 - Canonical specification: `README.md` in this directory.
 - Platform: SmolVLA + LIBERO `libero_spatial` task 4 on RTX 4090 D.
 - Frozen natural cohort: 50 episodes, 18 successes / 32 failures; group-disjoint train/validation/test = 30/10/10 by `initial_state_id`.
@@ -29,7 +29,9 @@ That experience motivated a simulator-first project about distinguishing deploym
 - Validation selected an offline outcome threshold of 0.9998072982 under a zero-sacrificed-validation-success constraint. On test it identified 4/7 failures, observed 0/3 sacrificed successes, and counterfactually saved 756 recorded steps (52.95 seconds at the measured 70.042 ms/step). This is an offline efficiency/faster-confirmation result, not a safety intervention.
 - The test risk plot and a 360x360, 20 FPS, 280-frame outcome-risk overlay video are complete. The overlay explicitly marks the step-80 trigger as offline counterfactual and continues the recorded trajectory.
 - Progress control uses a train-only, outcome-label-free frozen-feature time axis. Progress-only test AUROC is 0.905 at vision-step80 and 1.000 at temporal-step120; progress-residualized AUROC is 0.714 and 0.381 respectively. Vision residual AUROC CI [0.111, 1.000] and partial-correlation CI [-0.232, 1.000] are inconclusive. Only two vision success/failure pairs are within 0.5 train SD; no temporal pairs are close. Final interpretation: progress explains much of the observed ranking, while the current 10-episode test cannot determine whether vision retains progress-independent information.
-- Next: integrate the progress-control result into the final table/release and complete the claim audit. Independent recollection, a second task, and RQ1 are deferred. Do not reopen model selection, frame outcome-based termination as a safety intervention, or upgrade to Transformer.
+- The recorded `initial_state_id` matches the LIBERO preset index for all 50 v0.1 episodes, with stable preset fingerprints across collector sessions. Removing `checkpoint_step / 280` leaves temporal test AUPRC/AUROC unchanged at steps 80 and 120; the feature affects probability scale rather than within-checkpoint ranking.
+- Independent confirmation: preset states 30–49 produced 20 episodes (11 success / 9 failure). With all v0.1 weights and normalization frozen, vision-step80 reaches AUPRC 0.939 / AUROC 0.919 and temporal-step120 reaches AUPRC 0.882 / AUROC 0.828. This confirms same-task outcome association, not a progress-independent failure precursor or held-out-task generalization.
+- Next: preserve the frozen v0.1/v0.2 artifacts and claim boundary. A second task and learned A2 monitor remain out of scope. Do not reopen model selection, frame outcome-based termination as a safety intervention, or upgrade to Transformer.
 
 ## Locked research definitions
 
