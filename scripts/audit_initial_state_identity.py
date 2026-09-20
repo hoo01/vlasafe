@@ -23,6 +23,10 @@ def _simulator(env: Any) -> Any:
     return sim
 
 
+def _wrapper(env: Any) -> Any:
+    return env.envs[0]
+
+
 def _flat_state(sim: Any) -> np.ndarray:
     if hasattr(sim, "get_state"):
         state = sim.get_state()
@@ -111,7 +115,12 @@ def main() -> None:
                     env.close()
                 env = _create_env(args.task_id)
                 collector_session += 1
+            wrapper = _wrapper(env)
+            actual_init_state_id = int(wrapper.init_state_id)
+            preset_state = np.asarray(wrapper._init_states[actual_init_state_id])
+            preset_fingerprint = _fingerprint(preset_state, args.state_decimals)
             observation, _ = env.reset(seed=int(row["seed"]))
+            init_state_id_after_reset = int(wrapper.init_state_id)
             state = _flat_state(_simulator(env))
             episode_path = Path(row["path"])
             main_error = _frame_error(
@@ -129,6 +138,9 @@ def main() -> None:
                     "reconstructed_collector_session": collector_session,
                     "seed": int(row["seed"]),
                     "claimed_initial_state_id": claimed_id,
+                    "actual_initial_state_id_before_reset": actual_init_state_id,
+                    "initial_state_id_after_reset": init_state_id_after_reset,
+                    "preset_state_fingerprint": preset_fingerprint,
                     "replay_state_fingerprint": _fingerprint(state, args.state_decimals),
                     "replay_state_size": int(state.size),
                     "recorded_vs_replay_main_frame": main_error,
@@ -147,6 +159,17 @@ def main() -> None:
         fingerprint = str(row["replay_state_fingerprint"])
         by_claimed.setdefault(claimed, set()).add(fingerprint)
         by_fingerprint.setdefault(fingerprint, set()).add(claimed)
+    id_mismatches = [
+        row
+        for row in audited
+        if row["claimed_initial_state_id"]
+        != row["actual_initial_state_id_before_reset"]
+    ]
+    preset_by_claimed: dict[int, set[str]] = {}
+    for row in audited:
+        preset_by_claimed.setdefault(row["claimed_initial_state_id"], set()).add(
+            row["preset_state_fingerprint"]
+        )
     output = {
         "schema_version": "0.1.0",
         "purpose": "privileged audit only; fingerprints are not predictor inputs",
@@ -157,6 +180,12 @@ def main() -> None:
         "episodes": len(audited),
         "claimed_ids": len(by_claimed),
         "replay_fingerprints": len(by_fingerprint),
+        "claimed_vs_actual_init_state_id_mismatches": len(id_mismatches),
+        "claimed_ids_with_multiple_preset_fingerprints": {
+            str(key): sorted(value)
+            for key, value in preset_by_claimed.items()
+            if len(value) > 1
+        },
         "claimed_ids_with_multiple_replay_fingerprints": {
             str(key): sorted(value) for key, value in by_claimed.items() if len(value) > 1
         },
@@ -176,6 +205,10 @@ def main() -> None:
         len(output["claimed_ids_with_multiple_replay_fingerprints"]),
         "fingerprints_with_multiple_claimed_ids",
         len(output["replay_fingerprints_with_multiple_claimed_ids"]),
+        "id_mismatches",
+        output["claimed_vs_actual_init_state_id_mismatches"],
+        "claimed_ids_with_multiple_preset_fingerprints",
+        len(output["claimed_ids_with_multiple_preset_fingerprints"]),
     )
     if audited:
         print(
