@@ -55,6 +55,26 @@ The overlay video is 360×360, 20 FPS, and 280 frames. Its trigger is an offline
 counterfactual marker; the recorded rollout continued and no closed-loop intervention
 was performed.
 
+## v0.2 post-release audit and confirmation
+
+v0.1 remains frozen. The following artifacts audit its integrity and apply its frozen
+predictors to 20 previously unused task-4 preset states (30–49):
+
+- Confirmation manifest: `docs/manifests/v02_task4_confirmation.json`
+- Initial-state identity audit: `artifacts/results/v02_initial_state_identity.json`
+- Temporal model without explicit checkpoint progress:
+  `artifacts/results/v02_task4_temporal_no_checkpoint_progress.json`
+- Paired temporal ablation:
+  `artifacts/results/v02_task4_temporal_progress_ablation_bootstrap.json`
+- Frozen confirmation evaluation:
+  `artifacts/results/v02_task4_frozen_confirmation.json`
+- Large-artifact checksum: `artifacts/v02/release-sha256.txt`
+
+The confirmation cohort contains 20 episodes (11 success / 9 failure). Frozen
+vision at step 80 reaches AUPRC 0.939 and AUROC 0.919; frozen temporal MLP at
+step 120 reaches AUPRC 0.882 and AUROC 0.828. These results confirm outcome
+association within the same task, not a progress-independent failure precursor.
+
 ## Reproduce evaluation from frozen inputs
 
 Activate the recorded environment and expose the source package:
@@ -126,6 +146,28 @@ python scripts/evaluate_a2_consistency.py \
   --camera-swap-root artifacts/rq1/task4/camera_swap \
   --calibration-count 10 --detection-horizon 40 \
   --output artifacts/results/rq1_task4_a2_consistency.json
+```
+
+Apply the frozen v0.1 predictors to the already collected confirmation cohort:
+
+```bash
+python scripts/build_outcome_dataset.py \
+  docs/manifests/v02_task4_confirmation.json \
+  --output artifacts/v02/datasets/task4_confirmation_outcome.npz
+
+python scripts/extract_frozen_vision_features.py \
+  docs/manifests/v02_task4_confirmation.json \
+  --output artifacts/v02/features/task4_confirmation_frozen_vision.npz \
+  --device cuda
+
+python scripts/evaluate_frozen_confirmation.py \
+  artifacts/v02/datasets/task4_confirmation_outcome.npz \
+  artifacts/v02/features/task4_confirmation_frozen_vision.npz \
+  --temporal-model artifacts/results/week1_task4_temporal_mlp.pt \
+  --vision-model artifacts/results/week1_task4_frozen_vision.pt \
+  --reference-report artifacts/results/week1_task4_temporal_mlp.json \
+  --output artifacts/results/v02_task4_frozen_confirmation.json \
+  --device cuda
 ```
 
 ## Integrity check before publishing

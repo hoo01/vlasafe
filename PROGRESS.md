@@ -4,11 +4,11 @@
 
 ## 当前判断
 
-项目已完成并冻结四周计划的 v0.1 有界 release。现已启动 **v0.2 完整性审计**；新分析和新数据不得覆盖 v0.1 manifest、预测或 checksum。
+项目已完成并冻结四周计划的 v0.1 有界 release，并完成 **v0.2 完整性审计与独立确认集**；v0.1 manifest、预测和 checksum 保持不变。
 
-当前证据支持：冻结视觉和状态/动作历史能够在 held-out initial states 上预测 task 4 的最终 outcome；执行进度可以解释大部分排序能力。现有 10 条 test episode 不足以判断 vision-step80 是否还包含进度之外的信息。
+当前证据支持：冻结视觉和状态/动作历史能够在 held-out initial states 上预测 task 4 的最终 outcome；该关联在 20 条全新 preset-state confirmation episodes 上复现。执行进度可以解释大部分排序能力，现有数据仍不能判断 vision-step80 是否还包含进度之外的信息。
 
-当前证据不支持：独立失效前兆、Impending Failure Detection、safe stop、未测试 A2 类型的覆盖率或任务级泛化。
+当前证据不支持：独立失效前兆、Impending Failure Detection、safe stop、未覆盖 A2 类型的检测率或任务级泛化。
 
 ### v0.2 审计触发原因
 
@@ -26,7 +26,7 @@
 - 正式 cohort：50 episodes，18 success / 32 failure。
 - 冻结 split：30/10/10，按 `initial_state_id` 分组。
 - Predictor deploy-input allowlist 与 privileged-field rejection 已测试。
-- 25/25 单元测试通过。
+- 38/38 单元测试通过。
 
 ### 路线选择
 
@@ -89,6 +89,15 @@ Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均
 
 结论：进度解释得到定量支持；数据缺少足够 outcome overlap，无法可靠检验 vision 的进度外信号。
 
+### v0.2 完整性审计与独立确认
+
+- Initial-state identity：50/50 条 claimed ID 等于 reset 前真实 LIBERO `init_state_id`；重复 ID 的 preset fingerprint 一致；原 group-disjoint split 成立。
+- Temporal checkpoint-feature ablation：移除 `checkpoint_step / 280` 后，test step 80/120 的 AUPRC 和 AUROC 均不变。Step 80 Brier `+0.018 [0.004, 0.035]`、ECE `+0.013 [0.004, 0.026]`，表明该特征影响概率尺度而非同 checkpoint 排序。
+- Confirmation cohort：preset states 30–49，共 20 条，11 success / 9 failure；采集前冻结 v0.1 predictor、normalization、checkpoint 和指标。
+- Frozen vision step 80：AUPRC `0.939 [0.786, 1.000]`，AUROC `0.919 [0.747, 1.000]`，Brier `0.102`，ECE `0.114`。
+- Frozen temporal step 120：AUPRC `0.882 [0.671, 1.000]`，AUROC `0.828 [0.571, 1.000]`，Brier `0.140`，ECE `0.140`。
+- Step 0 两种模型均接近无排序信息；确认集支持 outcome association 在未见 preset states 上复现，但不证明独立失效前兆或任务级泛化。
+
 ### RQ1 supporting study
 
 - A1：11/11 预定义协议案例得到预期处理。
@@ -110,21 +119,21 @@ Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均
 
 ## 下一步执行顺序
 
-### 1. Initial-state identity audit（进行中）
+### 1. Initial-state identity audit（完成）
 
 - 检查固定 LeRobot/LIBERO revision 的 reset 与 init-state 选择逻辑。
 - 对重复 seed 和多个 seed 记录环境实际 init-state index；若接口不暴露编号，则对 reset 后完整 MuJoCo state 生成仅用于审计的 fingerprint。
 - 检查现有 metadata 中相同 `initial_state_id` 是否真的对应相同初始状态。
-- 若不成立：v0.1 只保留 held-out episode 结论；v0.2 使用真实 ID/fingerprint 重建 manifest，不覆盖 v0.1。
+- 结果：50/50 claimed ID 与真实 preset index 一致，重复 ID 的 preset fingerprint 一致；完整 simulator fingerprint 会随 seed 改变，不作为分组 ID。
 
-### 2. Temporal checkpoint-progress ablation（进行中）
+### 2. Temporal checkpoint-progress ablation（完成）
 
 - 保持数据、split、训练 seeds、MLP、优化器和 early stopping 不变。
 - 比较包含与移除 `checkpoint_step / 280` 的两个版本。
 - 按 episode、checkpoint 做 paired bootstrap，分别报告 AUPRC、AUROC、Brier 和 ECE 差值。
-- 该实验用于解释特征依赖和概率尺度，不根据 test 选择新主模型。
+- 结果：排序指标不依赖该特征；它会影响概率尺度。不根据 test 选择新主模型。
 
-### 3. 新数据决策（等待前两项）
+### 3. 独立 confirmation cohort（完成）
 
 - 已确认 task 4 共有 50 个 LIBERO preset states；v0.1 仅使用 0–29。v0.2 使用 30–49 采 20 条独立 confirmation episodes。
 - 新 cohort 采集前冻结模型、progress proxy、阈值、checkpoint 和指标。
@@ -153,6 +162,9 @@ Vision residual AUROC CI `[0.111, 1.000]`、partial-r CI `[-0.232, 1.000]`，均
 
 - 冻结 split：`docs/manifests/week1_task4_split.json`
 - Artifact 索引与复现命令：`docs/release-artifacts.md`
+- v0.2 confirmation manifest：`docs/manifests/v02_task4_confirmation.json`
+- v0.2 小型结果 JSON：`artifacts/results/v02_*.json`
+- v0.2 大型 artifact checksum：`artifacts/v02/release-sha256.txt`
 - v0.1 checksum：`artifacts/release-sha256.txt`（实验主机）
 - 主结果：`artifacts/results/week1_task4_*.json`（实验主机）
 - 可视化：`artifacts/visualizations/week1_task4/`（实验主机）
