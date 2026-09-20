@@ -55,7 +55,8 @@ A1/A2 故障通常从 `t=0` 就存在，因此也不报告 lead time。它们应
 
 ### 为什么使用 LIBERO-Spatial
 
-LIBERO 官方包含四组 task suite：Spatial 侧重空间关系变化，Object 侧重操作对象变化，Goal 侧重任务目标变化，LIBERO-100 则包含知识因素相互交织的 100 个任务，并进一步划分为 LIBERO-90 和 LIBERO-10。本项目没有进行跨 suite 性能比较，选择 Spatial 是四周 MVP 的预先范围控制，不能据此声称它优于其他 suite。
+LIBERO 官方包含四组 task suite：Spatial 侧重空间泛化，Object 侧重跨物体泛化，Goal 侧重语言目标理解，LIBERO-Long Long和前三组不是同一个性质——它不控制单一变量，而是增加任务长度和步骤复杂度。
+本项目没有进行跨 suite 性能比较，选择 Spatial 是四周 MVP 的预先范围控制，不能据此声称它优于其他 suite。
 
 Spatial 适合当前研究的原因是：先固定在一个以空间关系为主要变化来源的 suite 中，可以减少跨物体类别、跨目标语义和长程子任务结构同时变化造成的混杂；同时，任务能够在 RTX 4090 上快速闭环执行，正式采集约为每秒 30 多个控制步。需要注意，**suite、task 和 initial state 是三个不同层级**：
 
@@ -67,7 +68,7 @@ Spatial 适合当前研究的原因是：先固定在一个以空间关系为主
 
 ### 为什么最终使用 task 4
 
-任务选择发生在 Spatial suite 内。项目先对 task 1–9 各运行一条初筛，再对有代表性的候选扩测：task 5 连同初筛共 6/6 失败，过难；task 7 连同初筛共 6/6 成功，过易；task 4 的五条扩测为 1/5 成功、4/5 失败，首次确认了同一任务内的混合 outcome。因此正式采集选择 task 4，而没有把一个全成功任务和另一个全失败任务混合，否则 predictor 可能仅凭 task identity 完成分类。最终 task-4 自然 cohort 为 50 条，其中 18 条成功、32 条失败。
+先对 task 1–9 各运行一条初筛，再对有代表性的候选扩测：task 5 连同初筛共 6/6 失败，过难；task 7 连同初筛共 6/6 成功，过易；task 4 的五条扩测为 1/5 成功、4/5 失败，首次确认了同一任务内的混合 outcome。因此正式采集选择 task 4，而没有把一个全成功任务和另一个全失败任务混合，否则 predictor 可能仅凭 task identity 完成分类。最终 task-4 自然 cohort 为 50 条，其中 18 条成功、32 条失败。
 
 Rollout 路径从第一步开始同步记录：
 
@@ -97,25 +98,58 @@ Predictor 只允许读取真实部署可得的 RGB、proprioception、历史动�
 
 自然失败中，已实现的 self-collision 或 joint-violation 事件只覆盖 `1/32 = 3.125%`，validation/test 均无 event-positive episode。按照预设的 20% 数据门槛，项目选择 **Outcome Prediction**，停止 Impending lead-time 和 safe-stop 主张。Workspace violation 和 impact 尚未形成冻结协议，不能记作已验证的零事件。
 
-## 5. 方法
+## 5. 方法与基线
 
-当前比较三个 Outcome predictor：
+最终分析形成了以下 baseline 阶梯：
 
-1. **Initial-proprio difficulty baseline：** 只读取初始机器人状态，检验完整模型是否只是学习初始难度。
-2. **State/action temporal MLP：** 读取最近 16 步的 proprioception、动作和 timing 历史。
-3. **Frozen dual-camera vision：** 使用冻结的 `torchvision/resnet50 IMAGENET1K_V2` 提取主/腕相机特征，再训练 checkpoint-specific linear probe。
+1. **Train-prevalence constant：** 对所有 episode 输出训练集失败率 `19/30 = 0.633`，给出类别比例本身能够获得的最低排序与校准基准。
+2. **Initial difficulty baselines：** initial-proprio 只读取第 0 步机器人状态；frozen vision 的 step-0 结果只读取初始双相机画面。两者检验 outcome 是否从初始场景就已容易区分。
+3. **Visual progress proxy：** 使用 train-only、无 outcome label 的冻结视觉特征时间方向估计“画面看起来执行到了哪里”。它不是 `step / 280`；在相同 checkpoint 上，各轨迹的 step 编号相同，但视觉完成进度可以不同。
+4. **State/action temporal MLP：** 将最近 16 步的 proprioception、动作和 timing 历史展平，交给一个小型 MLP。
+5. **Frozen dual-camera vision：** 使用冻结的 `torchvision/resnet50 IMAGENET1K_V2` 提取主/腕相机特征，再训练 checkpoint-specific linear probe。
+
+Prevalence、initial-difficulty、temporal 和 frozen-vision 模型属于原始训练与评测流程；progress proxy 是在后续机制审计阶段引入的。本文把它提升到正式 baseline 位置以补全证据链，但不将其倒写为预注册设计。
 
 模型选择和 L2 正则只使用 validation。结果按完整 episode 进行 paired bootstrap，不把同一 episode 的相关窗口当成独立样本。
 
+项目没有报告 privileged-state oracle。即使重新采集完整物体真值，当前仅 30 条训练 episode 和 10 条 test episode，也不足以让高维 oracle 模型形成可信的信息上界；其结果更可能受小样本过拟合支配。
+
 ## 6. 当前主结果
 
-以下是同一组 10 条 held-out initial-state test episodes 的结果。每格依次为 **AUPRC / AUROC / Brier / ECE**，后两项越低越好。
+以下是同一组 10 条 held-out initial-state test episodes 的结果。为避免把排序能力与概率校准混在一张宽表中，二者分开报告。
+
+### 排序能力
+
+每格依次为 **AUPRC / AUROC**：
 
 | Method | Step 0 | Step 40 | Step 80 | Step 120 |
 | --- | --- | --- | --- | --- |
-| Initial-proprio difficulty | 0.799 / 0.452 / 0.238 / 0.173 | 0.799 / 0.452 / 0.238 / 0.173 | 0.799 / 0.452 / 0.238 / 0.173 | 0.799 / 0.452 / 0.238 / 0.173 |
-| State/action temporal MLP | 0.609 / 0.286 / 0.246 / 0.036 | 0.856 / 0.571 / 0.230 / 0.167 | 0.909 / 0.762 / 0.229 / 0.252 | **0.982 / 0.952 / 0.096 / 0.095** |
-| Frozen dual-camera vision | 0.652 / 0.190 / 0.563 / 0.636 | 0.856 / 0.571 / 0.377 / 0.399 | **0.982 / 0.952 / 0.100 / 0.096** | **0.982 / 0.952 / 0.100 / 0.101** |
+| Train-prevalence constant | 0.700 / 0.500 | 0.700 / 0.500 | 0.700 / 0.500 | 0.700 / 0.500 |
+| Initial-proprio difficulty | 0.799 / 0.452 | 0.799 / 0.452 | 0.799 / 0.452 | 0.799 / 0.452 |
+| State/action temporal MLP | 0.609 / 0.286 | 0.856 / 0.571 | 0.909 / 0.762 | **0.982 / 0.952** |
+| Frozen dual-camera vision | 0.652 / 0.190 | 0.856 / 0.571 | **0.982 / 0.952** | **0.982 / 0.952** |
+
+AUPRC 的无排序信息起点等于 test failure prevalence，即 `7/10 = 0.700`；常数分数的 AUROC 为 `0.500`。这里的 constant probability 使用训练集失败率 `0.633`，不是始终输出 `1.0` 的 always-failure classifier。
+
+### 概率误差与校准
+
+每格依次为 **Brier / ECE**，越低越好：
+
+| Method | Step 0 | Step 40 | Step 80 | Step 120 |
+| --- | --- | --- | --- | --- |
+| Train-prevalence constant | 0.214 / 0.067 | 0.214 / 0.067 | 0.214 / 0.067 | 0.214 / 0.067 |
+| Initial-proprio difficulty | 0.238 / 0.173 | 0.238 / 0.173 | 0.238 / 0.173 | 0.238 / 0.173 |
+| State/action temporal MLP | 0.246 / 0.036 | 0.230 / 0.167 | 0.229 / 0.252 | **0.096 / 0.095** |
+| Frozen dual-camera vision | 0.563 / 0.636 | 0.377 / 0.399 | **0.100 / 0.096** | **0.100 / 0.101** |
+
+### 审计阶段补入的进度基线
+
+| Progress baseline | Audit checkpoint | AUPRC | AUROC |
+| --- | ---: | ---: | ---: |
+| Visual progress proxy for vision audit | 80 | — | 0.905 |
+| Visual progress proxy for temporal audit | 120 | — | 1.000 |
+
+Progress proxy 只产生用于排序的连续分数，没有拟合为失败概率，因此不报告 Brier/ECE。冻结 JSON 中包含其 AUPRC，但该数值尚未同步进仓库文档；这里暂记为“—”，避免脱离已校验 artifact 手工补数。
 
 Paired episode bootstrap 支持 vision-step80 相对 initial-proprio 的排序改善：AUPRC `+0.183 [0.031, 0.450]`，AUROC `+0.500 [0.125, 0.857]`。Temporal-step120 的对应差值为 AUPRC `+0.183 [0.033, 0.450]`、AUROC `+0.500 [0.143, 0.860]`。
 
