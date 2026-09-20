@@ -241,7 +241,7 @@ Temporal-step120 的排序几乎完全可由进度代理解释。Vision-step80 �
 | Wrist only | 1.000 | 1.000 | 0.001 | 0.017 |
 | Dual camera | 0.982 | 0.952 | 0.100 | 0.096 |
 
-Wrist 和 dual 相对 main 的 Brier/ECE 配对区间支持改善；wrist 与 dual 的关键区间触及或跨过 0。正式结果继续使用预注册的 dual-camera pipeline，不根据 test 改选模型。
+Wrist 和 dual 相对 main 的 Brier/ECE 配对区间支持改善；wrist 与 dual 的差异没有得到可靠区间支持，详见附录 A。正式结果继续使用预注册的 dual-camera pipeline，不根据 test 改选模型。
 
 ### Offline decision utility
 
@@ -327,3 +327,16 @@ python scripts/plot_v01_main_results.py
 ## 12. 项目定位
 
 这是一个关于 VLA 失败预测的**单任务方法论研究**。核心贡献是泄漏受控的闭环数据与评测流程、冻结模型的独立 initial-state 复现，以及两次基于证据的结论收缩：先因 unsafe-event 覆盖不足从 Impending 转向 Outcome，再因机制审计撤回“独立失效前兆”的解释。项目不把当前结果包装成可泛化的失败检测方法。
+
+## 附录 A：Wrist 与 dual-camera 配对区间
+
+相机消融在同一组 10 条 test episode 上进行 10,000 次 episode-level paired bootstrap。下表差值定义为 `wrist - dual`；AUPRC/AUROC 越高越好，Brier/ECE 越低越好。
+
+| Metric | Point estimate | 95% CI |
+| --- | ---: | ---: |
+| AUPRC | +0.018 | [0.000, 0.107] |
+| AUROC | +0.048 | [0.000, 0.250] |
+| Brier | -0.099 | [-0.296, 0.0001] |
+| ECE | -0.079 | [-0.263, 0.008] |
+
+AUPRC/AUROC 的区间下界触及 0，Brier/ECE 的区间跨过 0。Wrist 的四个点估计均优于 dual，但当前样本不足以证明这种优势稳定存在，因此不能根据这组 test 消融把正式 pipeline 从预注册的 dual camera 改成 wrist only。
