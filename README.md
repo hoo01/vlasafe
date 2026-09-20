@@ -175,14 +175,11 @@ v0.2 不重新打开模型选择，而是针对 v0.1 的三个关键疑点做固
 
 ### 6.1 v0.1 主结果
 
-下表只回答一个问题：在冻结的 10 条 held-out initial-state test episodes 上，predictor 能否把最终失败排在成功之前？每格依次为 **AUPRC / AUROC**。
+下图回答一个问题：在冻结的 10 条使用训练时未见初始状态的测试轨迹（held-out initial-state test episodes）上，predictor 模型能否给“最后失败”的轨迹更高的风险分数，给“最后成功”的轨迹更低的风险分数？
 
-| Method | Step 0 | Step 40 | Step 80 | Step 120 |
-| --- | --- | --- | --- | --- |
-| Train-prevalence constant | 0.700 / 0.500 | 0.700 / 0.500 | 0.700 / 0.500 | 0.700 / 0.500 |
-| Initial-proprio difficulty | 0.799 / 0.452 | 0.799 / 0.452 | 0.799 / 0.452 | 0.799 / 0.452 |
-| State/action temporal MLP | 0.609 / 0.286 | 0.856 / 0.571 | 0.909 / 0.762 | **0.982 / 0.952** |
-| Frozen dual-camera vision | 0.652 / 0.190 | 0.856 / 0.571 | **0.982 / 0.952** | **0.982 / 0.952** |
+![v0.1 test 上各 checkpoint 的 AUPRC 与 AUROC](docs/figures/v01_main_ranking.png)
+
+Vision 在 step 80、temporal MLP 在 step 120 均达到 AUPRC `0.982`、AUROC `0.952`。完整逐点数值保存在绘图元数据和冻结 result JSON 中。
 
 AUPRC 的无排序信息起点等于 test failure prevalence，即 `7/10 = 0.700`；常数分数的 AUROC 为 `0.500`。这里的 constant probability 使用训练集失败率 `0.633`，不是始终输出 `1.0` 的 always-failure classifier。
 
@@ -310,6 +307,9 @@ v0.2 已完成 20 条独立 initial-state confirmation cohort，并以冻结 v0.
 ```bash
 export PYTHONPATH="$PWD/src"
 python -m unittest discover -s tests -v
+
+# 重绘 README 的 v0.1 主结果图（同时输出 PNG、SVG 和 JSON）
+python scripts/plot_v01_main_results.py
 ```
 
 大规模 rollout、视频、模型权重和 feature cache 不提交 Git，通过 manifest、artifact index 和 SHA-256 清单追踪。

@@ -1,0 +1,76 @@
+{
+  "title": "VLA-SafeBench v0.1 outcome ranking",
+  "test_episodes": 10,
+  "checkpoint_steps": [
+    0,
+    40,
+    80,
+    120
+  ],
+  "source": {
+    "mode": "documented_snapshot",
+    "note": "Values match README section 6.1 and the frozen v0.1 result reports."
+  },
+  "metrics": {
+    "Train prevalence": {
+      "auprc": [
+        0.7,
+        0.7,
+        0.7,
+        0.7
+      ],
+      "auroc": [
+        0.5,
+        0.5,
+        0.5,
+        0.5
+      ]
+    },
+    "Initial proprio": {
+      "auprc": [
+        0.799,
+        0.799,
+        0.799,
+        0.799
+      ],
+      "auroc": [
+        0.452,
+        0.452,
+        0.452,
+        0.452
+      ]
+    },
+    "Temporal MLP": {
+      "auprc": [
+        0.609,
+        0.856,
+        0.909,
+        0.982
+      ],
+      "auroc": [
+        0.286,
+        0.571,
+        0.762,
+        0.952
+      ]
+    },
+    "Frozen dual-camera vision": {
+      "auprc": [
+        0.652,
+        0.856,
+        0.982,
+        0.982
+      ],
+      "auroc": [
+        0.19,
+        0.571,
+        0.952,
+        0.952
+      ]
+    }
+  },
+  "outputs": [
+    "docs\\figures\\v01_main_ranking.png",
+    "docs\\figures\\v01_main_ranking.svg"
+  ]
+}
