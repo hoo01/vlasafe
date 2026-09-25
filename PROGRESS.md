@@ -100,7 +100,7 @@ Pilot 只决定是否进入正式采集，不能形成强模型结论。
 
 首轮物理事件 feasibility audit（2026-09-25）未通过 gate：零成功误触发的 object-drop 候选最多只有 6 个 failure episodes、覆盖 3 个 initial states；grasp-loss 只有 3 个 episodes、覆盖 2 个 states；离开盘子区域的 failed-placement 候选为 0。`drop_fall0.04_p3` 虽有 12 个事件，但误触发 4/40 success，不能因数量较多直接采用。下一步转向审计具有在线首次时刻的 pickup/transport/placement stall；仍不允许用最终 outcome 反向定义事件。
 
-第二轮 stall feasibility audit（2026-09-25）找到待物理复核的 `pickup_stall_approach0.10_w40`：53 个 failure triggers、1 个 success trigger、覆盖 16 个失败 initial states，54 个事件具有完整 `h/K/M` 窗口。该数量通过 pilot 的事件覆盖门槛，但尚未通过 stage-matched negative 和事件语义复核。事件定义为末端到碗距离首次进入 10 cm 后，连续 40 步仍未把碗抬升 4 cm；`t_event` 是 40 步等待期结束而非首次异常征兆，因此 Phase 2 只能把它表述为“即将确认的 pickup stall”，不能表述为尚未显现的物理失效。
+第二轮 stall feasibility audit（2026-09-25）的 `pickup_stall_approach0.10_w40` 数量上达到 53 个 failure triggers、1 个 success trigger 和 16 个失败 initial states，但物理复核否决了该规则：唯一的成功触发实际上完成了抓取和水平搬运，只是碗没有超过“相对初始高度抬升 4 cm”的判据。规则因此改为末端进入 10 cm 后 40 步内目标碗的三维位移是否达到 4 cm；该阈值沿用预先使用的阶段位移定义，不根据 outcome 重新搜索。修改后的规则必须重新通过数量与图像复核，旧结果不能作为 pilot gate 证据。
 
 ### Formal gate
 

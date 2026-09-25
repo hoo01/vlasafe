@@ -88,17 +88,22 @@ def detect_failed_placement(
 
 
 def detect_pickup_stall(
-    data: dict[str, Any], approach: float, wait: int
+    data: dict[str, Any], approach: float, wait: int, movement: float
 ) -> int | None:
-    """First close approach not followed by a lift within a fixed future window."""
+    """First close approach not followed by target movement in a fixed window."""
     if wait <= 0:
         raise ValueError("wait must be positive")
+    if movement <= 0:
+        raise ValueError("movement must be positive")
     approached = np.flatnonzero(data["bowl_eef_distance"] <= approach)
     for start in approached:
         end = int(start) + wait
-        if end >= len(data["lifted"]):
+        if end >= len(data["bowl"]):
             continue
-        if not np.any(data["lifted"][start : end + 1]):
+        displacement = np.linalg.norm(
+            data["bowl"][start : end + 1] - data["bowl"][start], axis=1
+        )
+        if float(np.max(displacement)) < movement:
             return end
     return None
 
@@ -185,14 +190,18 @@ def candidate_rules() -> list[tuple[str, str, dict[str, Any], Callable[[dict[str
             )
     for approach in (0.08, 0.10, 0.12):
         for wait in (20, 40):
-            parameters = {"bowl_eef_approach": approach, "wait": wait, "lift_height": 0.04}
+            parameters = {
+                "bowl_eef_approach": approach,
+                "wait": wait,
+                "minimum_target_movement": 0.04,
+            }
             rules.append(
                 (
-                    f"pickup_stall_approach{approach:.2f}_w{wait}",
+                    f"pickup_stall_approach{approach:.2f}_w{wait}_move0.04",
                     "pickup_stall",
                     parameters,
                     lambda data, approach=approach, wait=wait: detect_pickup_stall(
-                        data, approach, wait
+                        data, approach, wait, 0.04
                     ),
                 )
             )

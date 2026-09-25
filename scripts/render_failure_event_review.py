@@ -94,7 +94,7 @@ def contact_sheet(
     )
     draw.text(
         (8, 25),
-        f"approach step {approach}; pickup-stall confirmed at {event} after wait={wait}",
+        f"approach step {approach}; <4 cm target movement for wait={wait}; event={event}",
         fill="black",
         font=font,
     )
@@ -112,7 +112,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("feasibility_report", type=Path)
     parser.add_argument("manifest", type=Path)
-    parser.add_argument("--rule", default="pickup_stall_approach0.10_w40")
+    parser.add_argument("--rule", default="pickup_stall_approach0.10_w40_move0.04")
     parser.add_argument("--limit", type=int, default=12)
     parser.add_argument("--output-dir", type=Path, required=True)
     args = parser.parse_args()
