@@ -4,6 +4,8 @@ VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来�
 
 当前核心发现是：冻结视觉与状态/动作模型都能稳定预测 task 4 的最终 outcome，但这种能力主要来自**任务执行进度**。在预先冻结的 100 条 v0.3 轨迹上，vision-step80 的原始 AUPRC/AUROC 为 `0.926/0.863`；只使用黑碗、抽屉、盘子和夹爪的真实任务阶段即可达到 `0.947/0.908`。按 initial state 做 leave-one-group-out 阶段控制后，vision 与 temporal 的残差 AUROC 分别降至 `0.426` 和 `0.514`，置信区间均包含随机水平。因此 Phase 1 证明了 outcome association 的可重复性，也确认它不能解释为独立失效前兆。风险分数只用于 Outcome Prediction 和离线效率分析，不能作为即将发生危险或安全停止的依据。
 
+Phase 2 重新定义了带明确事件时刻的 pickup-stall pilot：在首次接近对齐并控制 checkpoint 当前物体位移后，16步 temporal MLP 相对 privileged stage baseline 的 test AUROC 增量为 `+0.321 [0.042, 0.750]`，显示初步的未来20步 stall-confirmation 排序信号。该结果只有4个 test initial-state clusters、27个 event-positive episodes，属于 pilot，不支持通用失效检测或 safe-stop 主张。
+
 ## 四周执行状态
 
 | 阶段 | 状态 | 已完成 | 尚未完成 |
@@ -14,6 +16,7 @@ VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来�
 | **Week 4** | **完成** | 完成度和 claim audit；A1 case table；60 条 A2 配对 rollout；command-effect evaluation；21-file release checksum | 无 Week-4 阻塞项 |
 | **v0.2 post-release audit** | **完成** | Initial-state identity audit；temporal checkpoint-feature ablation；20 条冻结模型独立确认集 | 不改写 v0.1 test 或选模结果 |
 | **v0.3 stage-control audit** | **完成** | 100 条预声明轨迹；真实物体阶段记录；initial-state cluster bootstrap；同状态阶段匹配 | Phase 1 机制结论已冻结 |
+| **v0.4 pickup-stall pilot** | **Pilot 完成** | 首次接近对齐；明确 `t_event`；gray zone；strict stage constraint；同状态对照；cluster bootstrap | 仅 temporal 通过 pilot 增量门槛；正式样本量尚未达到 |
 
 四周主计划已在 v0.1 收口。v0.2 验证原 split 和模型信号的可重复性；v0.3 针对“模型是否只读进度”预先冻结采样与分析协议，并给出 Phase 1 的最终机制结论。后续审计不倒写为原四周计划内的预注册实验，也不修改 v0.1 test 或选模结果。
 
@@ -303,7 +306,19 @@ A2 使用 20 组相同 seed 和 initial state 的三路配对 rollout：normal�
 
 Phase 1 已完成。v0.1 提供闭环系统、冻结 split、模型和 RQ1 supporting study；v0.2 验证 initial-state 身份并在 20 条独立轨迹上复现 outcome association；v0.3 用 100 条预声明轨迹确认该 association 主要由真实任务阶段解释。三版结果分别保留，不用后续数据反向修改旧 test、模型或阈值。
 
-下一阶段若继续，不再扩大普通 Outcome Prediction，也不升级 Transformer。Phase 2 只研究 **progress-controlled failure precursor detection**：先在碗已抬升或已接近盘子的轨迹中定义明确的未来失败事件，再比较 progress-only 与加入部署可用历史后的增量。没有 `t_event` 的最终失败标签仍按 Outcome Prediction 报告。
+Phase 2 已完成一个 **progress-controlled pickup-stall pilot**。事件定义为：末端首次进入目标碗 10 cm 后，如果40步内目标三维位移仍不足4 cm，则在第40步确认 pickup stall。预测时刻固定为首次接近后20步，因此任务是预测未来20步内是否确认该事件；它不是抓取尝试前的失败预知。
+
+Strict 数据排除了 checkpoint 前已经移动4 cm的负类。最终为86条样本、27个正类；group-disjoint test 有19条、7个正类、4个 initial states，其中所有正类都有同-state负类。Analysis-only stage baseline 同时使用首次接近时刻和 checkpoint 当前目标位移；这些 privileged 变量不进入 predictor。
+
+| Strict test | AUPRC | AUROC | 同-state配对 |
+| --- | ---: | ---: | ---: |
+| Stage-only baseline | 0.536 | 0.643 | 3/7 |
+| 16-step temporal MLP | **0.938** | **0.964** | **7/7** |
+| Frozen dual-camera vision | **0.982** | **0.988** | 6/7 |
+
+Temporal 相对 stage-only 的 AUPRC/AUROC 增量为 `+0.402 [0.037, 0.784]` / `+0.321 [0.042, 0.750]`，通过 pilot gate。Vision 的对应增量为 `+0.446 [0.000, 0.784]` / `+0.345 [0.000, 0.750]`，区间下界触及0，只作为提示性证据。Temporal ECE 为 `0.231`，不能把分数直接当作可靠概率或据此触发 safe stop。
+
+该结果仍是 pilot：test 只有4个 initial-state clusters，正式 gate 要求40–50个 event-positive episodes，而当前只有27个；事件还要求先观察20步停滞发展。因此当前可声称的是：**在首次接近对齐、且控制当前目标位移后，16步状态/动作历史对未来20步内的 pickup-stall 确认显示出初步增量排序信号。** 没有 `t_event` 的最终失败标签仍只按 Outcome Prediction 报告。
 
 ### 原始目标完成度核对
 

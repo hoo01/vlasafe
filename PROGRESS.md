@@ -116,6 +116,10 @@ Strict manifest 排除 9 条 checkpoint 前已跨越 4 cm 的 negatives 和 5 �
 
 最终 strict split 为 train 51/17、validation 16/3、test 19/7；validation/test 各2个 mixed groups，10/10 evaluation positives 有同-state negative。训练前再冻结一个更强的 analysis-only stage baseline：`first_approach_step + checkpoint_target_movement_m`。Primary comparison 必须是部署输入相对该 baseline 的增量；仅超过 approach-time 不足以排除 checkpoint 内部的部分进度差异。
 
+Strict pilot 已完成。Test 共19条、7 positives、4个 initial-state clusters。Stage-only baseline 为 AUPRC/AUROC `0.536/0.643`、同-state `3/7`；temporal MLP 为 `0.938/0.964`、`7/7`，相对 stage-only 增量 `+0.402 [0.037, 0.784]` / `+0.321 [0.042, 0.750]`，通过 pilot 排序门槛；frozen vision 为 `0.982/0.988`、`6/7`，增量 `+0.446 [0.000, 0.784]` / `+0.345 [0.000, 0.750]`，区间触及0，只作提示性证据。Temporal ECE `0.231`，不支持概率阈值或 safe-stop 主张。
+
+Phase 2 当前结论严格限于：观察首次接近后的20步历史，在控制首次接近时刻和 checkpoint 当前目标位移后，temporal history 对未来20步内 pickup-stall 确认显示 pilot-level 增量排序信号。当前仅27个 event-positive episodes、test仅4个 groups，未达到40–50 positives 的 Formal gate；下一步若升级结论，必须扩充独立 initial states 和 strict event positives，而不是升级模型复杂度。
+
 ### Formal gate
 
 - 总计至少 40–50 个 event-positive episodes。
