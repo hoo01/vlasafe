@@ -1,0 +1,133 @@
+"""Build the frozen, first-approach-aligned Phase-2 pickup-stall pilot manifest."""
+
+from __future__ import annotations
+
+import argparse
+import json
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+
+try:
+    from audit_failure_event_feasibility import trajectory
+except ModuleNotFoundError:
+    from scripts.audit_failure_event_feasibility import trajectory
+
+
+RULE = "pickup_stall_approach0.10_w40_move0.04"
+
+
+def allocate_groups(
+    positive_groups: list[int], negative_only_groups: list[int], seed: int
+) -> dict[int, str]:
+    rng = np.random.default_rng(seed)
+    result: dict[int, str] = {}
+    for groups in (positive_groups, negative_only_groups):
+        values = np.asarray(sorted(groups), dtype=np.int64)
+        rng.shuffle(values)
+        count = len(values)
+        train_end = int(round(0.6 * count))
+        validation_end = train_end + int(round(0.2 * count))
+        for index, group in enumerate(values.tolist()):
+            split = "train" if index < train_end else "validation" if index < validation_end else "test"
+            result[int(group)] = split
+    return result
+
+
+def aligned_sample(
+    data: dict[str, Any], history: int, wait: int, horizon: int, movement: float
+) -> dict[str, Any] | None:
+    approached = np.flatnonzero(data["bowl_eef_distance"] <= 0.10)
+    if not len(approached):
+        return None
+    approach = int(approached[0])
+    event = approach + wait
+    checkpoint = event - horizon
+    if event >= len(data["bowl"]) or checkpoint - history + 1 < 0:
+        return None
+    displacement = np.linalg.norm(
+        data["bowl"][approach : event + 1] - data["bowl"][approach], axis=1
+    )
+    maximum = float(np.max(displacement))
+    return {
+        "first_approach_step": approach,
+        "checkpoint_step": checkpoint,
+        "event_step": event if maximum < movement else None,
+        "pickup_stall": int(maximum < movement),
+        "maximum_target_movement_m": maximum,
+    }
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("cohort_manifest", type=Path)
+    parser.add_argument("--protocol", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    protocol = json.loads(args.protocol.read_text(encoding="utf-8"))
+    if protocol["event_rule"]["name"] != RULE:
+        raise ValueError(f"protocol must freeze {RULE}")
+    cohort = json.loads(args.cohort_manifest.read_text(encoding="utf-8"))
+    source_rows = [row for rows in cohort["splits"].values() for row in rows]
+    samples = []
+    for row in source_rows:
+        episode_path = Path(row["path"])
+        steps = [
+            json.loads(line)
+            for line in (episode_path / "steps.jsonl").read_text(encoding="utf-8").splitlines()
+        ]
+        sample = aligned_sample(trajectory(steps), history=16, wait=40, horizon=20, movement=0.04)
+        if sample is None:
+            continue
+        samples.append(
+            {
+                "episode_id": str(row["episode_id"]),
+                "path": row["path"],
+                "initial_state_id": int(row["initial_state_id"]),
+                "seed": int(row["seed"]),
+                "episode_success": bool(row["success"]),
+                **sample,
+            }
+        )
+    all_groups = sorted({row["initial_state_id"] for row in samples})
+    positive_groups = sorted(
+        {row["initial_state_id"] for row in samples if row["pickup_stall"]}
+    )
+    group_split = allocate_groups(
+        positive_groups,
+        sorted(set(all_groups) - set(positive_groups)),
+        int(protocol["split"]["seed"]),
+    )
+    splits = {"train": [], "validation": [], "test": []}
+    for row in samples:
+        split = group_split[row["initial_state_id"]]
+        splits[split].append(row)
+    for rows in splits.values():
+        rows.sort(key=lambda row: (row["initial_state_id"], row["seed"], row["episode_id"]))
+    report = {
+        "schema_version": "0.1.0",
+        "role": "phase2_pickup_stall_pilot",
+        "protocol": args.protocol.as_posix(),
+        "source_cohort": args.cohort_manifest.as_posix(),
+        "group_key": "initial_state_id",
+        "samples": len(samples),
+        "positives": sum(row["pickup_stall"] for row in samples),
+        "groups": len(all_groups),
+        "splits": splits,
+    }
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    print("PICKUP STALL PILOT", args.output)
+    print("samples", report["samples"], "positives", report["positives"], "groups", report["groups"])
+    for split, rows in splits.items():
+        print(
+            split,
+            "samples", len(rows),
+            "positive", sum(row["pickup_stall"] for row in rows),
+            "groups", len({row["initial_state_id"] for row in rows}),
+        )
+
+
+if __name__ == "__main__":
+    main()

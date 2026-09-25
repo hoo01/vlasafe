@@ -1,0 +1,60 @@
+{
+  "schema_version": "0.1.0",
+  "role": "frozen_phase2_pickup_stall_pilot_protocol",
+  "frozen_before_predictor_training": true,
+  "research_question": "At the same first-approach-relative stage, can deployment-observable history predict whether pickup stall will be confirmed within the next 20 steps?",
+  "source_cohort": "docs/manifests/v03_task4_stage_cohort.json",
+  "event_rule": {
+    "name": "pickup_stall_approach0.10_w40_move0.04",
+    "target": "task target selected from privileged simulator state for labels only",
+    "approach": "first end-effector-to-target distance <= 0.10 m",
+    "confirmation": "maximum target 3D displacement from the first-approach pose remains < 0.04 m for 40 steps",
+    "event_time": "first_approach_step + 40",
+    "one_shot": "only the first approach is evaluated; later transport/placement proximity cannot create a pickup event"
+  },
+  "window": {
+    "history_h": 16,
+    "future_horizon_k": 20,
+    "gray_zone_margin_m": 20,
+    "pilot_checkpoint": "first_approach_step + 20",
+    "positive": "pickup stall is confirmed exactly 20 steps after the pilot checkpoint",
+    "negative": "the target moves at least 0.04 m within the same 40-step first-approach window",
+    "claim_boundary": "The pilot predicts imminent stall confirmation after 20 observed stall-development steps; it is not pre-attempt failure prediction."
+  },
+  "information_boundary": {
+    "label_and_alignment_only": [
+      "target body identity and pose",
+      "end-effector-to-target distance",
+      "first approach step",
+      "target displacement"
+    ],
+    "predictor_inputs": "RGB and/or proprioception/action history through the pilot checkpoint only",
+    "forbidden": "Privileged scene state may not enter predictor features or normalization statistics."
+  },
+  "split": {
+    "group_key": "initial_state_id",
+    "seed": 20260925,
+    "group_proportions": [0.6, 0.2, 0.2],
+    "stratification": "deterministically shuffle event-positive groups and negative-only groups separately, then allocate each stratum 60/20/20",
+    "selection": "model and threshold selection use validation only; test is evaluated once"
+  },
+  "physical_review": {
+    "sample": "12 deterministic review episodes covering all 11 event-positive initial-state groups",
+    "result": {
+      "clear_pickup_stall": 11,
+      "pickup_stall_or_window_boundary": 1,
+      "wrong_target": 0,
+      "successful_transport": 0,
+      "unresolved": 0
+    },
+    "reviewed_by": "human visual review of synchronized main/wrist contact sheets",
+    "decision": "freeze event rule for pilot dataset construction"
+  },
+  "gate": {
+    "event_positive_episodes": 27,
+    "event_positive_initial_state_groups": 11,
+    "success_trigger_episodes": 0,
+    "complete_h_k_m_windows": 27,
+    "remaining_requirement": "at least 80% of positives must retain an aligned negative under the frozen grouped pilot split/evaluation design"
+  }
+}

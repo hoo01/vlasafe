@@ -104,6 +104,8 @@ Pilot 只决定是否进入正式采集，不能形成强模型结论。
 
 三维位移版本初次复核仍发现同一 success trigger：检测器在有效 pickup 后继续扫描后续 close approaches，把 transport/placement 后的静止误标为新的 pickup stall。规则进一步收紧为只检查首次进入 10 cm 后的唯一 40 步窗口；若该窗口内目标移动达到 4 cm，则 pickup 已推进，episode 后续不再产生 pickup-stall event。该修正来自事件阶段语义而非 outcome 指标，修正后须重新审计。
 
+最终 pilot 规则 `pickup_stall_approach0.10_w40_move0.04` 产生 27 个 event-positive episodes、0/40 success triggers，覆盖 11 个 initial states，27/27 具有完整窗口。人工复核的 12 条覆盖全部 11 个 positive states：11 条为明确 pickup stall，1 条为 stall/40-step window 边界，未发现错误目标、成功搬运或无法判断样本。规则、`h=16/K=20/M=20`、首次接近相对 checkpoint 和 grouped split 算法已冻结在 `docs/manifests/v04_task4_pickup_stall_protocol.json`；模型尚未训练，仍需验证对齐 negative 与分组 split 的支持度。
+
 ### Formal gate
 
 - 总计至少 40–50 个 event-positive episodes。
