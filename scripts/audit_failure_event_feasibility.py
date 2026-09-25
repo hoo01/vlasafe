@@ -52,6 +52,7 @@ def trajectory(rows: list[dict[str, Any]]) -> dict[str, Any]:
         "bowl_eef_distance": np.linalg.norm(bowl - eef, axis=1),
         "plate_xy_distance": np.linalg.norm((bowl - plate)[:, :2], axis=1),
         "running_max_height": np.maximum.accumulate(bowl[:, 2]),
+        "success": np.asarray([bool(row["success"]) for row in rows]),
     }
 
 
@@ -84,6 +85,56 @@ def detect_failed_placement(
     ever_entered = np.maximum.accumulate(data["plate_xy_distance"] <= entered)
     condition = ever_entered & (data["plate_xy_distance"] >= exited)
     return first_persistent(condition, persistence)
+
+
+def detect_pickup_stall(
+    data: dict[str, Any], approach: float, wait: int
+) -> int | None:
+    """First close approach not followed by a lift within a fixed future window."""
+    if wait <= 0:
+        raise ValueError("wait must be positive")
+    approached = np.flatnonzero(data["bowl_eef_distance"] <= approach)
+    for start in approached:
+        end = int(start) + wait
+        if end >= len(data["lifted"]):
+            continue
+        if not np.any(data["lifted"][start : end + 1]):
+            return end
+    return None
+
+
+def detect_transport_stall(
+    data: dict[str, Any], window: int, min_improvement: float
+) -> int | None:
+    """After lift, detect a window with too little progress toward the plate."""
+    if window <= 0:
+        raise ValueError("window must be positive")
+    distance = data["plate_xy_distance"]
+    for end in range(window, len(distance)):
+        start = end - window
+        if not np.any(data["lifted"][: start + 1]):
+            continue
+        if distance[end] < 0.10:
+            continue
+        improvement = float(distance[start] - np.min(distance[start : end + 1]))
+        if improvement < min_improvement:
+            return end
+    return None
+
+
+def detect_placement_timeout(
+    data: dict[str, Any], entered: float, wait: int
+) -> int | None:
+    """After entering the plate neighborhood, detect non-completion for ``wait`` steps."""
+    if wait <= 0:
+        raise ValueError("wait must be positive")
+    for start in np.flatnonzero(data["plate_xy_distance"] <= entered):
+        end = int(start) + wait
+        if end >= len(data["success"]):
+            continue
+        if not np.any(data["success"][start : end + 1]):
+            return end
+    return None
 
 
 def candidate_rules() -> list[tuple[str, str, dict[str, Any], Callable[[dict[str, Any]], int | None]]]:
@@ -129,6 +180,49 @@ def candidate_rules() -> list[tuple[str, str, dict[str, Any], Callable[[dict[str
                     parameters,
                     lambda data, exited=exited, persistence=persistence: detect_failed_placement(
                         data, 0.10, exited, persistence
+                    ),
+                )
+            )
+    for approach in (0.08, 0.10, 0.12):
+        for wait in (20, 40):
+            parameters = {"bowl_eef_approach": approach, "wait": wait, "lift_height": 0.04}
+            rules.append(
+                (
+                    f"pickup_stall_approach{approach:.2f}_w{wait}",
+                    "pickup_stall",
+                    parameters,
+                    lambda data, approach=approach, wait=wait: detect_pickup_stall(
+                        data, approach, wait
+                    ),
+                )
+            )
+    for window in (20, 40):
+        for improvement in (0.01, 0.02):
+            parameters = {
+                "window": window,
+                "minimum_plate_xy_improvement": improvement,
+                "outside_plate_xy": 0.10,
+            }
+            rules.append(
+                (
+                    f"transport_stall_w{window}_imp{improvement:.2f}",
+                    "transport_stall",
+                    parameters,
+                    lambda data, window=window, improvement=improvement: detect_transport_stall(
+                        data, window, improvement
+                    ),
+                )
+            )
+    for entered in (0.08, 0.10):
+        for wait in (20, 40):
+            parameters = {"plate_xy_entered": entered, "wait_without_success": wait}
+            rules.append(
+                (
+                    f"placement_timeout_enter{entered:.2f}_w{wait}",
+                    "placement_timeout",
+                    parameters,
+                    lambda data, entered=entered, wait=wait: detect_placement_timeout(
+                        data, entered, wait
                     ),
                 )
             )

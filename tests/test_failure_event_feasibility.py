@@ -6,6 +6,9 @@ from scripts.audit_failure_event_feasibility import (
     detect_drop,
     detect_failed_placement,
     detect_grasp_loss,
+    detect_pickup_stall,
+    detect_placement_timeout,
+    detect_transport_stall,
     first_persistent,
 )
 
@@ -40,6 +43,29 @@ class FailureEventFeasibilityTest(unittest.TestCase):
             detect_failed_placement(data, entered=0.1, exited=0.12, persistence=3),
             2,
         )
+
+    def test_pickup_stall_waits_for_absence_of_lift(self) -> None:
+        data = {
+            "bowl_eef_distance": np.asarray([0.2, 0.05, 0.05, 0.05, 0.05]),
+            "lifted": np.asarray([False, False, False, False, False]),
+        }
+        self.assertEqual(detect_pickup_stall(data, approach=0.1, wait=3), 4)
+
+    def test_transport_stall_requires_prior_lift(self) -> None:
+        data = {
+            "lifted": np.asarray([False, True, True, True, True]),
+            "plate_xy_distance": np.asarray([0.5, 0.4, 0.4, 0.4, 0.4]),
+        }
+        self.assertEqual(
+            detect_transport_stall(data, window=2, min_improvement=0.01), 3
+        )
+
+    def test_placement_timeout_is_suppressed_by_success(self) -> None:
+        data = {
+            "plate_xy_distance": np.asarray([0.2, 0.08, 0.08, 0.08, 0.08]),
+            "success": np.asarray([False, False, False, True, True]),
+        }
+        self.assertIsNone(detect_placement_timeout(data, entered=0.1, wait=2))
 
 
 if __name__ == "__main__":
