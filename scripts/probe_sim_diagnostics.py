@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import os
 
 import mujoco
@@ -21,20 +22,34 @@ def describe(name: str, value: object) -> None:
         print(f"{name}: type={type(value).__module__}.{type(value).__name__} value={value!r}")
 
 
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--task-id", type=int, default=0)
+    parser.add_argument("--initial-state-id", type=int, default=0)
+    parser.add_argument(
+        "--scene-names",
+        action="store_true",
+        help="Print all named MuJoCo bodies, sites, and non-robot geoms.",
+    )
+    return parser.parse_args()
+
+
 def main() -> None:
+    args = parse_args()
     os.environ.setdefault("MUJOCO_GL", "egl")
     os.environ.setdefault("PYOPENGL_PLATFORM", "egl")
     cfg = LiberoEnvConfig(
         task="libero_spatial",
-        task_ids=[0],
+        task_ids=[args.task_id],
         observation_height=64,
         observation_width=64,
         episode_length=2,
     )
-    env = cfg.create_envs(n_envs=1, use_async_envs=False)["libero_spatial"][0]
+    env = cfg.create_envs(n_envs=1, use_async_envs=False)["libero_spatial"][args.task_id]
     try:
-        obs, _ = env.reset(seed=123)
         wrapper = env.envs[0]
+        wrapper.init_state_id = args.initial_state_id
+        obs, _ = env.reset(seed=123)
         libero_env = wrapper._env
         robosuite_env = getattr(libero_env, "env", libero_env)
         sim = libero_env.sim
@@ -66,6 +81,17 @@ def main() -> None:
         print("mujoco_mj_contactForce:", hasattr(mujoco, "mj_contactForce"))
         print("model_jnt_range_shape:", np.asarray(sim.model.jnt_range).shape)
         print("model_geom_names_count:", len(sim.model.geom_names))
+
+        if args.scene_names:
+            body_names = [name for name in sim.model.body_names if name]
+            site_names = [name for name in sim.model.site_names if name]
+            robot_geoms = set(contact_geoms)
+            scene_geoms = [
+                name for name in sim.model.geom_names if name and name not in robot_geoms
+            ]
+            print("scene_body_names:", body_names)
+            print("scene_site_names:", site_names)
+            print("non_robot_geom_names:", scene_geoms)
 
         if sim.data.ncon:
             print("active_contacts:")
