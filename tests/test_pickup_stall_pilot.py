@@ -34,6 +34,19 @@ class PickupStallPilotTest(unittest.TestCase):
         sample = aligned_sample(data, history=16, wait=40, horizon=20, movement=0.04)
         self.assertEqual(sample["pickup_stall"], 0)
         self.assertIsNone(sample["event_step"])
+        self.assertTrue(sample["checkpoint_stage_eligible"])
+
+    def test_negative_that_already_moved_is_not_stage_eligible(self) -> None:
+        bowl = np.zeros((70, 3))
+        bowl[35:, 0] = 0.05
+        data = {
+            "bowl_eef_distance": np.r_[np.ones(20), np.full(50, 0.05)],
+            "bowl": bowl,
+        }
+        sample = aligned_sample(data, history=16, wait=40, horizon=20, movement=0.04)
+        self.assertEqual(sample["checkpoint_step"], 40)
+        self.assertEqual(sample["target_movement_crossing_step"], 35)
+        self.assertFalse(sample["checkpoint_stage_eligible"])
 
     def test_group_allocation_has_no_overlap(self) -> None:
         split = allocate_groups(

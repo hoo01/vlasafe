@@ -110,6 +110,8 @@ Pilot 只决定是否进入正式采集，不能形成强模型结论。
 
 修订后 pilot manifest 为 95 条、27 positives、20 groups：train 55/15、validation 20/6、test 20/6。Validation 与 test 各有 2 个 mixed groups 和 2 个 negative-only groups，12/12 evaluation positives 均有同-state negative；train 的 all-positive groups 只用于拟合。数据 gate 通过，开始构造 Phase 2 专用部署输入，标签保持 `pickup_stall`，不复用 Outcome 的 `failure` 命名，也不加入绝对 checkpoint progress。
 
+首轮 pilot 模型结果暂不成立：vision/temporal 虽相对 approach-time baseline 得到 AUROC 增量 `0.357 [0.078, 0.917]` / `0.298 [0.078, 0.889]`，但标签审计发现原 negative 允许目标在 checkpoint 前已经移动 4 cm，模型可能读取已经完成的 pickup progress。协议因此增加 checkpoint-stage constraint：negative 必须在 checkpoint 时尚未跨过 4 cm，并在之后 20 步内跨过；旧 manifest、features 和模型报告不得用于 precursor 结论，需全部重建。
+
 ### Formal gate
 
 - 总计至少 40–50 个 event-positive episodes。

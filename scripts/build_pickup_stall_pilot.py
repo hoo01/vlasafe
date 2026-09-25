@@ -52,12 +52,16 @@ def aligned_sample(
         data["bowl"][approach : event + 1] - data["bowl"][approach], axis=1
     )
     maximum = float(np.max(displacement))
+    crossings = np.flatnonzero(displacement >= movement)
+    crossing_step = approach + int(crossings[0]) if len(crossings) else None
     return {
         "first_approach_step": approach,
         "checkpoint_step": checkpoint,
         "event_step": event if maximum < movement else None,
         "pickup_stall": int(maximum < movement),
         "maximum_target_movement_m": maximum,
+        "target_movement_crossing_step": crossing_step,
+        "checkpoint_stage_eligible": crossing_step is None or crossing_step > checkpoint,
     }
 
 
@@ -130,6 +134,17 @@ def main() -> None:
                     "episode_id": str(row["episode_id"]),
                     "initial_state_id": int(row["initial_state_id"]),
                     "reason": reason,
+                }
+            )
+            continue
+        if not sample["checkpoint_stage_eligible"]:
+            exclusions.append(
+                {
+                    "episode_id": str(row["episode_id"]),
+                    "initial_state_id": int(row["initial_state_id"]),
+                    "reason": "target_moved_before_checkpoint",
+                    "checkpoint_step": int(sample["checkpoint_step"]),
+                    "target_movement_crossing_step": int(sample["target_movement_crossing_step"]),
                 }
             )
             continue

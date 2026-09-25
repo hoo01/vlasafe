@@ -18,7 +18,8 @@
     "gray_zone_margin_m": 20,
     "pilot_checkpoint": "first_approach_step + 20",
     "positive": "pickup stall is confirmed exactly 20 steps after the pilot checkpoint",
-    "negative": "the target moves at least 0.04 m within the same 40-step first-approach window",
+    "negative": "at the pilot checkpoint the target has not yet moved 0.04 m, then it crosses 0.04 m during the following 20 steps",
+    "checkpoint_stage_constraint": "exclude negatives whose target crossed 0.04 m on or before the checkpoint; otherwise the predictor can solve the task by reading already-completed pickup progress",
     "claim_boundary": "The pilot predicts imminent stall confirmation after 20 observed stall-development steps; it is not pre-attempt failure prediction."
   },
   "information_boundary": {
@@ -36,7 +37,7 @@
     "seed": 20260925,
     "group_proportions": [0.6, 0.2, 0.2],
     "stratification": "After the first support audit and before any predictor training, classify groups as mixed, all-positive, or negative-only. Deterministically allocate mixed and negative-only groups 60/20/20; keep the two all-positive groups in train so validation/test positives always support same-initial-state contrasts.",
-    "revision_note": "The initial positive-vs-negative-only allocation gave test same-state-negative coverage 4/9. No predictor had been trained. This frozen revision fixes evaluation support using label strata, not model performance.",
+    "revision_note": "The initial positive-vs-negative-only allocation gave test same-state-negative coverage 4/9, so the pre-training split was revised using label strata. The first pilot model then exposed a stricter temporal-label flaw: some negatives had already moved 0.04 m by the checkpoint. Those samples are now excluded and the pilot must be rebuilt; the first model result is invalid for precursor claims.",
     "selection": "model and threshold selection use validation only; test is evaluated once"
   },
   "physical_review": {
