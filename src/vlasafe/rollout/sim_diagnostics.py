@@ -8,7 +8,33 @@ from typing import Any
 import numpy as np
 
 
-EVENT_SCHEMA_VERSION = "0.2.0"
+EVENT_SCHEMA_VERSION = "0.3.0"
+
+
+_SCENE_EXCLUDED_PREFIXES = ("robot0_", "gripper0_", "mount0_")
+_SCENE_EXCLUDED_BODIES = {"world", "table"}
+_SCENE_EXCLUDED_SITE_PREFIXES = ("gripper0_", "main_table_")
+_SCENE_EXCLUDED_SITES = {"table_top"}
+
+
+def _scene_body_names(model: Any) -> tuple[str, ...]:
+    return tuple(
+        name
+        for name in model.body_names
+        if name
+        and name not in _SCENE_EXCLUDED_BODIES
+        and not name.startswith(_SCENE_EXCLUDED_PREFIXES)
+    )
+
+
+def _scene_site_names(model: Any) -> tuple[str, ...]:
+    return tuple(
+        name
+        for name in model.site_names
+        if name
+        and name not in _SCENE_EXCLUDED_SITES
+        and not name.startswith(_SCENE_EXCLUDED_SITE_PREFIXES)
+    )
 
 
 def _model_contact_geoms(model: Any) -> set[str]:
@@ -37,6 +63,8 @@ class SimDiagnostics:
     robot_geoms: set[str]
     gripper_geoms: set[str]
     joint_limits: np.ndarray
+    scene_body_names: tuple[str, ...]
+    scene_site_names: tuple[str, ...]
     joint_tolerance: float = 1e-6
 
     @classmethod
@@ -60,6 +88,8 @@ class SimDiagnostics:
             robot_geoms=robot_geoms,
             gripper_geoms=gripper_geoms,
             joint_limits=joint_limits,
+            scene_body_names=_scene_body_names(sim.model),
+            scene_site_names=_scene_site_names(sim.model),
         )
 
     def sample(self, observation: dict[str, Any]) -> dict[str, Any]:
@@ -71,6 +101,24 @@ class SimDiagnostics:
         upper_margin = self.joint_limits[:, 1] - joint_pos
         min_margin = np.minimum(lower_margin, upper_margin)
         joint_violation = bool(np.any(min_margin < -self.joint_tolerance))
+
+        scene_body_poses = {}
+        for name in self.scene_body_names:
+            body_id = self.sim.model.body_name2id(name)
+            scene_body_poses[name] = {
+                "position": np.asarray(self.sim.data.body_xpos[body_id])
+                .astype(float)
+                .tolist(),
+                "quaternion": np.asarray(self.sim.data.body_xquat[body_id])
+                .astype(float)
+                .tolist(),
+            }
+        scene_site_positions = {}
+        for name in self.scene_site_names:
+            site_id = self.sim.model.site_name2id(name)
+            scene_site_positions[name] = (
+                np.asarray(self.sim.data.site_xpos[site_id]).astype(float).tolist()
+            )
 
         self_collision = False
         self_collision_pairs: set[tuple[str, str]] = set()
@@ -137,4 +185,8 @@ class SimDiagnostics:
             "max_robot_contact_force": max_robot_contact_force,
             "max_robot_contact_pair": max_robot_contact_pair,
             "impact_threshold": None,
+            # Privileged scene state for post-hoc stage alignment only. Predictor
+            # input selection rejects the entire label_only subtree.
+            "scene_body_poses": scene_body_poses,
+            "scene_site_positions": scene_site_positions,
         }
