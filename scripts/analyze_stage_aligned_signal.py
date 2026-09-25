@@ -161,6 +161,8 @@ def optimal_pairs(
     groups: np.ndarray,
     standardized_features: np.ndarray,
     risk: np.ndarray,
+    stage_score: np.ndarray,
+    residual_risk: np.ndarray,
 ) -> list[dict[str, Any]]:
     pairs = []
     for group in np.unique(groups):
@@ -196,12 +198,43 @@ def optimal_pairs(
                     ),
                     "success_risk": float(risk[success_index]),
                     "failure_risk": float(risk[failure_index]),
-                    "risk_orders_pair_correctly": bool(
+                    "raw_risk_correct": bool(
                         risk[failure_index] > risk[success_index]
+                    ),
+                    "stage_only_correct": bool(
+                        stage_score[failure_index] > stage_score[success_index]
+                    ),
+                    "residual_risk_correct": bool(
+                        residual_risk[failure_index] > residual_risk[success_index]
                     ),
                 }
             )
     return sorted(pairs, key=lambda row: (row["initial_state_id"], row["stage_distance"]))
+
+
+def paired_accuracy(
+    pairs: list[dict[str, Any]], key: str, samples: int, seed: int
+) -> dict[str, Any]:
+    if not pairs:
+        return {"correct": 0, "pairs": 0, "accuracy": None, "ci95": None}
+    groups = sorted({int(row["initial_state_id"]) for row in pairs})
+    by_group = {
+        group: [row for row in pairs if int(row["initial_state_id"]) == group]
+        for group in groups
+    }
+    rng = np.random.default_rng(seed)
+    values = []
+    for _ in range(samples):
+        sampled = rng.choice(groups, len(groups), replace=True)
+        rows = [row for group in sampled for row in by_group[int(group)]]
+        values.append(float(np.mean([row[key] for row in rows])))
+    correct = sum(bool(row[key]) for row in pairs)
+    return {
+        "correct": correct,
+        "pairs": len(pairs),
+        "accuracy": correct / len(pairs),
+        "ci95": np.percentile(values, [2.5, 97.5]).tolist(),
+    }
 
 
 def event_summary(rows: list[dict[str, Any]]) -> tuple[str, dict[str, int | None]]:
@@ -302,7 +335,13 @@ def analyze_model(
         )
         sensitivity[str(value)] = ranking_metrics(labels_array, candidate)
     pairs = optimal_pairs(
-        episode_ids, labels_array, groups_array, standardized, risk_array
+        episode_ids,
+        labels_array,
+        groups_array,
+        standardized,
+        risk_array,
+        stage_score,
+        residual_risk,
     )
     return {
         "model": model,
@@ -325,7 +364,16 @@ def analyze_model(
         "same_initial_state_stage_matches": {
             "groups_with_mixed_outcomes": len({row["initial_state_id"] for row in pairs}),
             "pairs": len(pairs),
-            "correct": sum(row["risk_orders_pair_correctly"] for row in pairs),
+            "stage_distance": {
+                "min": float(min(row["stage_distance"] for row in pairs)) if pairs else None,
+                "median": float(np.median([row["stage_distance"] for row in pairs])) if pairs else None,
+                "max": float(max(row["stage_distance"] for row in pairs)) if pairs else None,
+            },
+            "raw_risk": paired_accuracy(pairs, "raw_risk_correct", samples, seed + 10),
+            "stage_only": paired_accuracy(pairs, "stage_only_correct", samples, seed + 11),
+            "stage_residualized_risk": paired_accuracy(
+                pairs, "residual_risk_correct", samples, seed + 12
+            ),
             "details": pairs,
         },
         "event_reach_coverage": summarize_event_coverage(event_rows),
