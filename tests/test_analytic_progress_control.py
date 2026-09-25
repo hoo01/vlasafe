@@ -7,6 +7,7 @@ from scripts.analyze_analytic_progress_control import (
     analytic_features,
     fit_linear,
     predict_linear,
+    subgroup_metrics,
 )
 
 
@@ -35,6 +36,17 @@ class AnalyticProgressControlTest(unittest.TestCase):
         y = 2.0 + 3.0 * x[:, 0]
         coefficients = fit_linear(x, y, ridge=0.0)
         np.testing.assert_allclose(predict_linear(x, coefficients), y)
+
+    def test_subgroup_metrics_reports_in_support_ranking(self) -> None:
+        result = subgroup_metrics(
+            labels=np.asarray([0, 1, 0]),
+            raw_risk=np.asarray([0.1, 0.9, 0.8]),
+            analytic_score=np.asarray([0.2, 0.7, 0.4]),
+            residual_risk=np.asarray([0.0, 0.8, 0.5]),
+            selected=np.asarray([True, True, False]),
+        )
+        self.assertEqual(result["episodes"], 2)
+        self.assertEqual(result["ranking_metrics"]["raw_risk"]["auroc"], 1.0)
 
 
 if __name__ == "__main__":

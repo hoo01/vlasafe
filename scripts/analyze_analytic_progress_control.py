@@ -156,6 +156,34 @@ def bootstrap(
     }
 
 
+def subgroup_metrics(
+    labels: np.ndarray,
+    raw_risk: np.ndarray,
+    analytic_score: np.ndarray,
+    residual_risk: np.ndarray,
+    selected: np.ndarray,
+) -> dict[str, Any]:
+    subgroup_labels = labels[selected]
+    result: dict[str, Any] = {
+        "episodes": int(selected.sum()),
+        "failures": int(subgroup_labels.sum()),
+        "successes": int((subgroup_labels == 0).sum()),
+    }
+    if len(np.unique(subgroup_labels)) < 2:
+        result["ranking_metrics"] = None
+        return result
+    result["ranking_metrics"] = {
+        "raw_risk": ranking_metrics(subgroup_labels, raw_risk[selected]),
+        "analytic_progress_baseline": ranking_metrics(
+            subgroup_labels, analytic_score[selected]
+        ),
+        "progress_residualized_risk": ranking_metrics(
+            subgroup_labels, residual_risk[selected]
+        ),
+    }
+    return result
+
+
 def analyze_model(
     *,
     name: str,
@@ -183,6 +211,25 @@ def analyze_model(
     expected_risk = predict_linear(confirmation_x, risk_coefficients)
     residual_risk = risk - expected_risk
     outside = (confirmation_raw < train_raw.min(axis=0)) | (confirmation_raw > train_raw.max(axis=0))
+    in_support = ~outside.any(axis=1)
+
+    episode_audit = []
+    for index, episode_id in enumerate(confirmation_ids):
+        outside_features = [
+            feature
+            for feature_index, feature in enumerate(FEATURE_NAMES)
+            if outside[index, feature_index]
+        ]
+        episode_audit.append(
+            {
+                "episode_id": str(episode_id),
+                "failure": int(labels[index]),
+                "raw_risk": float(risk[index]),
+                "analytic_progress_score": float(analytic_score[index]),
+                "residual_risk": float(residual_risk[index]),
+                "outside_reference_train_features": outside_features,
+            }
+        )
 
     return {
         "name": name,
@@ -211,7 +258,14 @@ def analyze_model(
                     feature: int(outside[:, index].sum())
                     for index, feature in enumerate(FEATURE_NAMES)
                 },
+                "in_support_only": subgroup_metrics(
+                    labels, risk, analytic_score, residual_risk, in_support
+                ),
+                "out_of_support_only": subgroup_metrics(
+                    labels, risk, analytic_score, residual_risk, ~in_support
+                ),
             },
+            "episode_audit": episode_audit,
         },
         "episode_bootstrap": bootstrap(
             labels, risk, analytic_score, residual_risk, confirmation_x, samples, seed
