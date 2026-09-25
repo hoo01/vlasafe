@@ -108,6 +108,8 @@ Pilot 只决定是否进入正式采集，不能形成强模型结论。
 
 首次 grouped split support audit 保留 95/100 条（5 条从未进入 10 cm），但 test 仅 4/9 positives 拥有同-state negative，未通过额外匹配 gate。由于尚未训练任何 predictor，split 算法在模型实验前修订并重新冻结：9 个 mixed groups 与 9 个 negative-only groups 分别按 60/20/20 分配，2 个 all-positive groups 只进入 train；revision 及原因写入 protocol，后续不再因模型结果调整。
 
+修订后 pilot manifest 为 95 条、27 positives、20 groups：train 55/15、validation 20/6、test 20/6。Validation 与 test 各有 2 个 mixed groups 和 2 个 negative-only groups，12/12 evaluation positives 均有同-state negative；train 的 all-positive groups 只用于拟合。数据 gate 通过，开始构造 Phase 2 专用部署输入，标签保持 `pickup_stall`，不复用 Outcome 的 `failure` 命名，也不加入绝对 checkpoint progress。
+
 ### Formal gate
 
 - 总计至少 40–50 个 event-positive episodes。
