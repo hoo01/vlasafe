@@ -23,6 +23,7 @@ class PickupStallPilotTest(unittest.TestCase):
         self.assertEqual(sample["checkpoint_step"], 40)
         self.assertEqual(sample["event_step"], 60)
         self.assertEqual(sample["pickup_stall"], 1)
+        self.assertEqual(sample["checkpoint_target_movement_m"], 0.0)
 
     def test_aligned_negative_moves_in_same_window(self) -> None:
         bowl = np.zeros((70, 3))

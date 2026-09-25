@@ -21,12 +21,16 @@ from vlasafe.outcome_metrics import binary_metrics, fit_logistic_l2, predict_log
 from vlasafe.pilot_metrics import cluster_bootstrap, matched_pair_accuracy
 
 
-def fit_approach_baseline(
-    step: np.ndarray, target: np.ndarray, train: np.ndarray, validation: np.ndarray
+def fit_stage_baseline(
+    raw_features: np.ndarray,
+    target: np.ndarray,
+    train: np.ndarray,
+    validation: np.ndarray,
 ) -> tuple[np.ndarray, dict[str, Any]]:
-    mean = float(step[train].mean())
-    std = float(step[train].std()) or 1.0
-    features = ((step - mean) / std)[:, None]
+    mean = raw_features[train].mean(axis=0)
+    std = raw_features[train].std(axis=0)
+    std[std < 1e-8] = 1.0
+    features = (raw_features - mean) / std
     candidates = []
     for l2 in L2_CANDIDATES:
         weights, bias = fit_logistic_l2(features[train], target[train], l2)
@@ -35,9 +39,10 @@ def fit_approach_baseline(
         candidates.append((metrics["auprc"], -metrics["brier"], l2, weights, bias, probability, metrics))
     chosen = max(candidates, key=lambda row: (row[0], row[1]))
     return chosen[5], {
-        "feature": "privileged first_approach_step; analysis baseline only",
-        "train_mean": mean,
-        "train_std": std,
+        "features": ["first_approach_step", "checkpoint_target_movement_m"],
+        "role": "privileged stage-control baseline for analysis only",
+        "train_mean": mean.tolist(),
+        "train_std": std.tolist(),
         "chosen_l2": chosen[2],
         "validation_metrics": chosen[6],
     }
@@ -95,8 +100,16 @@ def main() -> None:
     device = torch.device(args.device)
     prevalence = float(target[train].mean())
     prevalence_probability = np.full(len(target), prevalence)
-    approach_probability, approach_metadata = fit_approach_baseline(
-        temporal["first_approach_step"].astype(float), target, train, validation
+    stage_probability, stage_metadata = fit_stage_baseline(
+        np.column_stack(
+            [
+                temporal["first_approach_step"].astype(float),
+                temporal["checkpoint_target_movement_m"].astype(float),
+            ]
+        ),
+        target,
+        train,
+        validation,
     )
 
     temporal_features, temporal_normalization = normalize_and_flatten_temporal(
@@ -118,7 +131,7 @@ def main() -> None:
     )
     probabilities = {
         "prevalence": prevalence_probability,
-        "approach_time": approach_probability,
+        "stage_only": stage_probability,
         "temporal_mlp": temporal_probability,
         "frozen_vision": vision_probability,
     }
@@ -145,7 +158,7 @@ def main() -> None:
         "vision_features": args.vision_features.as_posix(),
         "target": "pickup_stall",
         "absolute_checkpoint_feature": False,
-        "approach_baseline": approach_metadata,
+        "stage_baseline": stage_metadata,
         "temporal": {"model": "MLP 128-64, 5-seed ensemble", "normalization": temporal_normalization, "runs": temporal_runs},
         "vision": {"model": "frozen ResNet-50 dual-camera linear probe", "cameras": cameras, **vision_metadata},
         "results": results,
@@ -171,7 +184,7 @@ def main() -> None:
     print("device", device, "test groups", len(np.unique(temporal["initial_state_id"][test])))
     for name, values in results["test"].items():
         print(name, {key: value for key, value in values.items() if key != "same_state_pairs"}, values["same_state_pairs"])
-    print("delta vs approach", bootstrap["delta_vs_approach_time"])
+    print("delta vs stage", bootstrap["delta_vs_stage_only"])
 
 
 if __name__ == "__main__":

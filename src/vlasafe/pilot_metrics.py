@@ -50,7 +50,7 @@ def cluster_bootstrap(
     deltas = {
         name: {metric: [] for metric in METRICS}
         for name in probabilities
-        if name not in {"prevalence", "approach_time"}
+        if name not in {"prevalence", "stage_only"}
     }
     valid = 0
     for _ in range(samples):
@@ -72,7 +72,7 @@ def cluster_bootstrap(
         for name in deltas:
             for metric in METRICS:
                 deltas[name][metric].append(
-                    metrics[name][metric] - metrics["approach_time"][metric]
+                    metrics[name][metric] - metrics["stage_only"][metric]
                 )
     observed = {
         name: binary_metrics(target, probability)
@@ -92,10 +92,10 @@ def cluster_bootstrap(
             }
             for name in probabilities
         },
-        "delta_vs_approach_time": {
+        "delta_vs_stage_only": {
             name: {
                 metric: {
-                    "point": observed[name][metric] - observed["approach_time"][metric],
+                    "point": observed[name][metric] - observed["stage_only"][metric],
                     "ci95": np.percentile(values, [2.5, 97.5]).tolist(),
                 }
                 for metric, values in metric_values.items()

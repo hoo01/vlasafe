@@ -61,6 +61,7 @@ def aligned_sample(
         "event_step": event if maximum < movement else None,
         "pickup_stall": int(maximum < movement),
         "maximum_target_movement_m": maximum,
+        "checkpoint_target_movement_m": float(displacement[checkpoint - approach]),
         "target_movement_crossing_step": crossing_step,
         "checkpoint_stage_eligible": crossing_step is None or crossing_step > checkpoint,
     }

@@ -20,6 +20,7 @@
     "positive": "pickup stall is confirmed exactly 20 steps after the pilot checkpoint",
     "negative": "at the pilot checkpoint the target has not yet moved 0.04 m, then it crosses 0.04 m during the following 20 steps",
     "checkpoint_stage_constraint": "exclude negatives whose target crossed 0.04 m on or before the checkpoint; otherwise the predictor can solve the task by reading already-completed pickup progress",
+    "stage_baseline": "Fit an analysis-only baseline from first_approach_step and privileged target displacement at the checkpoint. The primary model comparison is deployment features versus this stronger stage baseline.",
     "claim_boundary": "The pilot predicts imminent stall confirmation after 20 observed stall-development steps; it is not pre-attempt failure prediction."
   },
   "information_boundary": {

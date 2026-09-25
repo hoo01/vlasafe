@@ -23,7 +23,7 @@ def main() -> None:
         for key in (
             "state", "action", "timing", "mask", "frame_id", "pickup_stall",
             "checkpoint_step", "first_approach_step", "event_step", "episode_id",
-            "episode_path", "initial_state_id", "split",
+            "checkpoint_target_movement_m", "episode_path", "initial_state_id", "split",
         )
     }
     for split, samples in manifest["splits"].items():
@@ -42,6 +42,9 @@ def main() -> None:
             records["first_approach_step"].append(int(sample["first_approach_step"]))
             records["event_step"].append(
                 -1 if sample["event_step"] is None else int(sample["event_step"])
+            )
+            records["checkpoint_target_movement_m"].append(
+                float(sample["checkpoint_target_movement_m"])
             )
             records["episode_id"].append(str(sample["episode_id"]))
             records["episode_path"].append(path.as_posix())

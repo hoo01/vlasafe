@@ -114,6 +114,8 @@ Pilot 只决定是否进入正式采集，不能形成强模型结论。
 
 Strict manifest 排除 9 条 checkpoint 前已跨越 4 cm 的 negatives 和 5 条 no-approach episodes，保留 86 条与全部 27 positives。首次 strict split 因 8 个 mixed groups 的整数取整变成 train/validation/test=`5/2/1`，test 仅3 positives、1 mixed group，未进入训练。Allocator 最终冻结为 mixed=`4/2/2`；negative-only=`5/2/2`；all-positive 只进 train，以恢复两个 evaluation split 各2个 mixed groups。此后不再修改 strict split。
 
+最终 strict split 为 train 51/17、validation 16/3、test 19/7；validation/test 各2个 mixed groups，10/10 evaluation positives 有同-state negative。训练前再冻结一个更强的 analysis-only stage baseline：`first_approach_step + checkpoint_target_movement_m`。Primary comparison 必须是部署输入相对该 baseline 的增量；仅超过 approach-time 不足以排除 checkpoint 内部的部分进度差异。
+
 ### Formal gate
 
 - 总计至少 40–50 个 event-positive episodes。

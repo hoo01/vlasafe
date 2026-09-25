@@ -21,14 +21,14 @@ class PickupStallTrainingTest(unittest.TestCase):
         target = np.asarray([1, 0, 1, 0])
         probabilities = {
             "prevalence": np.full(4, 0.5),
-            "approach_time": np.asarray([0.6, 0.4, 0.6, 0.4]),
+            "stage_only": np.asarray([0.6, 0.4, 0.6, 0.4]),
             "temporal_mlp": np.asarray([0.9, 0.1, 0.8, 0.2]),
         }
         result = cluster_bootstrap(
             target, probabilities, np.asarray([1, 1, 2, 2]), samples=20, seed=1
         )
         self.assertEqual(result["valid_samples"], 20)
-        self.assertIn("temporal_mlp", result["delta_vs_approach_time"])
+        self.assertIn("temporal_mlp", result["delta_vs_stage_only"])
 
 
 if __name__ == "__main__":
