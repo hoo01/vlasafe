@@ -71,17 +71,49 @@ Phase 1 已完成。冻结视觉和状态/动作历史能够稳定预测 LIBERO-
 
 ## Phase 2 入口
 
-Phase 2 不再扩大普通 outcome prediction，也不先升级模型。目标是：
+Phase 2 不再扩大普通 outcome prediction，也不先升级模型。Stage-conditioned outcome 只作为 sanity check；核心目标是：
 
 > 在相同执行阶段下，预测未来 `K` 步内是否发生具有明确 `t_event` 的失败事件。
 
-执行顺序：
+最终 predictor 只能读取最近 `h` 步的 RGB、proprioception 和 action。Privileged simulator state 只用于定义 `t_event`、stage matching、分层审计和 stage-only baseline，不能进入 predictor 或 normalization。
 
-1. 在现有 v0.3 中构造 lift-aligned 与 plate-approach-aligned cohort。
-2. 审计 19 条 lifted-but-failed 和 16 条 plate-approach-but-failed 轨迹，冻结可自动标注的 grasp-loss/object-drop 事件。
-3. 分开报告 progress-controlled outcome 与真正的 future-event precursor 标签。
-4. 比较 progress-only、progress + state/action、progress + vision；只有增量的分组置信区间稳定高于 0，才声称存在 precursor。
-5. 简单模型无残差信号时，不升级 Transformer。
+Future-event 标签包含 gray zone：
+
+```text
+0 < t_event - t <= K          positive
+K < t_event - t <= K + M      ignore
+t_event - t > K + M           negative
+t >= t_event                  不进入 precursor 训练/评测
+```
+
+无事件 episode 的 negative 也必须按 stage 匹配，不能从早期轨迹任意大量抽样。首轮固定检查 `h=16`、`K=20`、`M=20` 的可行性；多个 `K` 只能作为预先声明的次要分析，不能从 test 选最好结果。
+
+### Pilot gate
+
+- 至少 20 个 event-positive episodes 和 20 个可匹配 negative episodes。
+- 至少覆盖 10 个独立 `initial_state_id`。
+- 成功轨迹上的候选事件误触发率满足冻结上限。
+- 至少 80% positive 能在 caliper 内找到 stage-matched negative。
+- 至少 80% event-positive episode 有完整的历史/预测窗口。
+
+Pilot 只决定是否进入正式采集，不能形成强模型结论。
+
+### Formal gate
+
+- 总计至少 40–50 个 event-positive episodes。
+- 每个主报告 event type 最好至少 30 个 positive episodes。
+- 至少同量、目标 1:2 的 stage-matched negatives。
+- Split 按 `initial_state_id` 分组；threshold/model selection 只使用 validation，test 只评一次。
+- 指标按 initial state 或 episode/event cluster bootstrap。
+
+### 执行顺序
+
+1. 用现有 v0.3 审计 lifted-but-failed 和 plate-approach-but-failed 轨迹，统计可自动定义的 grasp-loss/object-drop/failed-placement 候选事件。
+2. 冻结事件规则、`h/K/M` 和成功轨迹误触发上限。
+3. 构造带 gray zone 的 stage-matched pilot dataset，报告匹配前后平衡、覆盖率和 stage-only baseline。
+4. Pilot gate 通过后才设计针对 late failure 的正式采集；目标至少 40–50 个 event-positive episodes。
+5. 正式比较 stage-only baseline、single-frame vision、temporal MLP 和 frozen visual temporal model。
+6. 只有部署可用历史相对 progress baseline 的增量置信区间稳定大于 0，才声称存在 precursor；简单模型无信号时不升级 Transformer。
 
 ## 冻结边界
 
