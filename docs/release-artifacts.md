@@ -97,6 +97,33 @@ stage control reduces vision AUROC to 0.426 [0.260, 0.597]. Temporal step 120
 falls to 0.514 [0.334, 0.705]. Both intervals include chance; Phase 1 finds no
 reliable progress-independent outcome signal.
 
+## v0.4 strict pickup-stall pilot
+
+Phase 2 defines an explicit online event: after the first end-effector approach
+within 0.10 m of the target bowl, pickup stall is confirmed if target displacement
+remains below 0.04 m for 40 steps. Prediction uses the 16-step history ending 20
+steps before confirmation. Negatives that already crossed 0.04 m by that checkpoint
+are excluded.
+
+- Frozen protocol: `docs/manifests/v04_task4_pickup_stall_protocol.json`
+- Strict pilot manifest: `docs/manifests/v04_task4_pickup_stall_pilot_strict.json`
+- Temporal dataset: `artifacts/v04/datasets/task4_pickup_stall_pilot_strict.npz`
+- Frozen dual-camera features:
+  `artifacts/v04/features/task4_pickup_stall_frozen_vision_strict.npz`
+- Strict result: `artifacts/results/v04_task4_pickup_stall_pilot_strict.json`
+- Model bundle: `artifacts/results/v04_task4_pickup_stall_pilot_strict.pt`
+- Physical-review contact sheets:
+  `artifacts/visualizations/v04_pickup_stall_first_approach_review/`
+- Release checksum: `artifacts/v04/release-sha256.txt`
+
+The strict cohort contains 86 aligned samples and 27 positives. Group-disjoint test
+contains 19 samples, 7 positives, and 4 initial-state clusters. Temporal MLP reaches
+AUPRC/AUROC 0.938/0.964 and improves over the privileged stage baseline by
+0.402 [0.037, 0.784] / 0.321 [0.042, 0.750]. Frozen vision reaches 0.982/0.988,
+but its incremental intervals touch zero. This is pilot evidence for predicting
+stall confirmation after 20 observed development steps, not a safe-stop result or
+a general failure detector.
+
 ## Reproduce evaluation from frozen inputs
 
 Activate the recorded environment and expose the source package:
@@ -244,7 +271,7 @@ all 21 files.
 
 Phase 1 supports reproducible same-task outcome association, an offline efficiency
 analysis, a bounded A1/A2 supporting study, and a task-progress confounding result.
-The stage-controlled evidence does not support a progress-independent failure
-precursor. It also does not establish held-out task generalization, impending
-unsafe-event detection, safe-stop effectiveness, learned A2 monitoring, or coverage
-beyond the explicitly tested fault cases.
+Phase 2 adds pilot-level temporal evidence for one operational pickup-stall event.
+It does not establish held-out task generalization, general impending unsafe-event
+detection, safe-stop effectiveness, learned A2 monitoring, or coverage beyond the
+explicitly tested event and fault cases.

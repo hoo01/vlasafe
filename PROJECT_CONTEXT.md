@@ -16,7 +16,7 @@ That experience motivated a simulator-first project about distinguishing deploym
 
 ## Current project state
 
-- Status (2026-09-25): Phase 1 is complete. The bounded v0.1 release remains frozen; v0.2 confirmed same-task outcome association, and the predeclared v0.3 stage cohort resolved the progress-confounding question.
+- Status (2026-09-25): Phase 1 is complete and frozen. Phase 2 has completed a strict pickup-stall pilot; formal-scale collection is not yet complete.
 - Canonical specification: `README.md` in this directory.
 - Platform: SmolVLA + LIBERO `libero_spatial` task 4.
 - v0.1 natural cohort: 50 episodes, 18 successes / 32 failures; group-disjoint train/validation/test = 30/10/10 by `initial_state_id`.
@@ -28,8 +28,13 @@ That experience motivated a simulator-first project about distinguishing deploym
 - The stage-only baseline reaches AUROC 0.908 at step 80, exceeding vision. Leave-one-initial-state-out stage residualization reduces vision AUROC to 0.426 [0.260, 0.597] and temporal to 0.514 [0.334, 0.705].
 - Same-state nearest-stage pairs agree: vision raw/stage-only/residual ordering is 13/16, 15/16, 7/16; temporal is 15/16, 13/16, 9/16. Median match distances remain 2.89/4.41 SD.
 - Final Phase-1 interpretation: frozen predictors reliably rank eventual outcome, but measured task stage explains the signal. There is no reliable progress-independent precursor evidence.
+- Phase-2 event: first target approach within 0.10 m followed by less than 0.04 m target displacement over 40 steps; predict confirmation from the 16-step history ending 20 steps before `t_event`.
+- Strict Phase-2 cohort: 86 aligned samples, 27 positives. Test has 19 samples, 7 positives, and 4 held-out initial-state groups; every test positive has a same-state negative.
+- Strict stage baseline uses privileged first-approach time and checkpoint target displacement for analysis only. Temporal MLP reaches AUPRC/AUROC 0.938/0.964, with increments 0.402 [0.037, 0.784] / 0.321 [0.042, 0.750]; same-state pairs are 7/7.
+- Frozen vision reaches 0.982/0.988, but incremental confidence intervals touch zero; treat it as suggestive. Temporal ECE is 0.231, so no probability-threshold or safe-stop claim is supported.
+- Phase-2 claim boundary: pilot evidence for imminent confirmation of one pickup-stall definition after 20 observed development steps. Only 27 event positives and 4 test groups; formal gate remains 40–50 positives with more independent states.
 - A1/A2 supporting results remain bounded: A1 11/11 predefined cases; action-axis swap command-effect 10/10 with normal false alarms 1/10; camera swap 7/10 is only an indirect response.
-- Phase 2, if pursued, must use stage-aligned samples and explicit future failure events with `t_event`. Do not reopen ordinary outcome model selection or upgrade model complexity before the label/data gate is satisfied.
+- Any Phase-2 continuation must expand strict event positives and independent initial states under the frozen v0.4 definition. Do not reopen ordinary outcome model selection, alter the strict test split, or upgrade model complexity before the formal data gate is satisfied.
 
 ## Locked research definitions
 
