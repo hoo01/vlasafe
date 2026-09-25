@@ -75,6 +75,28 @@ vision at step 80 reaches AUPRC 0.939 and AUROC 0.919; frozen temporal MLP at
 step 120 reaches AUPRC 0.882 and AUROC 0.828. These results confirm outcome
 association within the same task, not a progress-independent failure precursor.
 
+## v0.3 predeclared stage-control audit
+
+v0.3 freezes a 100-episode mechanism cohort before outcome inspection: preset
+states 30–49, five new seeds per state, 40 successes and 60 failures. All 100
+episodes passed sidecar/video validation. Privileged scene poses are analysis-only
+and never enter either frozen predictor.
+
+- Predeclared protocol: `docs/manifests/v03_task4_stage_protocol.json`
+- Frozen cohort manifest: `docs/manifests/v03_task4_stage_cohort.json`
+- Rollouts: `artifacts/v03/task4_stage_cohort/`
+- Temporal dataset: `artifacts/v03/datasets/task4_stage_outcome.npz`
+- Frozen dual-camera features: `artifacts/v03/features/task4_stage_frozen_vision.npz`
+- Frozen predictor evaluation: `artifacts/results/v03_task4_frozen_stage_cohort.json`
+- Stage-aligned analysis: `artifacts/results/v03_task4_stage_aligned_signal.json`
+- Checksum: `artifacts/v03/release-sha256.txt`
+
+At step 80, frozen vision reaches AUPRC 0.926 / AUROC 0.863, while the
+privileged stage-only baseline reaches AUROC 0.908. Leave-one-initial-state-out
+stage control reduces vision AUROC to 0.426 [0.260, 0.597]. Temporal step 120
+falls to 0.514 [0.334, 0.705]. Both intervals include chance; Phase 1 finds no
+reliable progress-independent outcome signal.
+
 ## Reproduce evaluation from frozen inputs
 
 Activate the recorded environment and expose the source package:
@@ -170,6 +192,36 @@ python scripts/evaluate_frozen_confirmation.py \
   --device cuda
 ```
 
+Rebuild and evaluate the v0.3 stage cohort from its frozen manifest:
+
+```bash
+python scripts/build_outcome_dataset.py \
+  docs/manifests/v03_task4_stage_cohort.json \
+  --checkpoint-steps 80 120 \
+  --output artifacts/v03/datasets/task4_stage_outcome.npz
+
+python scripts/extract_frozen_vision_features.py \
+  docs/manifests/v03_task4_stage_cohort.json \
+  --checkpoint-steps 80 \
+  --cameras main_camera wrist_camera \
+  --output artifacts/v03/features/task4_stage_frozen_vision.npz \
+  --device cuda
+
+python scripts/evaluate_frozen_stage_cohort.py \
+  artifacts/v03/datasets/task4_stage_outcome.npz \
+  artifacts/v03/features/task4_stage_frozen_vision.npz \
+  docs/manifests/v03_task4_stage_cohort.json \
+  --temporal-model artifacts/results/week1_task4_temporal_mlp.pt \
+  --vision-model artifacts/results/week1_task4_frozen_vision.pt \
+  --output artifacts/results/v03_task4_frozen_stage_cohort.json \
+  --device cuda
+
+python scripts/analyze_stage_aligned_signal.py \
+  docs/manifests/v03_task4_stage_cohort.json \
+  artifacts/results/v03_task4_frozen_stage_cohort.json \
+  --output artifacts/results/v03_task4_stage_aligned_signal.json
+```
+
 ## Integrity check before publishing
 
 Run this on the experiment host after all artifacts are frozen, store the output with
@@ -190,7 +242,9 @@ all 21 files.
 
 ## Claim boundary
 
-This release supports held-out initial-state episode outcome prediction on one LIBERO
-task, an offline efficiency analysis, and a bounded A1/A2 supporting study. It does not
-establish held-out task generalization, impending unsafe-event detection, safe-stop
-effectiveness, learned A2 monitoring, or coverage beyond the explicitly tested fault cases.
+Phase 1 supports reproducible same-task outcome association, an offline efficiency
+analysis, a bounded A1/A2 supporting study, and a task-progress confounding result.
+The stage-controlled evidence does not support a progress-independent failure
+precursor. It also does not establish held-out task generalization, impending
+unsafe-event detection, safe-stop effectiveness, learned A2 monitoring, or coverage
+beyond the explicitly tested fault cases.

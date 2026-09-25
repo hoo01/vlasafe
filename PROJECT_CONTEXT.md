@@ -16,22 +16,20 @@ That experience motivated a simulator-first project about distinguishing deploym
 
 ## Current project state
 
-- Status (2026-09-20): the bounded four-week v0.1 release remains frozen and checksum-verified (21/21 files). A post-release v0.2 audit verified initial-state identity, ablated the temporal checkpoint feature, and evaluated the frozen predictors on 20 previously unused task-4 preset states.
+- Status (2026-09-25): Phase 1 is complete. The bounded v0.1 release remains frozen; v0.2 confirmed same-task outcome association, and the predeclared v0.3 stage cohort resolved the progress-confounding question.
 - Canonical specification: `README.md` in this directory.
-- Platform: SmolVLA + LIBERO `libero_spatial` task 4 on RTX 4090 D.
-- Frozen natural cohort: 50 episodes, 18 successes / 32 failures; group-disjoint train/validation/test = 30/10/10 by `initial_state_id`.
-- Formal event coverage: 1/32 failures has an available self-collision or joint-violation event (3.125%); therefore impending lead-time and safe-stop claims were dropped.
-- State/action temporal MLP first reliably exceeds initial-proprio difficulty at step 120.
-- Frozen dual-camera ResNet-50 checkpoint vision reliably exceeds initial-frame and initial-proprio difficulty at step 80 (test AUPRC 0.982, AUROC 0.952), so the Week-2 learned-signal gate remains GO. Frozen RGB/error and LOEO audits classify the cue as B: vision mainly reads outcome-associated execution progress / proximity to a successful configuration, not an independent early failure precursor. Vision-step80 and temporal-step120 assign different probabilities but misorder the same failure/success pair, have identical LOEO ranking metrics, and are highly correlated across the 10 test episodes (Pearson 0.9998; Spearman 0.9515). Treat them as likely measurements of the same latent progress signal, not independent evidence chains.
-- The shared false negative `smolvla-20260911T013117405943Z` looks success-like at step 80, reaches a near-complete configuration around steps 120–160, then makes small adjustments until the 280-step timeout without a usable self-collision or joint-violation event. Its first reliable divergence from successful trajectories is around steps 120–160, not step 80.
-- Test contains only 10 episodes and every failure reaches the 280-step horizon; retain both limitations in every claim.
-- The main/wrist/dual-camera ablation is complete. At step 80, main/wrist/dual test AUPRC is 0.844/1.000/0.982 and AUROC is 0.667/1.000/0.952. Paired bootstrap supports lower Brier/ECE for wrist and dual versus main, but does not support a reliable wrist-versus-dual difference. Keep the preregistered dual-camera pipeline as the main model.
-- Validation selected an offline outcome threshold of 0.9998072982 under a zero-sacrificed-validation-success constraint. On test it identified 4/7 failures, observed 0/3 sacrificed successes, and counterfactually saved 756 recorded steps (52.95 seconds at the measured 70.042 ms/step). This is an offline efficiency/faster-confirmation result, not a safety intervention.
-- The test risk plot and a 360x360, 20 FPS, 280-frame outcome-risk overlay video are complete. The overlay explicitly marks the step-80 trigger as offline counterfactual and continues the recorded trajectory.
-- Progress control uses a train-only, outcome-label-free frozen-feature time axis. Progress-only test AUROC is 0.905 at vision-step80 and 1.000 at temporal-step120; progress-residualized AUROC is 0.714 and 0.381 respectively. Vision residual AUROC CI [0.111, 1.000] and partial-correlation CI [-0.232, 1.000] are inconclusive. Only two vision success/failure pairs are within 0.5 train SD; no temporal pairs are close. Final interpretation: progress explains much of the observed ranking, while the current 10-episode test cannot determine whether vision retains progress-independent information.
-- The recorded `initial_state_id` matches the LIBERO preset index for all 50 v0.1 episodes, with stable preset fingerprints across collector sessions. Removing `checkpoint_step / 280` leaves temporal test AUPRC/AUROC unchanged at steps 80 and 120; the feature affects probability scale rather than within-checkpoint ranking.
-- Independent confirmation: preset states 30–49 produced 20 episodes (11 success / 9 failure). With all v0.1 weights and normalization frozen, vision-step80 reaches AUPRC 0.939 / AUROC 0.919 and temporal-step120 reaches AUPRC 0.882 / AUROC 0.828. This confirms same-task outcome association, not a progress-independent failure precursor or held-out-task generalization.
-- Next: preserve the frozen v0.1/v0.2 artifacts and claim boundary. A second task and learned A2 monitor remain out of scope. Do not reopen model selection, frame outcome-based termination as a safety intervention, or upgrade to Transformer.
+- Platform: SmolVLA + LIBERO `libero_spatial` task 4.
+- v0.1 natural cohort: 50 episodes, 18 successes / 32 failures; group-disjoint train/validation/test = 30/10/10 by `initial_state_id`.
+- Formal event coverage in v0.1 is 1/32 failures (3.125%); impending lead-time and safe-stop claims remain dropped.
+- v0.1 test: frozen dual-camera vision at step 80 and temporal MLP at step 120 both reach AUPRC 0.982 / AUROC 0.952.
+- v0.2 independent confirmation uses preset states 30–49 (20 episodes, 11 success / 9 failure). Frozen vision-step80 reaches AUPRC 0.939 / AUROC 0.919; temporal-step120 reaches 0.882 / 0.828.
+- v0.3 was frozen before collection: preset states 30–49, five new seeds per state, 100/100 valid episodes (40 success / 60 failure). Privileged black-bowl, drawer, plate, and gripper state is analysis-only.
+- On v0.3, vision-step80 raw AUPRC/AUROC is 0.926/0.863 and temporal-step120 is 0.937/0.876. Initial-state cluster bootstrap is used because each state has five repetitions.
+- The stage-only baseline reaches AUROC 0.908 at step 80, exceeding vision. Leave-one-initial-state-out stage residualization reduces vision AUROC to 0.426 [0.260, 0.597] and temporal to 0.514 [0.334, 0.705].
+- Same-state nearest-stage pairs agree: vision raw/stage-only/residual ordering is 13/16, 15/16, 7/16; temporal is 15/16, 13/16, 9/16. Median match distances remain 2.89/4.41 SD.
+- Final Phase-1 interpretation: frozen predictors reliably rank eventual outcome, but measured task stage explains the signal. There is no reliable progress-independent precursor evidence.
+- A1/A2 supporting results remain bounded: A1 11/11 predefined cases; action-axis swap command-effect 10/10 with normal false alarms 1/10; camera swap 7/10 is only an indirect response.
+- Phase 2, if pursued, must use stage-aligned samples and explicit future failure events with `t_event`. Do not reopen ordinary outcome model selection or upgrade model complexity before the label/data gate is satisfied.
 
 ## Locked research definitions
 

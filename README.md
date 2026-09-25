@@ -2,7 +2,7 @@
 
 VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来研究机器人策略失败时，系统能够观察到什么、预测什么，以及哪些结论不能从现有数据推出。
 
-当前核心发现是：冻结视觉特征可以较早预测 task 4 的最终成功或失败，并在 20 个从未用于训练、选模或阈值选择的 LIBERO preset states 上复现；vision-step80 的确认集 AUPRC 为 0.939、AUROC 为 0.919。RGB/error、LOEO 和定量进度控制同时表明，**任务执行进度可以解释大部分已观察到的预测能力**。独立确认集验证了 outcome association 的可重复性，但没有回答视觉是否读取了进度之外的失效信号。风险分数只用于 Outcome Prediction 和离线效率分析，不能描述为即将发生危险或安全停止依据。
+当前核心发现是：冻结视觉与状态/动作模型都能稳定预测 task 4 的最终 outcome，但这种能力主要来自**任务执行进度**。在预先冻结的 100 条 v0.3 轨迹上，vision-step80 的原始 AUPRC/AUROC 为 `0.926/0.863`；只使用黑碗、抽屉、盘子和夹爪的真实任务阶段即可达到 `0.947/0.908`。按 initial state 做 leave-one-group-out 阶段控制后，vision 与 temporal 的残差 AUROC 分别降至 `0.426` 和 `0.514`，置信区间均包含随机水平。因此 Phase 1 证明了 outcome association 的可重复性，也确认它不能解释为独立失效前兆。风险分数只用于 Outcome Prediction 和离线效率分析，不能作为即将发生危险或安全停止的依据。
 
 ## 四周执行状态
 
@@ -13,8 +13,9 @@ VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来�
 | **Week 3** | **完成** | 主/腕/双相机消融；offline utility；risk 曲线与视频；定量进度控制实验 | 无 Week-3 阻塞项 |
 | **Week 4** | **完成** | 完成度和 claim audit；A1 case table；60 条 A2 配对 rollout；command-effect evaluation；21-file release checksum | 无 Week-4 阻塞项 |
 | **v0.2 post-release audit** | **完成** | Initial-state identity audit；temporal checkpoint-feature ablation；20 条冻结模型独立确认集 | 不改写 v0.1 test 或选模结果 |
+| **v0.3 stage-control audit** | **完成** | 100 条预声明轨迹；真实物体阶段记录；initial-state cluster bootstrap；同状态阶段匹配 | Phase 1 机制结论已冻结 |
 
-四周主计划已在 v0.1 收口。v0.2 是发布后的完整性审计与确认性补充：它验证原 split 和模型信号的可重复性，但不倒写成原计划内的预注册实验，也不修改 v0.1 test 结果。
+四周主计划已在 v0.1 收口。v0.2 验证原 split 和模型信号的可重复性；v0.3 针对“模型是否只读进度”预先冻结采样与分析协议，并给出 Phase 1 的最终机制结论。后续审计不倒写为原四周计划内的预注册实验，也不修改 v0.1 test 或选模结果。
 
 ## 1. 研究问题
 
@@ -84,6 +85,8 @@ Rollout 路径从第一步开始同步记录：
 
 Predictor 只允许读取真实部署可得的 RGB、proprioception、历史动作和 timing metadata。物体真值位姿、完整 MuJoCo 状态、接触力、joint margin 和碰撞标签只能用于生成标签或事后分析，不能进入 predictor 输入或归一化统计。
 
+v0.3 将两个黑碗、盘子、柜体/抽屉和任务区域的 MuJoCo 位姿写入 `label_only`，只用于定义和控制任务阶段。目标碗按 episode 开始时与上层抽屉区域的 XY 距离确定，100/100 条均选择 `akita_black_bowl_1_main`。这些特权量从未进入冻结 predictor。
+
 ## 4. 冻结数据协议
 
 当前 task 4 cohort 包含 50 条自然 rollout：
@@ -96,6 +99,15 @@ Predictor 只允许读取真实部署可得的 RGB、proprioception、历史动�
 | **Total** | **50** | **18** | **32** |
 
 切分按 `initial_state_id` 分组，确保同一 initial state 不跨 split。Manifest 在生成 step 0/40/80/120 的样本之前冻结，test 不参与模型、超参数或阈值选择。
+
+发布后另有两批只用于确认和机制审计的数据：
+
+| Cohort | Episodes | Success | Failure | 用途 |
+| --- | ---: | ---: | ---: | --- |
+| v0.2 confirmation | 20 | 11 | 9 | 冻结模型在 preset states 30–49 上一次性复评 |
+| v0.3 stage cohort | 100 | 40 | 60 | states 30–49 × 5 个新 seed；真实阶段控制与同状态匹配 |
+
+v0.3 在采集前冻结为 100 条，不因中途 outcome 增删样本；100/100 episode 均通过 sidecar/video validator。统计区间以 `initial_state_id` 为 cluster，而不是把同一初始状态的五次重复当成独立样本。
 
 自然失败中，已实现的 self-collision 或 joint-violation 事件只覆盖 `1/32 = 3.125%`，validation/test 均无 event-positive episode。按照预设的 20% 数据门槛，项目选择 **Outcome Prediction**，停止 Impending lead-time 和 safe-stop 主张。Workspace violation 和 impact 尚未形成冻结协议，不能记作已验证的零事件。
 
@@ -117,7 +129,7 @@ Predictor 只允许读取真实部署可得的 RGB、proprioception、历史动�
 
 **排除什么**："成败在开始那一刻就已注定"。如果初始场景就能高精度区分，说明执行过程没有产生新信息，"过程中的失败预测"这个研究问题在这批数据上不成立——该换任务，而不是换模型。
 
-### 第 3 层：Visual progress proxy
+### 第 3 层：Progress / stage baselines
 
 用 train-only、不含 outcome label 的冻结视觉特征时间方向，估计"画面看起来执行到了哪里"。
 
@@ -125,11 +137,26 @@ Predictor 只允许读取真实部署可得的 RGB、proprioception、历史动�
 
 需要说明的是，这个 proxy 不是 `step / 280`。在同一个 checkpoint 上所有轨迹的 step 编号完全相同，无法产生任何排序；它估计的是视觉上的完成程度，同一时刻的不同轨迹可以有不同的进度。
 
+v0.3 进一步使用 MuJoCo 真值构造更强的 stage-only baseline：黑碗的三维位移与总位移、黑碗到末端执行器/盘子的距离、上层抽屉位移和夹爪位置。它们只参与事后控制。Stage-only 在 vision-step80 达到 AUROC `0.908`，高于视觉模型本身的 `0.863`。
+
 ### 第 4 层：State/action temporal MLP
 
 将最近 16 步的 proprioception、动作和 timing 历史展平，输入一个小型 MLP，不使用画面。
 
 具体输入为每步 25 维 proprioception、7 维实际执行动作和 2 维 timing，共 16 步；padding mask 与 `checkpoint_step / 280` 也作为显式特征。网络为 `input → 128 → 64 → 1`，隐藏层使用 ReLU 和 0.1 dropout，最终概率取 5 个固定训练 seed 模型的平均。v0.2 单独消融了 checkpoint 特征，确认它不产生同 checkpoint 内的排序能力。
+
+```mermaid
+flowchart LR
+    A["最近 16 步历史<br/>25-D proprioception<br/>7-D executed action<br/>2-D timing"] --> B["Train-only normalization<br/>因果左填充"]
+    B --> C["展平历史<br/>16 × 34 = 544-D"]
+    M["Padding mask<br/>16-D"] --> D["拼接<br/>561-D"]
+    P["Checkpoint t / 280<br/>1-D"] --> D
+    C --> D
+    D --> E["Linear 561 → 128<br/>ReLU + Dropout 0.1"]
+    E --> F["Linear 128 → 64<br/>ReLU + Dropout 0.1"]
+    F --> G["Linear 64 → 1<br/>Sigmoid"]
+    G --> H["5 个固定 seed 概率平均<br/>P episode failure"]
+```
 
 **回答什么**：抛开视觉，光凭机器人自身的运动学轨迹能否判断成败。如果能，说明失败信号已经体现在本体状态层面。
 
@@ -153,7 +180,7 @@ Predictor 只允许读取真实部署可得的 RGB、proprioception、历史动�
 
 AUROC 衡量总体排序，AUPRC 在 failure/success 不平衡时强调失败类的 precision-recall；两者都不能说明输出的 `0.8` 是否真能解释为 80% failure probability。因此同时报告 Brier score 衡量概率平方误差，并以 ECE 辅助检查置信度与经验失败率是否一致。Brier/ECE 越低越好；ECE 依赖分箱且当前样本很少，只作为辅助证据，不单独用于模型选择或结论升级。
 
-### v0.2 发布后审计方法
+### 发布后审计方法
 
 v0.2 不重新打开模型选择，而是针对 v0.1 的三个关键疑点做固定协议验证：
 
@@ -170,6 +197,8 @@ v0.2 不重新打开模型选择，而是针对 v0.1 的三个关键疑点做固
 **目的：**检查原来观察到的 outcome prediction 能力，能否在新的 held-out initial states 上再次出现。确认集不参与训练、选模、阈值选择或校准，也不并入原 test。
 
 这三项依次回答：原 split 的 initial-state 身份是否真实、temporal 排序是否由显式 checkpoint 特征制造、原 outcome association 能否在独立 initial states 上复现。它们不回答 held-out task 泛化，也不把 Outcome Prediction 升级为 Impending Failure Detection。
+
+v0.3 随后专门检验进度混淆。采样协议在 outcome inspection 前固定：preset states 30–49 各运行 5 个新 seed，共 100 条自然 rollout；冻结 v0.1 predictor，不重新训练或选参。分析记录真实物体阶段，并采用 leave-one-initial-state-out 控制与 initial-state cluster bootstrap。该实验回答“在控制真实任务阶段后，原 outcome signal 是否仍然存在”。
 
 ## 6. 主结果与审计结论
 
@@ -198,38 +227,40 @@ Paired episode bootstrap 支持 vision-step80 相对 initial-proprio 的排序�
 
 确认集失败率为 0.45，因此无排序信息的 AUPRC 起点为 0.45、AUROC 为 0.50。结果支持“同一 task 内、未见 preset initial states 上存在可复现的 outcome signal”，降低了原 10 条 test 偶然产生高分的可能性。
 
-确认集只复评了两个冻结 learned predictor，没有重新拟合 initial-proprio baseline 或 progress proxy。它回答的是“原 outcome 排序能否在新 initial states 上复现”，而不是重复机制识别实验；关于模型主要读取执行进度的判断仍来自 v0.1 train/test 上的 RGB、LOEO 和 progress-control 审计。
+确认集只回答“原 outcome 排序能否在新 initial states 上复现”。信号来源由下述 v0.3 阶段控制实验判定。
 
-### 6.3 审计结论
+### 6.3 v0.3 真实阶段控制
 
-| 审计问题 | 关键结果 | 结论 |
-| --- | --- | --- |
-| 模型是否主要读取视觉执行进度？ | Progress-only AUROC：vision-step80 `0.905`；temporal-step120 `1.000` | 执行进度可以解释大部分排序能力；是否存在进度外视觉信号仍无法确定。 |
-| Temporal 排序是否由 `checkpoint_step / 280` 制造？ | 移除后 step 80/120 的 AUPRC、AUROC 均不变 | 显式 checkpoint 特征不产生同 checkpoint 内的排序，只影响概率尺度。 |
+v0.3 使用预先冻结的 100 条轨迹（40 success、60 failure）。冻结模型直接应用于新数据；置信区间按 20 个 `initial_state_id` cluster bootstrap。
 
-因此保留的主张是：**冻结 predictor 能在同一 task 的未见 initial states 上复现 outcome 排序，但现有证据不能把它解释为独立失效前兆。** 完整进度控制、匹配对和置信区间见下一节；完整校准与消融数值见冻结 artifacts。
+| Model | Raw AUPRC | Raw AUROC [95% CI] | Stage-only AUROC [95% CI] | Stage-residualized AUROC [95% CI] |
+| --- | ---: | ---: | ---: | ---: |
+| Vision, step 80（100 条） | 0.926 | 0.863 [0.745, 0.957] | **0.908 [0.841, 0.959]** | **0.426 [0.260, 0.597]** |
+| Temporal, step 120（99 条） | 0.937 | 0.876 [0.759, 0.968] | 0.741 [0.562, 0.903] | **0.514 [0.334, 0.705]** |
+
+Stage-only 使用真实黑碗/抽屉/盘子/夹爪状态，但只用于分析。控制模型按 leave-one-initial-state-out 拟合，不读取被留出 state 的样本。两种 predictor 的残差区间均包含 AUROC 0.5，没有显示出可靠的阶段外排序能力。
+
+因此 Phase 1 的主张是：**冻结 predictor 能稳定预测同一 task 的最终 outcome，但已观察到的能力主要由任务执行进度解释，不构成独立失效前兆。**
 
 ## 7. 模型实际读取了什么
 
-最初的表面结果是：vision 在 step 80 达到了 temporal MLP 在 step 120 才达到的排序指标。RGB/error、leave-one-episode-out 和逐 episode 审计限制了这一解释：
+Phase 1 的审计从定性检查逐步升级为真实阶段控制：
 
-- 成功轨迹通常在 step 122–160 结束，中位数约为 133；所有失败轨迹都运行到 step 280 超时。
-- Step 80 的低风险画面通常更接近成功构型，高风险画面通常进度较慢。
-- Vision-step80 与 temporal-step120 错排同一对 failure/success，概率高度相关（Pearson `0.9998`，Spearman `0.9515`）。
-- 关键 false negative 在 step 80 看起来仍顺利推进，之后进入近完成构型，却持续微调至 step 280 超时；可靠分叉约在 step 120–160。
+1. RGB/error 与 LOEO 显示风险随目标接近和成功构型变化；vision-step80 与 temporal-step120 高度相关，并错排同一对轨迹。
+2. v0.1 的 train-only visual progress proxy 已能复现大部分排序，但原 test 只有 10 条，结论区间很宽。
+3. v0.3 直接记录黑碗、抽屉、盘子和夹爪的真值状态，并在 100 条预声明轨迹上完成阶段控制。
 
-定量进度控制使用 train-only、无 outcome label 的 frozen-feature 时间方向作为 progress proxy。结果如下：
+到达关键阶段的覆盖率进一步说明 outcome 与进度强耦合：
 
-| Model | Raw AUROC | Progress-only AUROC | Progress-residualized AUROC | Partial correlation |
-| --- | ---: | ---: | ---: | ---: |
-| Vision, step 80 | 0.952 | 0.905 | 0.714 | 0.552 |
-| Temporal, step 120 | 0.952 | 1.000 | 0.381 | -0.202 |
+| 事件 | Success 到达 | Failure 到达 | 首次到达中位 step |
+| --- | ---: | ---: | ---: |
+| 黑碗位移超过 4 cm | 40/40 | 28/60 | 65 |
+| 黑碗抬升超过 4 cm | 40/40 | 19/60 | 66 |
+| 黑碗进入盘子 XY 10 cm 范围 | 40/40 | 16/60 | 96 |
 
-Temporal-step120 的排序几乎完全可由进度代理解释。Vision-step80 的残差点估计仍为正，但 residual AUROC 的 95% CI 为 `[0.111, 1.000]`，partial correlation CI 为 `[-0.232, 1.000]`，无法排除无额外信号。
+同一 initial state 内的阶段最近配对得到相同结论。Vision 原始风险排对 13/16，stage-only 排对 15/16；扣除阶段后只剩 7/16。Temporal 对应为 15/16、13/16 和 9/16。配对阶段距离中位数仍有 2.89/4.41 个标准差，因此原始高配对率也不能解释为同阶段 precursor。
 
-进度匹配进一步暴露数据重叠不足：vision-step80 只有 2 对 success/failure 的距离小于 0.5 个 train SD（两对均排对），第三对相差 2.0 SD；temporal-step120 的三对距离为 1.61–2.08 SD，没有真正接近的匹配对。`2/2` 只是描述性结果，不能据此声称视觉学到进度之外的信息。
-
-因此最终机制结论是：**执行进度可以解释大部分已观察到的 outcome 排序能力；现有 10 条 test episode 不足以判断 vision-step80 是否还包含进度之外的信息。**
+最终机制结论：**模型主要读取任务执行进度。控制真实阶段后，没有发现可靠的进度外 outcome signal。** 这是一项 Outcome Prediction 的混淆变量审计，不是 Impending Failure Detection。
 
 ## 8. Supporting results
 
@@ -243,9 +274,9 @@ Temporal-step120 的排序几乎完全可由进度代理解释。Vision-step80 �
 
 Wrist 和 dual 相对 main 的 Brier/ECE 配对区间支持改善；wrist 与 dual 的差异没有得到可靠区间支持，详见附录 A。正式结果继续使用预注册的 dual-camera pipeline，不根据 test 改选模型。
 
-### Offline decision utility
+### Offline Early-Termination Analysis：离线提前终止分析
 
-Validation 在零 sacrificed-success 约束下选择阈值 `0.9998072982`，随后固定到 test：
+在 validation 上，以“不提前终止任何成功 episode”为约束选择阈值，并在满足该约束的候选中最大化 saved steps，得到 τ≈0.9998。阈值随后冻结并一次性应用于 test。由于 validation 仅含 4 条成功轨迹，该阈值只作为当前数据上的离线 operating point，不视为可泛化的安全阈值。
 
 | Split | Detected failures | Sacrificed successes | Saved steps | Estimated wall time |
 | --- | ---: | ---: | ---: | ---: |
@@ -270,15 +301,9 @@ A2 使用 20 组相同 seed 和 initial state 的三路配对 rollout：normal�
 
 ## 9. 当前状态与下一阶段
 
-2026-09-14 最终 release checksum 包含 21 个文件并通过 21/21 校验：原 18-file Outcome v0.1 快照、进度控制报告和两个 RQ1 报告。大体积配对 rollout 留在实验主机，并由 A2 report 中的 episode ID、seed 和逐条结果索引。
+Phase 1 已完成。v0.1 提供闭环系统、冻结 split、模型和 RQ1 supporting study；v0.2 验证 initial-state 身份并在 20 条独立轨迹上复现 outcome association；v0.3 用 100 条预声明轨迹确认该 association 主要由真实任务阶段解释。三版结果分别保留，不用后续数据反向修改旧 test、模型或阈值。
 
-2026-09-20 的 v0.2 checksum 另列 10 个文件，覆盖 confirmation manifest、完整性审计、temporal 消融、确认集 dataset/feature metadata 与冻结评测结果；大型 NPZ/PT 仍只通过 SHA-256 追踪，不并入 Git。
-
-进度控制实验已经完成，结果属于“当前样本不足以区分”：进度解释得到定量支持，vision 的额外信息没有得到可靠统计证据。该结果已纳入最终文档和 release。
-
-Week 4 的 RQ1 supporting study 已完成：A1 case table 为 11/11；A2 的协议规则无法识别两类数值合法故障，command-effect 在 10 条 evaluation pairs 中对动作 `x/y` 置换检出 10/10，正常误报 1/10。相机置换结果只作为间接异常响应报告。本阶段不训练专门的 learned A2 monitor。
-
-v0.2 已完成 20 条独立 initial-state confirmation cohort，并以冻结 v0.1 predictor 一次性评测。第二任务、Transformer、π0.5、RoboTwin、recovery 和 adaptive chunking 不进入当前阶段。
+下一阶段若继续，不再扩大普通 Outcome Prediction，也不升级 Transformer。Phase 2 只研究 **progress-controlled failure precursor detection**：先在碗已抬升或已接近盘子的轨迹中定义明确的未来失败事件，再比较 progress-only 与加入部署可用历史后的增量。没有 `t_event` 的最终失败标签仍按 Outcome Prediction 报告。
 
 ### 原始目标完成度核对
 
@@ -290,11 +315,12 @@ v0.2 已完成 20 条独立 initial-state confirmation cohort，并以冻结 v0.
 | Outcome/Impending 数据分流 | **完成** | event coverage 1/32，选择 Outcome |
 | 冻结无泄漏 split | **完成** | 30/10/10，按 initial state 分组 |
 | 强 baseline 与 learned predictor | **完成** | initial-proprio、temporal、frozen vision |
-| Held-out 指标、校准与 bootstrap | **完成** | 10 条原 test + 20 条独立 confirmation；机制控制仍受小样本限制 |
-| 机制审计与进度控制 | **完成** | RGB/error、LOEO、残差化和进度匹配 |
+| Held-out 指标、校准与 bootstrap | **完成** | 10 条原 test、20 条独立 confirmation、100 条 stage cohort |
+| 机制审计与进度控制 | **完成** | 真实物体阶段、LOIO 控制、cluster bootstrap、同状态匹配 |
 | 风险叠加视频 | **完成** | outcome-risk offline overlay |
 | 可复现 release | **完成** | 21-file checksum 21/21 |
 | v0.2 审计与独立确认 | **完成** | 20 条未见 preset states；10-file checksum 清单 |
+| v0.3 阶段控制 | **完成** | 100 条预声明轨迹；残差 AUROC 回到随机水平附近 |
 | 2–3 个正式任务 | **未完成** | 当前只有 task 4，不声称 task generalization |
 | A1 运行时规则覆盖 | **完成（有界案例集）** | 11/11 deterministic cases；不外推到未测试协议错误 |
 | A2 / command-effect consistency | **完成（supporting study）** | 20 组配对 cohort；动作置换 10/10、normal 误报 1/10；相机结果仅为间接响应 |
@@ -317,7 +343,8 @@ python scripts/plot_v01_main_results.py
 ## 11. 已知限制
 
 - 当前正式数据只覆盖一个 LIBERO task。
-- 原 test 只有 10 条 episode，7 条失败全部是 280-step timeout；20 条 confirmation 增强了复现证据，但没有扩大 task 范围。
+- v0.3 虽有 100 条 episode，但只覆盖 20 个 preset states、每个重复 5 次；区间已按 initial state 聚类，仍不能外推到新任务。
+- 当前 Outcome predictor 的高分主要反映执行进度，不能当作 failure precursor。
 - Outcome predictor 没有明确 failure timestamp，不能报告 unsafe lead time。
 - Self-collision/joint-violation 标签覆盖不足，workspace/impact 尚未冻结。
 - RQ1 只测试两类 A2 故障、一个任务和 10 组 evaluation pairs，且不包含 learned A2 monitor。
@@ -326,7 +353,7 @@ python scripts/plot_v01_main_results.py
 
 ## 12. 项目定位
 
-这是一个关于 VLA 失败预测的**单任务方法论研究**。核心贡献是泄漏受控的闭环数据与评测流程、冻结模型的独立 initial-state 复现，以及两次基于证据的结论收缩：先因 unsafe-event 覆盖不足从 Impending 转向 Outcome，再因机制审计撤回“独立失效前兆”的解释。项目不把当前结果包装成可泛化的失败检测方法。
+这是一个关于 VLA 失败预测的**单任务方法论与混淆变量审计项目**。它建立了泄漏受控的闭环数据与评测流程，复现了冻结模型的 outcome association，并用 100 条预声明轨迹显示真实任务阶段足以解释该信号。项目的结论不是“实现了失败检测器”，而是“高 Outcome AUROC 不等于学到了失效前兆”；Phase 2 必须在相同阶段、明确未来事件的条件下重新定义问题。
 
 ## 附录 A：Wrist 与 dual-camera 配对区间
 
