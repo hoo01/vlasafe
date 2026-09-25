@@ -19,11 +19,11 @@ RULE = "pickup_stall_approach0.10_w40_move0.04"
 
 
 def allocate_groups(
-    positive_groups: list[int], negative_only_groups: list[int], seed: int
+    mixed_groups: list[int], all_positive_groups: list[int], negative_only_groups: list[int], seed: int
 ) -> dict[int, str]:
     rng = np.random.default_rng(seed)
     result: dict[int, str] = {}
-    for groups in (positive_groups, negative_only_groups):
+    for groups in (mixed_groups, negative_only_groups):
         values = np.asarray(sorted(groups), dtype=np.int64)
         rng.shuffle(values)
         count = len(values)
@@ -32,6 +32,8 @@ def allocate_groups(
         for index, group in enumerate(values.tolist()):
             split = "train" if index < train_end else "validation" if index < validation_end else "test"
             result[int(group)] = split
+    for group in all_positive_groups:
+        result[int(group)] = "train"
     return result
 
 
@@ -142,12 +144,26 @@ def main() -> None:
             }
         )
     all_groups = sorted({row["initial_state_id"] for row in samples})
-    positive_groups = sorted(
-        {row["initial_state_id"] for row in samples if row["pickup_stall"]}
+    rows_by_group: dict[int, list[dict[str, Any]]] = {}
+    for row in samples:
+        rows_by_group.setdefault(row["initial_state_id"], []).append(row)
+    mixed_groups = sorted(
+        group for group, rows in rows_by_group.items()
+        if any(row["pickup_stall"] for row in rows)
+        and any(not row["pickup_stall"] for row in rows)
+    )
+    all_positive_groups = sorted(
+        group for group, rows in rows_by_group.items()
+        if all(row["pickup_stall"] for row in rows)
+    )
+    negative_only_groups = sorted(
+        group for group, rows in rows_by_group.items()
+        if not any(row["pickup_stall"] for row in rows)
     )
     group_split = allocate_groups(
-        positive_groups,
-        sorted(set(all_groups) - set(positive_groups)),
+        mixed_groups,
+        all_positive_groups,
+        negative_only_groups,
         int(protocol["split"]["seed"]),
     )
     splits = {"train": [], "validation": [], "test": []}
@@ -166,6 +182,11 @@ def main() -> None:
         "samples": len(samples),
         "positives": sum(row["pickup_stall"] for row in samples),
         "groups": len(all_groups),
+        "group_strata": {
+            "mixed": mixed_groups,
+            "all_positive": all_positive_groups,
+            "negative_only": negative_only_groups,
+        },
         "excluded": exclusions,
         "support": support,
         "splits": splits,

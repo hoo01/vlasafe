@@ -106,6 +106,8 @@ Pilot 只决定是否进入正式采集，不能形成强模型结论。
 
 最终 pilot 规则 `pickup_stall_approach0.10_w40_move0.04` 产生 27 个 event-positive episodes、0/40 success triggers，覆盖 11 个 initial states，27/27 具有完整窗口。人工复核的 12 条覆盖全部 11 个 positive states：11 条为明确 pickup stall，1 条为 stall/40-step window 边界，未发现错误目标、成功搬运或无法判断样本。规则、`h=16/K=20/M=20`、首次接近相对 checkpoint 和 grouped split 算法已冻结在 `docs/manifests/v04_task4_pickup_stall_protocol.json`；模型尚未训练，仍需验证对齐 negative 与分组 split 的支持度。
 
+首次 grouped split support audit 保留 95/100 条（5 条从未进入 10 cm），但 test 仅 4/9 positives 拥有同-state negative，未通过额外匹配 gate。由于尚未训练任何 predictor，split 算法在模型实验前修订并重新冻结：9 个 mixed groups 与 9 个 negative-only groups 分别按 60/20/20 分配，2 个 all-positive groups 只进入 train；revision 及原因写入 protocol，后续不再因模型结果调整。
+
 ### Formal gate
 
 - 总计至少 40–50 个 event-positive episodes。

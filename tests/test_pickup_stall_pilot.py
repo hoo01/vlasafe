@@ -36,11 +36,15 @@ class PickupStallPilotTest(unittest.TestCase):
         self.assertIsNone(sample["event_step"])
 
     def test_group_allocation_has_no_overlap(self) -> None:
-        split = allocate_groups(list(range(11)), list(range(11, 20)), seed=7)
+        split = allocate_groups(
+            list(range(9)), [9, 10], list(range(11, 20)), seed=7
+        )
         self.assertEqual(set(split), set(range(20)))
         self.assertEqual(sum(value == "train" for value in split.values()), 12)
         self.assertEqual(sum(value == "validation" for value in split.values()), 4)
         self.assertEqual(sum(value == "test" for value in split.values()), 4)
+        self.assertEqual(split[9], "train")
+        self.assertEqual(split[10], "train")
 
     def test_support_counts_only_same_group_negatives(self) -> None:
         rows = [
