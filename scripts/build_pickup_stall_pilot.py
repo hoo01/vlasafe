@@ -59,6 +59,47 @@ def aligned_sample(
     }
 
 
+def alignment_exclusion_reason(
+    data: dict[str, Any], history: int, wait: int, horizon: int
+) -> str | None:
+    approached = np.flatnonzero(data["bowl_eef_distance"] <= 0.10)
+    if not len(approached):
+        return "no_first_approach"
+    approach = int(approached[0])
+    event = approach + wait
+    checkpoint = event - horizon
+    if event >= len(data["bowl"]):
+        return "incomplete_approach_window"
+    if checkpoint - history + 1 < 0:
+        return "insufficient_history"
+    return None
+
+
+def split_support(rows: list[dict[str, Any]]) -> dict[str, Any]:
+    by_group: dict[int, list[dict[str, Any]]] = {}
+    for row in rows:
+        by_group.setdefault(int(row["initial_state_id"]), []).append(row)
+    mixed = {
+        group
+        for group, values in by_group.items()
+        if any(row["pickup_stall"] for row in values)
+        and any(not row["pickup_stall"] for row in values)
+    }
+    positives = [row for row in rows if row["pickup_stall"]]
+    matched = [row for row in positives if row["initial_state_id"] in mixed]
+    return {
+        "samples": len(rows),
+        "positives": len(positives),
+        "negatives": len(rows) - len(positives),
+        "groups": len(by_group),
+        "mixed_outcome_groups": len(mixed),
+        "positives_with_same_state_negative": len(matched),
+        "positive_same_state_negative_fraction": len(matched) / len(positives)
+        if positives
+        else None,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("cohort_manifest", type=Path)
@@ -71,14 +112,24 @@ def main() -> None:
     cohort = json.loads(args.cohort_manifest.read_text(encoding="utf-8"))
     source_rows = [row for rows in cohort["splits"].values() for row in rows]
     samples = []
+    exclusions = []
     for row in source_rows:
         episode_path = Path(row["path"])
         steps = [
             json.loads(line)
             for line in (episode_path / "steps.jsonl").read_text(encoding="utf-8").splitlines()
         ]
-        sample = aligned_sample(trajectory(steps), history=16, wait=40, horizon=20, movement=0.04)
+        data = trajectory(steps)
+        reason = alignment_exclusion_reason(data, history=16, wait=40, horizon=20)
+        sample = aligned_sample(data, history=16, wait=40, horizon=20, movement=0.04)
         if sample is None:
+            exclusions.append(
+                {
+                    "episode_id": str(row["episode_id"]),
+                    "initial_state_id": int(row["initial_state_id"]),
+                    "reason": reason,
+                }
+            )
             continue
         samples.append(
             {
@@ -105,6 +156,7 @@ def main() -> None:
         splits[split].append(row)
     for rows in splits.values():
         rows.sort(key=lambda row: (row["initial_state_id"], row["seed"], row["episode_id"]))
+    support = {split: split_support(rows) for split, rows in splits.items()}
     report = {
         "schema_version": "0.1.0",
         "role": "phase2_pickup_stall_pilot",
@@ -114,6 +166,8 @@ def main() -> None:
         "samples": len(samples),
         "positives": sum(row["pickup_stall"] for row in samples),
         "groups": len(all_groups),
+        "excluded": exclusions,
+        "support": support,
         "splits": splits,
     }
     args.output.parent.mkdir(parents=True, exist_ok=True)
@@ -121,12 +175,9 @@ def main() -> None:
     print("PICKUP STALL PILOT", args.output)
     print("samples", report["samples"], "positives", report["positives"], "groups", report["groups"])
     for split, rows in splits.items():
-        print(
-            split,
-            "samples", len(rows),
-            "positive", sum(row["pickup_stall"] for row in rows),
-            "groups", len({row["initial_state_id"] for row in rows}),
-        )
+        summary = support[split]
+        print(split, summary)
+    print("excluded", len(exclusions), {reason: sum(row["reason"] == reason for row in exclusions) for reason in sorted({row["reason"] for row in exclusions})})
 
 
 if __name__ == "__main__":

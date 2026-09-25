@@ -4,7 +4,12 @@ import unittest
 
 import numpy as np
 
-from scripts.build_pickup_stall_pilot import aligned_sample, allocate_groups
+from scripts.build_pickup_stall_pilot import (
+    aligned_sample,
+    alignment_exclusion_reason,
+    allocate_groups,
+    split_support,
+)
 
 
 class PickupStallPilotTest(unittest.TestCase):
@@ -36,6 +41,26 @@ class PickupStallPilotTest(unittest.TestCase):
         self.assertEqual(sum(value == "train" for value in split.values()), 12)
         self.assertEqual(sum(value == "validation" for value in split.values()), 4)
         self.assertEqual(sum(value == "test" for value in split.values()), 4)
+
+    def test_support_counts_only_same_group_negatives(self) -> None:
+        rows = [
+            {"initial_state_id": 1, "pickup_stall": 1},
+            {"initial_state_id": 1, "pickup_stall": 0},
+            {"initial_state_id": 2, "pickup_stall": 1},
+        ]
+        support = split_support(rows)
+        self.assertEqual(support["positives_with_same_state_negative"], 1)
+        self.assertEqual(support["positive_same_state_negative_fraction"], 0.5)
+
+    def test_reports_incomplete_window(self) -> None:
+        data = {
+            "bowl_eef_distance": np.r_[np.ones(20), np.full(10, 0.05)],
+            "bowl": np.zeros((30, 3)),
+        }
+        self.assertEqual(
+            alignment_exclusion_reason(data, history=16, wait=40, horizon=20),
+            "incomplete_approach_window",
+        )
 
 
 if __name__ == "__main__":
