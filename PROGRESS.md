@@ -102,6 +102,8 @@ Pilot 只决定是否进入正式采集，不能形成强模型结论。
 
 第二轮 stall feasibility audit（2026-09-25）的 `pickup_stall_approach0.10_w40` 数量上达到 53 个 failure triggers、1 个 success trigger 和 16 个失败 initial states，但物理复核否决了该规则：唯一的成功触发实际上完成了抓取和水平搬运，只是碗没有超过“相对初始高度抬升 4 cm”的判据。规则因此改为末端进入 10 cm 后 40 步内目标碗的三维位移是否达到 4 cm；该阈值沿用预先使用的阶段位移定义，不根据 outcome 重新搜索。修改后的规则必须重新通过数量与图像复核，旧结果不能作为 pilot gate 证据。
 
+三维位移版本初次复核仍发现同一 success trigger：检测器在有效 pickup 后继续扫描后续 close approaches，把 transport/placement 后的静止误标为新的 pickup stall。规则进一步收紧为只检查首次进入 10 cm 后的唯一 40 步窗口；若该窗口内目标移动达到 4 cm，则 pickup 已推进，episode 后续不再产生 pickup-stall event。该修正来自事件阶段语义而非 outcome 指标，修正后须重新审计。
+
 ### Formal gate
 
 - 总计至少 40–50 个 event-positive episodes。

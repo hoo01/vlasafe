@@ -65,6 +65,18 @@ class FailureEventFeasibilityTest(unittest.TestCase):
             detect_pickup_stall(data, approach=0.1, wait=3, movement=0.04)
         )
 
+    def test_pickup_stall_does_not_search_again_after_valid_first_approach(self) -> None:
+        data = {
+            "bowl_eef_distance": np.asarray([0.2, 0.09, 0.08, 0.07, 0.06, 0.05]),
+            "bowl": np.asarray(
+                [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.05, 0.0, 0.0],
+                 [0.05, 0.0, 0.0], [0.05, 0.0, 0.0], [0.05, 0.0, 0.0]]
+            ),
+        }
+        self.assertIsNone(
+            detect_pickup_stall(data, approach=0.1, wait=2, movement=0.04)
+        )
+
     def test_transport_stall_requires_prior_lift(self) -> None:
         data = {
             "lifted": np.asarray([False, True, True, True, True]),

@@ -96,15 +96,19 @@ def detect_pickup_stall(
     if movement <= 0:
         raise ValueError("movement must be positive")
     approached = np.flatnonzero(data["bowl_eef_distance"] <= approach)
-    for start in approached:
-        end = int(start) + wait
-        if end >= len(data["bowl"]):
-            continue
-        displacement = np.linalg.norm(
-            data["bowl"][start : end + 1] - data["bowl"][start], axis=1
-        )
-        if float(np.max(displacement)) < movement:
-            return end
+    if not len(approached):
+        return None
+    # Pickup is a one-shot stage transition. Searching later close approaches
+    # can relabel transport/placement as pickup stalls after a valid pickup.
+    start = int(approached[0])
+    end = start + wait
+    if end >= len(data["bowl"]):
+        return None
+    displacement = np.linalg.norm(
+        data["bowl"][start : end + 1] - data["bowl"][start], axis=1
+    )
+    if float(np.max(displacement)) < movement:
+        return end
     return None
 
 

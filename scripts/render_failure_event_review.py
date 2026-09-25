@@ -8,7 +8,13 @@ from pathlib import Path
 from typing import Any
 
 import imageio.v2 as imageio
+import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+
+try:
+    from audit_failure_event_feasibility import trajectory
+except ModuleNotFoundError:
+    from scripts.audit_failure_event_feasibility import trajectory
 
 
 def choose_review_rows(rows: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
@@ -72,6 +78,15 @@ def contact_sheet(
 ) -> None:
     event = int(row["event_step"])
     approach = event - wait
+    step_rows = [
+        json.loads(line)
+        for line in (episode_path / "steps.jsonl").read_text(encoding="utf-8").splitlines()
+    ]
+    data = trajectory(step_rows)
+    displacement = np.linalg.norm(
+        data["bowl"][approach : event + 1] - data["bowl"][approach], axis=1
+    )
+    maximum_movement_cm = 100.0 * float(np.max(displacement))
     indexes = sorted(
         {
             min(num_steps - 1, max(0, step))
@@ -94,7 +109,7 @@ def contact_sheet(
     )
     draw.text(
         (8, 25),
-        f"approach step {approach}; <4 cm target movement for wait={wait}; event={event}",
+        f"target {data['target']} | approach={approach}; event={event}; max move={maximum_movement_cm:.2f} cm",
         fill="black",
         font=font,
     )
