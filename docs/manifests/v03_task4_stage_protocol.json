@@ -1,0 +1,66 @@
+{
+  "schema_version": "0.1.0",
+  "role": "predeclared_stage_aligned_mechanism_cohort",
+  "frozen_before_collection": true,
+  "research_question": "Does the frozen vision-step80 outcome score retain association with final outcome after controlling privileged object-stage progress within unseen preset initial states?",
+  "identity": {
+    "task": "libero_spatial",
+    "task_id": 4,
+    "task_description": "pick up the black bowl from the top drawer of the wooden cabinet and place it on the plate",
+    "policy": "frozen SmolVLA checkpoint used by v0.1 and v0.2",
+    "fault_mode": "none",
+    "max_steps": 280,
+    "event_schema_version": "0.3.0"
+  },
+  "sampling": {
+    "preset_initial_state_ids": {
+      "start_inclusive": 30,
+      "stop_exclusive": 50
+    },
+    "repetitions_per_initial_state": 5,
+    "seed_starts": [3000, 4000, 5000, 6000, 7000],
+    "episodes_per_repetition": 20,
+    "total_episodes": 100,
+    "output_root": "artifacts/v03/task4_stage_cohort",
+    "selection_rule": "collect every declared episode; do not stop, extend, or exclude based on outcomes"
+  },
+  "information_boundary": {
+    "predictor": "unchanged frozen v0.1 model; scene poses never enter predictor or normalization",
+    "analysis_only": [
+      "label_only.scene_body_poses",
+      "label_only.scene_site_positions"
+    ]
+  },
+  "stage_variables": {
+    "target_object": "At episode start, select the black-bowl body closest in XY to wooden_cabinet_1_top_region; expected name is akita_black_bowl_1_main.",
+    "continuous_controls": [
+      "target-bowl displacement from its episode start pose",
+      "target-bowl height relative to its episode start height",
+      "target-bowl distance to end effector",
+      "target-bowl XY and 3D distance to plate",
+      "top-drawer displacement from its episode start pose",
+      "gripper qpos"
+    ],
+    "event_alignment": [
+      "first target-bowl displacement exceeding 0.04 m",
+      "first target-bowl height increase exceeding 0.04 m",
+      "first target-bowl XY distance to plate below 0.10 m"
+    ],
+    "threshold_policy": "fixed here before outcome inspection; report event reach coverage and never discard trajectories that do not reach an event"
+  },
+  "evaluation": {
+    "primary_model": "frozen dual-camera vision predictor evaluated at step 80",
+    "secondary_model": "frozen temporal MLP evaluated at step 120",
+    "primary_test": "vision risk versus outcome after controlling continuous object-stage variables, with initial_state_id-cluster bootstrap",
+    "matched_analysis": "compare success/failure runs from the same initial_state_id at the closest object-stage state",
+    "reporting": [
+      "raw AUROC/AUPRC",
+      "stage-only AUROC/AUPRC",
+      "stage-residualized AUROC/AUPRC",
+      "same-initial-state matched-pair accuracy and coverage",
+      "event reach coverage by outcome",
+      "95% confidence intervals from initial_state_id-cluster bootstrap"
+    ],
+    "claim_limit": "Outcome association beyond measured task stage; never call it impending-failure detection without an independently defined future unsafe event."
+  }
+}
