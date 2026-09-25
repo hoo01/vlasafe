@@ -27,8 +27,9 @@ def allocate_groups(
         values = np.asarray(sorted(groups), dtype=np.int64)
         rng.shuffle(values)
         count = len(values)
-        train_end = int(round(0.6 * count))
-        validation_end = train_end + int(round(0.2 * count))
+        evaluation_count = max(1, int(round(0.2 * count))) if count >= 3 else 0
+        train_end = count - 2 * evaluation_count
+        validation_end = train_end + evaluation_count
         for index, group in enumerate(values.tolist()):
             split = "train" if index < train_end else "validation" if index < validation_end else "test"
             result[int(group)] = split

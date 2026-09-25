@@ -59,6 +59,13 @@ class PickupStallPilotTest(unittest.TestCase):
         self.assertEqual(split[9], "train")
         self.assertEqual(split[10], "train")
 
+    def test_eight_mixed_groups_allocate_two_to_each_evaluation_split(self) -> None:
+        split = allocate_groups(list(range(8)), [], list(range(8, 17)), seed=7)
+        mixed_splits = [split[index] for index in range(8)]
+        self.assertEqual(mixed_splits.count("train"), 4)
+        self.assertEqual(mixed_splits.count("validation"), 2)
+        self.assertEqual(mixed_splits.count("test"), 2)
+
     def test_support_counts_only_same_group_negatives(self) -> None:
         rows = [
             {"initial_state_id": 1, "pickup_stall": 1},

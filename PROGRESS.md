@@ -112,6 +112,8 @@ Pilot 只决定是否进入正式采集，不能形成强模型结论。
 
 首轮 pilot 模型结果暂不成立：vision/temporal 虽相对 approach-time baseline 得到 AUROC 增量 `0.357 [0.078, 0.917]` / `0.298 [0.078, 0.889]`，但标签审计发现原 negative 允许目标在 checkpoint 前已经移动 4 cm，模型可能读取已经完成的 pickup progress。协议因此增加 checkpoint-stage constraint：negative 必须在 checkpoint 时尚未跨过 4 cm，并在之后 20 步内跨过；旧 manifest、features 和模型报告不得用于 precursor 结论，需全部重建。
 
+Strict manifest 排除 9 条 checkpoint 前已跨越 4 cm 的 negatives 和 5 条 no-approach episodes，保留 86 条与全部 27 positives。首次 strict split 因 8 个 mixed groups 的整数取整变成 train/validation/test=`5/2/1`，test 仅3 positives、1 mixed group，未进入训练。Allocator 最终冻结为 mixed=`4/2/2`；negative-only=`5/2/2`；all-positive 只进 train，以恢复两个 evaluation split 各2个 mixed groups。此后不再修改 strict split。
+
 ### Formal gate
 
 - 总计至少 40–50 个 event-positive episodes。

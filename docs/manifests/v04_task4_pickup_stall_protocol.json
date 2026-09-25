@@ -36,8 +36,8 @@
     "group_key": "initial_state_id",
     "seed": 20260925,
     "group_proportions": [0.6, 0.2, 0.2],
-    "stratification": "After the first support audit and before any predictor training, classify groups as mixed, all-positive, or negative-only. Deterministically allocate mixed and negative-only groups 60/20/20; keep the two all-positive groups in train so validation/test positives always support same-initial-state contrasts.",
-    "revision_note": "The initial positive-vs-negative-only allocation gave test same-state-negative coverage 4/9, so the pre-training split was revised using label strata. The first pilot model then exposed a stricter temporal-label flaw: some negatives had already moved 0.04 m by the checkpoint. Those samples are now excluded and the pilot must be rebuilt; the first model result is invalid for precursor claims.",
+    "stratification": "Classify groups as mixed, all-positive, or negative-only. For each stratum with at least three groups, allocate round(20%) to validation, the same count to test, and the remainder to train. Keep all-positive groups in train so validation/test positives always support same-initial-state contrasts.",
+    "revision_note": "The initial positive-vs-negative-only allocation gave test same-state-negative coverage 4/9, so the pre-training split was revised using label strata. The first pilot model then exposed a stricter temporal-label flaw: some negatives had already moved 0.04 m by the checkpoint. Those samples are excluded and the first model result is invalid. On the strict cohort, integer rounding assigned only one of eight mixed groups to test; before strict-model training, allocation was frozen as 4/2/2 mixed groups so both evaluation splits retain two same-state contrast groups.",
     "selection": "model and threshold selection use validation only; test is evaluated once"
   },
   "physical_review": {
