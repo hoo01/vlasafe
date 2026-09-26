@@ -122,6 +122,17 @@ v0.5 同样在采集前固定为 `30 initial states × 6 seeds = 180` 条，不�
 
 五个模型不是互相竞争的方案，而是一条递进的排除链：每一层都用来排除一种"看起来有效、实际另有解释"的可能。只有逐层通过，才能说预测能力来自真正的执行过程信号。
 
+### 项目实际训练了什么
+
+SmolVLA 在全部实验中始终作为**冻结的执行策略**，负责根据观测产生机器人动作；项目没有微调 SmolVLA，也不以提高 task success rate 为目标。视觉 encoder `ResNet-50` 同样始终冻结。真正训练的只有两个外部轻量 predictor：
+
+| Predictor | 训练部分 | 输入 | 输出 |
+| --- | --- | --- | --- |
+| State/action temporal MLP | `128 → 64 → 1` MLP | 最近16步 proprioception、实际动作和 timing | outcome 或 pickup-stall 分数 |
+| Frozen-vision probe | 4096维特征上的单个线性概率头 | 当前主相机与腕相机的冻结 ResNet-50 特征 | outcome 或 pickup-stall 分数 |
+
+因此，“frozen vision”不是微调 ResNet-50，也不是视觉 MLP；它是在预训练视觉表示上拟合一个线性 probe。Phase 1 与 Phase 2 使用相同类型的 predictor，但训练标签不同：Phase 1 预测 episode 最终失败，Phase 2 的两个 predictor 都预测未来20步内是否确认 pickup stall。
+
 ### 第 1 层：Train-prevalence constant
 
 对所有 episode 输出同一个数——训练集失败率 `19/30 = 0.633`。
@@ -140,7 +151,9 @@ v0.5 同样在采集前固定为 `30 initial states × 6 seeds = 180` 条，不�
 
 用 train-only、不含 outcome label 的冻结视觉特征时间方向，估计"画面看起来执行到了哪里"。
 
-**排除什么**："模型只是在读执行进度"。这是整条链里最关键的一层——如果 predictor 的排序能力能被单纯的进度估计复现，那它就没有学到进度之外的任何东西。
+**排除什么**："模型只是在读执行进度"。这是整条链里最关键的一层——如果 predictor 的排序能力能被单纯的进度估计复现，就不能据此声称它学到了进度之外的信息。
+
+更严谨地说，如果 temporal 或 vision 没有显著超过 stage-only，我们只能得出“没有证据证明它使用了进度之外的信息”，而不能证明模型绝对只读取进度。相反，显著超过 stage-only 说明 predictor 包含这组预定义阶段变量无法解释的信息；它仍不等于排除了所有可能的进度表征。
 
 需要说明的是，这个 proxy 不是 `step / 280`。在同一个 checkpoint 上所有轨迹的 step 编号完全相同，无法产生任何排序；它估计的是视觉上的完成程度，同一时刻的不同轨迹可以有不同的进度。
 
@@ -176,6 +189,14 @@ flowchart LR
 **回答什么**：视觉是否提供了本体状态之外的信息，尤其是更早的信息。
 
 冻结 encoder、只训线性层是小样本下的必要约束：训练集仅 30 个 episode，若让 ResNet-50 的两千多万参数一起训练，模型会直接记住这些 episode。这个设计测的是"预训练视觉特征中是否已包含 outcome 信息"。
+
+Temporal 与 vision 不是输出两种不同的失败概率。在同一 phase 内，它们预测相同标签，只是条件信息不同：temporal 依靠近期运动和 command-effect 历史，vision 依靠当前的空间、遮挡与潜在接触构型。两者并列的目的，是判断信号主要存在于本体运动历史还是视觉表示中，而不是把两种分数组合成一个 detector。
+
+v0.5 最严格的 mixed-state 结果支持 frozen-vision probe：它相对 stage-only 的 AUROC 增量区间完全高于0；temporal 的点估计也高于 stage-only，但AUROC增量区间跨0。因此当前稳定证据支持的是**冻结 ResNet-50 表示加训练后的线性头这条视觉 pipeline**；其中实际被监督训练的是线性头，不是 SmolVLA 或 ResNet-50 encoder。
+
+### 能否知道视觉模型具体看到了什么
+
+现有实验完成的是混淆排除，而不是视觉机制定位。结果证明视觉分数不能只由首次接近时刻和 checkpoint 目标位移解释；候选信息包括夹爪—黑碗相对构型、接近角度、遮挡和接触状态，但项目没有逐项标注或消融这些因素。因此准确结论是“视觉表示包含 stage-only 未解释、与未来 pickup stall 相关的信号”，不能直接声称模型已经识别某一种确定的抓取错误。进一步定位需要目标区域遮挡、裁剪、归因图或独立的对准/接触标签。
 
 ### 关于 progress proxy 的引入时机
 
