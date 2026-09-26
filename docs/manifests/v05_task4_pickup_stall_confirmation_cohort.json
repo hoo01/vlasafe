@@ -1,0 +1,1648 @@
+{
+  "schema_version": "0.1.0",
+  "role": "stage_aligned_mechanism_confirmation_only",
+  "source_protocol": "docs/manifests/v05_task4_pickup_stall_confirmation_protocol.json",
+  "selection": "collect every declared episode; do not stop, extend, replace, or exclude episodes based on outcomes or event labels",
+  "group_key": "initial_state_id",
+  "identity": {
+    "task": "libero_spatial",
+    "task_id": 4,
+    "task_description": "pick up the black bowl from the top drawer of the wooden cabinet and place it on the plate",
+    "policy": "the same frozen SmolVLA checkpoint used by v0.1-v0.4",
+    "fault_mode": "none",
+    "max_steps": 280,
+    "event_schema_version": "0.3.0",
+    "vlasafe_revision": "88e7e38b90e65f10a9f2b404a01d5e3760d28242"
+  },
+  "totals": {
+    "episodes": 180,
+    "successes": 70,
+    "failures": 110,
+    "initial_states": 30,
+    "repetitions_per_initial_state": 6
+  },
+  "splits": {
+    "stage_confirmation": [
+      {
+        "episode_id": "smolvla-20260926T084154938666Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084154938666Z",
+        "seed": 8000,
+        "initial_state_id": 0,
+        "success": true,
+        "num_steps": 128,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084800859837Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084800859837Z",
+        "seed": 9000,
+        "initial_state_id": 0,
+        "success": true,
+        "num_steps": 126,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085425735289Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085425735289Z",
+        "seed": 10000,
+        "initial_state_id": 0,
+        "success": true,
+        "num_steps": 130,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090046301409Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090046301409Z",
+        "seed": 11000,
+        "initial_state_id": 0,
+        "success": true,
+        "num_steps": 128,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090705738113Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090705738113Z",
+        "seed": 12000,
+        "initial_state_id": 0,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091326112510Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091326112510Z",
+        "seed": 13000,
+        "initial_state_id": 0,
+        "success": true,
+        "num_steps": 125,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084206528166Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084206528166Z",
+        "seed": 8001,
+        "initial_state_id": 1,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084811719006Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084811719006Z",
+        "seed": 9001,
+        "initial_state_id": 1,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085437244143Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085437244143Z",
+        "seed": 10001,
+        "initial_state_id": 1,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090058068235Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090058068235Z",
+        "seed": 11001,
+        "initial_state_id": 1,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090722462653Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090722462653Z",
+        "seed": 12001,
+        "initial_state_id": 1,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091337289156Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091337289156Z",
+        "seed": 13001,
+        "initial_state_id": 1,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084218884140Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084218884140Z",
+        "seed": 8002,
+        "initial_state_id": 2,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084824586072Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084824586072Z",
+        "seed": 9002,
+        "initial_state_id": 2,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085450069384Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085450069384Z",
+        "seed": 10002,
+        "initial_state_id": 2,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090111080205Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090111080205Z",
+        "seed": 11002,
+        "initial_state_id": 2,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090735370284Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090735370284Z",
+        "seed": 12002,
+        "initial_state_id": 2,
+        "success": true,
+        "num_steps": 136,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091350536171Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091350536171Z",
+        "seed": 13002,
+        "initial_state_id": 2,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084231918573Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084231918573Z",
+        "seed": 8003,
+        "initial_state_id": 3,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084836653882Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084836653882Z",
+        "seed": 9003,
+        "initial_state_id": 3,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085502927318Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085502927318Z",
+        "seed": 10003,
+        "initial_state_id": 3,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090124089326Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090124089326Z",
+        "seed": 11003,
+        "initial_state_id": 3,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090742740676Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090742740676Z",
+        "seed": 12003,
+        "initial_state_id": 3,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091402714488Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091402714488Z",
+        "seed": 13003,
+        "initial_state_id": 3,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084244674637Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084244674637Z",
+        "seed": 8004,
+        "initial_state_id": 4,
+        "success": true,
+        "num_steps": 132,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084850143631Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084850143631Z",
+        "seed": 9004,
+        "initial_state_id": 4,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085515882557Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085515882557Z",
+        "seed": 10004,
+        "initial_state_id": 4,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090137337267Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090137337267Z",
+        "seed": 11004,
+        "initial_state_id": 4,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090755312029Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090755312029Z",
+        "seed": 12004,
+        "initial_state_id": 4,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091415689842Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091415689842Z",
+        "seed": 13004,
+        "initial_state_id": 4,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084251988998Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084251988998Z",
+        "seed": 8005,
+        "initial_state_id": 5,
+        "success": true,
+        "num_steps": 133,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084903565613Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084903565613Z",
+        "seed": 9005,
+        "initial_state_id": 5,
+        "success": true,
+        "num_steps": 128,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085528715192Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085528715192Z",
+        "seed": 10005,
+        "initial_state_id": 5,
+        "success": true,
+        "num_steps": 134,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090150033728Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090150033728Z",
+        "seed": 11005,
+        "initial_state_id": 5,
+        "success": true,
+        "num_steps": 138,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090808389270Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090808389270Z",
+        "seed": 12005,
+        "initial_state_id": 5,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091429065461Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091429065461Z",
+        "seed": 13005,
+        "initial_state_id": 5,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084259458066Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084259458066Z",
+        "seed": 8006,
+        "initial_state_id": 6,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084911298547Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084911298547Z",
+        "seed": 9006,
+        "initial_state_id": 6,
+        "success": true,
+        "num_steps": 235,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085536293585Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085536293585Z",
+        "seed": 10006,
+        "initial_state_id": 6,
+        "success": true,
+        "num_steps": 148,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090157553077Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090157553077Z",
+        "seed": 11006,
+        "initial_state_id": 6,
+        "success": true,
+        "num_steps": 239,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090821798381Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090821798381Z",
+        "seed": 12006,
+        "initial_state_id": 6,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091441895377Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091441895377Z",
+        "seed": 13006,
+        "initial_state_id": 6,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084311841077Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084311841077Z",
+        "seed": 8007,
+        "initial_state_id": 7,
+        "success": true,
+        "num_steps": 125,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084922913252Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084922913252Z",
+        "seed": 9007,
+        "initial_state_id": 7,
+        "success": true,
+        "num_steps": 126,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085545775151Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085545775151Z",
+        "seed": 10007,
+        "initial_state_id": 7,
+        "success": true,
+        "num_steps": 125,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090207840637Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090207840637Z",
+        "seed": 11007,
+        "initial_state_id": 7,
+        "success": true,
+        "num_steps": 127,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090835006513Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090835006513Z",
+        "seed": 12007,
+        "initial_state_id": 7,
+        "success": true,
+        "num_steps": 133,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091454797064Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091454797064Z",
+        "seed": 13007,
+        "initial_state_id": 7,
+        "success": true,
+        "num_steps": 126,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084319016031Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084319016031Z",
+        "seed": 8008,
+        "initial_state_id": 8,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084930568452Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084930568452Z",
+        "seed": 9008,
+        "initial_state_id": 8,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085553767541Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085553767541Z",
+        "seed": 10008,
+        "initial_state_id": 8,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090215217167Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090215217167Z",
+        "seed": 11008,
+        "initial_state_id": 8,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090843256841Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090843256841Z",
+        "seed": 12008,
+        "initial_state_id": 8,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091502301846Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091502301846Z",
+        "seed": 13008,
+        "initial_state_id": 8,
+        "success": true,
+        "num_steps": 137,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084331995711Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084331995711Z",
+        "seed": 8009,
+        "initial_state_id": 9,
+        "success": true,
+        "num_steps": 135,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084943507749Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084943507749Z",
+        "seed": 9009,
+        "initial_state_id": 9,
+        "success": true,
+        "num_steps": 230,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085607702808Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085607702808Z",
+        "seed": 10009,
+        "initial_state_id": 9,
+        "success": true,
+        "num_steps": 136,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090228199392Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090228199392Z",
+        "seed": 11009,
+        "initial_state_id": 9,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090856403073Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090856403073Z",
+        "seed": 12009,
+        "initial_state_id": 9,
+        "success": true,
+        "num_steps": 133,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091509926289Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091509926289Z",
+        "seed": 13009,
+        "initial_state_id": 9,
+        "success": true,
+        "num_steps": 128,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084339220293Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084339220293Z",
+        "seed": 8010,
+        "initial_state_id": 10,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084954184236Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084954184236Z",
+        "seed": 9010,
+        "initial_state_id": 10,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085615797867Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085615797867Z",
+        "seed": 10010,
+        "initial_state_id": 10,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090240388014Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090240388014Z",
+        "seed": 11010,
+        "initial_state_id": 10,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090903780563Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090903780563Z",
+        "seed": 12010,
+        "initial_state_id": 10,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091517230375Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091517230375Z",
+        "seed": 13010,
+        "initial_state_id": 10,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084353778786Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084353778786Z",
+        "seed": 8011,
+        "initial_state_id": 11,
+        "success": true,
+        "num_steps": 133,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085007231560Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085007231560Z",
+        "seed": 9011,
+        "initial_state_id": 11,
+        "success": true,
+        "num_steps": 132,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085629288535Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085629288535Z",
+        "seed": 10011,
+        "initial_state_id": 11,
+        "success": true,
+        "num_steps": 225,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090253146584Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090253146584Z",
+        "seed": 11011,
+        "initial_state_id": 11,
+        "success": true,
+        "num_steps": 130,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090916920685Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090916920685Z",
+        "seed": 12011,
+        "initial_state_id": 11,
+        "success": true,
+        "num_steps": 135,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091530280381Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091530280381Z",
+        "seed": 13011,
+        "initial_state_id": 11,
+        "success": true,
+        "num_steps": 136,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084401798326Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084401798326Z",
+        "seed": 8012,
+        "initial_state_id": 12,
+        "success": true,
+        "num_steps": 139,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085014605259Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085014605259Z",
+        "seed": 9012,
+        "initial_state_id": 12,
+        "success": true,
+        "num_steps": 139,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085640420146Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085640420146Z",
+        "seed": 10012,
+        "initial_state_id": 12,
+        "success": true,
+        "num_steps": 146,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090300384444Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090300384444Z",
+        "seed": 11012,
+        "initial_state_id": 12,
+        "success": true,
+        "num_steps": 139,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090924132690Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090924132690Z",
+        "seed": 12012,
+        "initial_state_id": 12,
+        "success": true,
+        "num_steps": 139,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091538139686Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091538139686Z",
+        "seed": 13012,
+        "initial_state_id": 12,
+        "success": true,
+        "num_steps": 142,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084409935341Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084409935341Z",
+        "seed": 8013,
+        "initial_state_id": 13,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085022326961Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085022326961Z",
+        "seed": 9013,
+        "initial_state_id": 13,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085649033454Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085649033454Z",
+        "seed": 10013,
+        "initial_state_id": 13,
+        "success": true,
+        "num_steps": 137,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090307790877Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090307790877Z",
+        "seed": 11013,
+        "initial_state_id": 13,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090932342705Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090932342705Z",
+        "seed": 12013,
+        "initial_state_id": 13,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091546183017Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091546183017Z",
+        "seed": 13013,
+        "initial_state_id": 13,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084423006710Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084423006710Z",
+        "seed": 8014,
+        "initial_state_id": 14,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085035038853Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085035038853Z",
+        "seed": 9014,
+        "initial_state_id": 14,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085657077103Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085657077103Z",
+        "seed": 10014,
+        "initial_state_id": 14,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090320848832Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090320848832Z",
+        "seed": 11014,
+        "initial_state_id": 14,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090945309467Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090945309467Z",
+        "seed": 12014,
+        "initial_state_id": 14,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091559600259Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091559600259Z",
+        "seed": 13014,
+        "initial_state_id": 14,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084436055137Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084436055137Z",
+        "seed": 8015,
+        "initial_state_id": 15,
+        "success": true,
+        "num_steps": 135,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085048034959Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085048034959Z",
+        "seed": 9015,
+        "initial_state_id": 15,
+        "success": true,
+        "num_steps": 130,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085710503338Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085710503338Z",
+        "seed": 10015,
+        "initial_state_id": 15,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090334326390Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090334326390Z",
+        "seed": 11015,
+        "initial_state_id": 15,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090958465164Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090958465164Z",
+        "seed": 12015,
+        "initial_state_id": 15,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091613294959Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091613294959Z",
+        "seed": 13015,
+        "initial_state_id": 15,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084443163942Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084443163942Z",
+        "seed": 8016,
+        "initial_state_id": 16,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085055181608Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085055181608Z",
+        "seed": 9016,
+        "initial_state_id": 16,
+        "success": true,
+        "num_steps": 136,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085723806899Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085723806899Z",
+        "seed": 10016,
+        "initial_state_id": 16,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090348396852Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090348396852Z",
+        "seed": 11016,
+        "initial_state_id": 16,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091011373481Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091011373481Z",
+        "seed": 12016,
+        "initial_state_id": 16,
+        "success": true,
+        "num_steps": 137,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091625987834Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091625987834Z",
+        "seed": 13016,
+        "initial_state_id": 16,
+        "success": true,
+        "num_steps": 128,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084455903617Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084455903617Z",
+        "seed": 8017,
+        "initial_state_id": 17,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085103050339Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085103050339Z",
+        "seed": 9017,
+        "initial_state_id": 17,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085737200057Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085737200057Z",
+        "seed": 10017,
+        "initial_state_id": 17,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090401983618Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090401983618Z",
+        "seed": 11017,
+        "initial_state_id": 17,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091019096663Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091019096663Z",
+        "seed": 12017,
+        "initial_state_id": 17,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091633431340Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091633431340Z",
+        "seed": 13017,
+        "initial_state_id": 17,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084508670593Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084508670593Z",
+        "seed": 8018,
+        "initial_state_id": 18,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085116325785Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085116325785Z",
+        "seed": 9018,
+        "initial_state_id": 18,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085750847300Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085750847300Z",
+        "seed": 10018,
+        "initial_state_id": 18,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090414411160Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090414411160Z",
+        "seed": 11018,
+        "initial_state_id": 18,
+        "success": true,
+        "num_steps": 140,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091031347707Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091031347707Z",
+        "seed": 12018,
+        "initial_state_id": 18,
+        "success": true,
+        "num_steps": 137,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091645867795Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091645867795Z",
+        "seed": 13018,
+        "initial_state_id": 18,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084521663230Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084521663230Z",
+        "seed": 8019,
+        "initial_state_id": 19,
+        "success": true,
+        "num_steps": 141,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085129019399Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085129019399Z",
+        "seed": 9019,
+        "initial_state_id": 19,
+        "success": true,
+        "num_steps": 137,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085805224936Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085805224936Z",
+        "seed": 10019,
+        "initial_state_id": 19,
+        "success": true,
+        "num_steps": 138,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090422231415Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090422231415Z",
+        "seed": 11019,
+        "initial_state_id": 19,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091039209225Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091039209225Z",
+        "seed": 12019,
+        "initial_state_id": 19,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091659111209Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091659111209Z",
+        "seed": 13019,
+        "initial_state_id": 19,
+        "success": true,
+        "num_steps": 142,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084529365411Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084529365411Z",
+        "seed": 8020,
+        "initial_state_id": 20,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085137101159Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085137101159Z",
+        "seed": 9020,
+        "initial_state_id": 20,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085813498314Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085813498314Z",
+        "seed": 10020,
+        "initial_state_id": 20,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090434570664Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090434570664Z",
+        "seed": 11020,
+        "initial_state_id": 20,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091052546742Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091052546742Z",
+        "seed": 12020,
+        "initial_state_id": 20,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091706944917Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091706944917Z",
+        "seed": 13020,
+        "initial_state_id": 20,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084542450840Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084542450840Z",
+        "seed": 8021,
+        "initial_state_id": 21,
+        "success": true,
+        "num_steps": 131,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085151085903Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085151085903Z",
+        "seed": 9021,
+        "initial_state_id": 21,
+        "success": true,
+        "num_steps": 131,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085827155312Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085827155312Z",
+        "seed": 10021,
+        "initial_state_id": 21,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090447816708Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090447816708Z",
+        "seed": 11021,
+        "initial_state_id": 21,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091107248799Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091107248799Z",
+        "seed": 12021,
+        "initial_state_id": 21,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091720302236Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091720302236Z",
+        "seed": 13021,
+        "initial_state_id": 21,
+        "success": true,
+        "num_steps": 133,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084550078031Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084550078031Z",
+        "seed": 8022,
+        "initial_state_id": 22,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085158631023Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085158631023Z",
+        "seed": 9022,
+        "initial_state_id": 22,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085841172801Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085841172801Z",
+        "seed": 10022,
+        "initial_state_id": 22,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090500671059Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090500671059Z",
+        "seed": 11022,
+        "initial_state_id": 22,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091120822284Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091120822284Z",
+        "seed": 12022,
+        "initial_state_id": 22,
+        "success": true,
+        "num_steps": 131,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091727954470Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091727954470Z",
+        "seed": 13022,
+        "initial_state_id": 22,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084603043133Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084603043133Z",
+        "seed": 8023,
+        "initial_state_id": 23,
+        "success": true,
+        "num_steps": 135,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085211536747Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085211536747Z",
+        "seed": 9023,
+        "initial_state_id": 23,
+        "success": true,
+        "num_steps": 135,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085854941936Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085854941936Z",
+        "seed": 10023,
+        "initial_state_id": 23,
+        "success": true,
+        "num_steps": 136,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090514121125Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090514121125Z",
+        "seed": 11023,
+        "initial_state_id": 23,
+        "success": true,
+        "num_steps": 138,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091128956781Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091128956781Z",
+        "seed": 12023,
+        "initial_state_id": 23,
+        "success": true,
+        "num_steps": 138,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091740842235Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091740842235Z",
+        "seed": 13023,
+        "initial_state_id": 23,
+        "success": true,
+        "num_steps": 138,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084610475113Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084610475113Z",
+        "seed": 8024,
+        "initial_state_id": 24,
+        "success": true,
+        "num_steps": 131,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085219115782Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085219115782Z",
+        "seed": 9024,
+        "initial_state_id": 24,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085902818418Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085902818418Z",
+        "seed": 10024,
+        "initial_state_id": 24,
+        "success": true,
+        "num_steps": 132,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090522186025Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090522186025Z",
+        "seed": 11024,
+        "initial_state_id": 24,
+        "success": true,
+        "num_steps": 131,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091136847617Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091136847617Z",
+        "seed": 12024,
+        "initial_state_id": 24,
+        "success": true,
+        "num_steps": 132,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091748304766Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091748304766Z",
+        "seed": 13024,
+        "initial_state_id": 24,
+        "success": true,
+        "num_steps": 134,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084618000897Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084618000897Z",
+        "seed": 8025,
+        "initial_state_id": 25,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085231888067Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085231888067Z",
+        "seed": 9025,
+        "initial_state_id": 25,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085910574022Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085910574022Z",
+        "seed": 10025,
+        "initial_state_id": 25,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090529578662Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090529578662Z",
+        "seed": 11025,
+        "initial_state_id": 25,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091144635471Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091144635471Z",
+        "seed": 12025,
+        "initial_state_id": 25,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091756081128Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091756081128Z",
+        "seed": 13025,
+        "initial_state_id": 25,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084631875509Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084631875509Z",
+        "seed": 8026,
+        "initial_state_id": 26,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085244976699Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085244976699Z",
+        "seed": 9026,
+        "initial_state_id": 26,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085923534186Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085923534186Z",
+        "seed": 10026,
+        "initial_state_id": 26,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090542696840Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090542696840Z",
+        "seed": 11026,
+        "initial_state_id": 26,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091157851652Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091157851652Z",
+        "seed": 12026,
+        "initial_state_id": 26,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091809026583Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091809026583Z",
+        "seed": 13026,
+        "initial_state_id": 26,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084645661750Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084645661750Z",
+        "seed": 8027,
+        "initial_state_id": 27,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085257821973Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085257821973Z",
+        "seed": 9027,
+        "initial_state_id": 27,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085936789735Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085936789735Z",
+        "seed": 10027,
+        "initial_state_id": 27,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090555685773Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090555685773Z",
+        "seed": 11027,
+        "initial_state_id": 27,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091210917910Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091210917910Z",
+        "seed": 12027,
+        "initial_state_id": 27,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091822509844Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091822509844Z",
+        "seed": 13027,
+        "initial_state_id": 27,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084658820708Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084658820708Z",
+        "seed": 8028,
+        "initial_state_id": 28,
+        "success": true,
+        "num_steps": 130,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085310617664Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085310617664Z",
+        "seed": 9028,
+        "initial_state_id": 28,
+        "success": true,
+        "num_steps": 132,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085949813256Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085949813256Z",
+        "seed": 10028,
+        "initial_state_id": 28,
+        "success": true,
+        "num_steps": 133,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090609058454Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090609058454Z",
+        "seed": 11028,
+        "initial_state_id": 28,
+        "success": true,
+        "num_steps": 133,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091223925812Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091223925812Z",
+        "seed": 12028,
+        "initial_state_id": 28,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091836011199Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091836011199Z",
+        "seed": 13028,
+        "initial_state_id": 28,
+        "success": true,
+        "num_steps": 138,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T084706092901Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T084706092901Z",
+        "seed": 8029,
+        "initial_state_id": 29,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085318058725Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085318058725Z",
+        "seed": 9029,
+        "initial_state_id": 29,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T085957438010Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T085957438010Z",
+        "seed": 10029,
+        "initial_state_id": 29,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T090616759396Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T090616759396Z",
+        "seed": 11029,
+        "initial_state_id": 29,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091235871282Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091235871282Z",
+        "seed": 12029,
+        "initial_state_id": 29,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      },
+      {
+        "episode_id": "smolvla-20260926T091843699613Z",
+        "path": "artifacts/v05/task4_pickup_stall_confirmation/smolvla-20260926T091843699613Z",
+        "seed": 13029,
+        "initial_state_id": 29,
+        "success": false,
+        "num_steps": 280,
+        "event_schema_version": "0.3.0"
+      }
+    ]
+  }
+}

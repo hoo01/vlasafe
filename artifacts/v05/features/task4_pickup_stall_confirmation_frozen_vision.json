@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "manifest": "docs/manifests/v05_task4_pickup_stall_confirmation.json",
+  "encoder": "torchvision/resnet50 IMAGENET1K_V2",
+  "weights_url": "https://download.pytorch.org/models/resnet50-11ad3fa6.pth",
+  "encoder_frozen": true,
+  "target": "pickup_stall_confirmed_within_next_20_steps",
+  "camera_order": [
+    "main_camera",
+    "wrist_camera"
+  ],
+  "records": 144,
+  "feature_shape": [
+    144,
+    2,
+    2048
+  ],
+  "device": "cuda",
+  "privileged_predictor_inputs": []
+}

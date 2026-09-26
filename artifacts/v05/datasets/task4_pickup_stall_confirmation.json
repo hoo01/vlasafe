@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1.0",
+  "source_manifest": "docs/manifests/v05_task4_pickup_stall_confirmation.json",
+  "target": "pickup_stall_confirmed_within_next_20_steps",
+  "window_size": 16,
+  "samples": 144,
+  "positives": 61,
+  "feature_shapes": {
+    "state": [
+      16,
+      25
+    ],
+    "action": [
+      16,
+      7
+    ],
+    "timing": [
+      16,
+      2
+    ]
+  },
+  "absolute_checkpoint_feature": false,
+  "privileged_predictor_inputs": []
+}

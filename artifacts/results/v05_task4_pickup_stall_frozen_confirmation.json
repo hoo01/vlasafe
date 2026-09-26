@@ -1,0 +1,1806 @@
+{
+  "schema_version": "0.1.0",
+  "role": "one_shot_frozen_phase2_confirmation",
+  "confirmation_temporal": "artifacts/v05/datasets/task4_pickup_stall_confirmation.npz",
+  "confirmation_vision": "artifacts/v05/features/task4_pickup_stall_confirmation_frozen_vision.npz",
+  "pilot_temporal": "artifacts/v04/datasets/task4_pickup_stall_pilot_strict.npz",
+  "pilot_report": "artifacts/results/v04_task4_pickup_stall_pilot_strict.json",
+  "frozen_model": "artifacts/results/v04_task4_pickup_stall_pilot_strict.pt",
+  "confirmation_manifest": "docs/manifests/v05_task4_pickup_stall_confirmation.json",
+  "device": "cuda",
+  "cameras": [
+    "main_camera",
+    "wrist_camera"
+  ],
+  "support_gate_passed": false,
+  "primary_ranking_gate_passed": true,
+  "formal_claim_gate_passed": false,
+  "full_confirmation": {
+    "samples": 144,
+    "positives": 61,
+    "negatives": 83,
+    "groups": 29,
+    "metrics": {
+      "prevalence": {
+        "auprc": 0.4236111111111111,
+        "auroc": 0.5,
+        "brier": 0.2523148148148149,
+        "ece": 0.09027777777777779,
+        "same_state_pairs": {
+          "mixed_groups": 13,
+          "pairs": 77,
+          "correct": 0,
+          "accuracy": 0.0
+        }
+      },
+      "stage_only": {
+        "auprc": 0.6230413035610558,
+        "auroc": 0.6432944894331424,
+        "brier": 0.24148651546466837,
+        "ece": 0.07795376171790794,
+        "same_state_pairs": {
+          "mixed_groups": 13,
+          "pairs": 77,
+          "correct": 47,
+          "accuracy": 0.6103896103896104
+        }
+      },
+      "temporal_mlp": {
+        "auprc": 0.8790445071896656,
+        "auroc": 0.837843175982619,
+        "brier": 0.1794425103761802,
+        "ece": 0.24559602337992853,
+        "same_state_pairs": {
+          "mixed_groups": 13,
+          "pairs": 77,
+          "correct": 64,
+          "accuracy": 0.8311688311688312
+        }
+      },
+      "frozen_vision": {
+        "auprc": 0.922403896828906,
+        "auroc": 0.9358088090065179,
+        "brier": 0.11272758718275938,
+        "ece": 0.10681604259221303,
+        "same_state_pairs": {
+          "mixed_groups": 13,
+          "pairs": 77,
+          "correct": 69,
+          "accuracy": 0.8961038961038961
+        }
+      }
+    },
+    "cluster_bootstrap": {
+      "unit": "initial_state_id cluster",
+      "requested_samples": 10000,
+      "valid_samples": 10000,
+      "metrics": {
+        "prevalence": {
+          "auprc": {
+            "point": 0.4236111111111111,
+            "ci95": [
+              0.2826086956521739,
+              0.5704708742040956
+            ]
+          },
+          "auroc": {
+            "point": 0.5,
+            "ci95": [
+              0.5,
+              0.5
+            ]
+          },
+          "brier": {
+            "point": 0.2523148148148149,
+            "ci95": [
+              0.20531400966183583,
+              0.30126806917914306
+            ]
+          },
+          "ece": {
+            "point": 0.09027777777777779,
+            "ci95": [
+              0.004694835680751186,
+              0.23713754087076236
+            ]
+          }
+        },
+        "stage_only": {
+          "auprc": {
+            "point": 0.6230413035610558,
+            "ci95": [
+              0.42222623222446626,
+              0.7977949938068832
+            ]
+          },
+          "auroc": {
+            "point": 0.6432944894331424,
+            "ci95": [
+              0.48688708713132084,
+              0.787612102911338
+            ]
+          },
+          "brier": {
+            "point": 0.24148651546466837,
+            "ci95": [
+              0.19784209751535753,
+              0.2873417971586343
+            ]
+          },
+          "ece": {
+            "point": 0.07795376171790794,
+            "ci95": [
+              0.027325499264791747,
+              0.22124361204814147
+            ]
+          }
+        },
+        "temporal_mlp": {
+          "auprc": {
+            "point": 0.8790445071896656,
+            "ci95": [
+              0.7215613093794944,
+              0.9751315164243544
+            ]
+          },
+          "auroc": {
+            "point": 0.837843175982619,
+            "ci95": [
+              0.6626392988510966,
+              0.9790945728399417
+            ]
+          },
+          "brier": {
+            "point": 0.1794425103761802,
+            "ci95": [
+              0.131990570203215,
+              0.23604138254210316
+            ]
+          },
+          "ece": {
+            "point": 0.24559602337992853,
+            "ci95": [
+              0.18528752966085454,
+              0.32847648316390926
+            ]
+          }
+        },
+        "frozen_vision": {
+          "auprc": {
+            "point": 0.922403896828906,
+            "ci95": [
+              0.8363922161806562,
+              0.9800054243909961
+            ]
+          },
+          "auroc": {
+            "point": 0.9358088090065179,
+            "ci95": [
+              0.8706745267444419,
+              0.9874242162512915
+            ]
+          },
+          "brier": {
+            "point": 0.11272758718275938,
+            "ci95": [
+              0.05320824426758301,
+              0.18456542678640292
+            ]
+          },
+          "ece": {
+            "point": 0.10681604259221303,
+            "ci95": [
+              0.049068166166920335,
+              0.19102650034498342
+            ]
+          }
+        }
+      },
+      "delta_vs_stage_only": {
+        "temporal_mlp": {
+          "auprc": {
+            "point": 0.25600320362860984,
+            "ci95": [
+              0.1024523142155811,
+              0.42335607458886304
+            ]
+          },
+          "auroc": {
+            "point": 0.19454868654947666,
+            "ci95": [
+              0.04401237328562917,
+              0.3550472164186009
+            ]
+          },
+          "brier": {
+            "point": -0.062044005088488174,
+            "ci95": [
+              -0.0939484740335447,
+              -0.027519527024840687
+            ]
+          },
+          "ece": {
+            "point": 0.1676422616620206,
+            "ci95": [
+              0.05800635943328037,
+              0.22632766434455717
+            ]
+          }
+        },
+        "frozen_vision": {
+          "auprc": {
+            "point": 0.2993625932678502,
+            "ci95": [
+              0.1462296866580207,
+              0.46767398129760956
+            ]
+          },
+          "auroc": {
+            "point": 0.2925143195733755,
+            "ci95": [
+              0.16426161745734952,
+              0.431079731494984
+            ]
+          },
+          "brier": {
+            "point": -0.128758928281909,
+            "ci95": [
+              -0.19690934683554887,
+              -0.061649435025689335
+            ]
+          },
+          "ece": {
+            "point": 0.02886228087430509,
+            "ci95": [
+              -0.12115813398549108,
+              0.11538337942449146
+            ]
+          }
+        }
+      }
+    }
+  },
+  "mixed_initial_state_subset": {
+    "samples": 73,
+    "positives": 36,
+    "negatives": 37,
+    "groups": 13,
+    "metrics": {
+      "prevalence": {
+        "auprc": 0.4931506849315068,
+        "auroc": 0.5,
+        "brier": 0.2754946727549468,
+        "ece": 0.1598173515981735,
+        "same_state_pairs": {
+          "mixed_groups": 13,
+          "pairs": 77,
+          "correct": 0,
+          "accuracy": 0.0
+        }
+      },
+      "stage_only": {
+        "auprc": 0.6434136582081638,
+        "auroc": 0.5893393393393394,
+        "brier": 0.2679389867776302,
+        "ece": 0.15295929964908161,
+        "same_state_pairs": {
+          "mixed_groups": 13,
+          "pairs": 77,
+          "correct": 47,
+          "accuracy": 0.6103896103896104
+        }
+      },
+      "temporal_mlp": {
+        "auprc": 0.8147193917343878,
+        "auroc": 0.7154654654654654,
+        "brier": 0.2373622813746514,
+        "ece": 0.3126512776090674,
+        "same_state_pairs": {
+          "mixed_groups": 13,
+          "pairs": 77,
+          "correct": 64,
+          "accuracy": 0.8311688311688312
+        }
+      },
+      "frozen_vision": {
+        "auprc": 0.8989017489699295,
+        "auroc": 0.8915165165165165,
+        "brier": 0.16617197591461852,
+        "ece": 0.17386572283659965,
+        "same_state_pairs": {
+          "mixed_groups": 13,
+          "pairs": 77,
+          "correct": 69,
+          "accuracy": 0.8961038961038961
+        }
+      }
+    },
+    "cluster_bootstrap": {
+      "unit": "initial_state_id cluster",
+      "requested_samples": 10000,
+      "valid_samples": 10000,
+      "metrics": {
+        "prevalence": {
+          "auprc": {
+            "point": 0.4931506849315068,
+            "ci95": [
+              0.35135135135135137,
+              0.6351351351351351
+            ]
+          },
+          "auroc": {
+            "point": 0.5,
+            "ci95": [
+              0.5,
+              0.5
+            ]
+          },
+          "brier": {
+            "point": 0.2754946727549468,
+            "ci95": [
+              0.22822822822822827,
+              0.3228228228228229
+            ]
+          },
+          "ece": {
+            "point": 0.1598173515981735,
+            "ci95": [
+              0.024875621890547317,
+              0.3018018018018018
+            ]
+          }
+        },
+        "stage_only": {
+          "auprc": {
+            "point": 0.6434136582081638,
+            "ci95": [
+              0.4663995709300798,
+              0.8101564474382489
+            ]
+          },
+          "auroc": {
+            "point": 0.5893393393393394,
+            "ci95": [
+              0.40826117032178727,
+              0.7757358511586453
+            ]
+          },
+          "brier": {
+            "point": 0.2679389867776302,
+            "ci95": [
+              0.21894512792587614,
+              0.3179074502353906
+            ]
+          },
+          "ece": {
+            "point": 0.15295929964908161,
+            "ci95": [
+              0.03848710551014385,
+              0.29279440348034774
+            ]
+          }
+        },
+        "temporal_mlp": {
+          "auprc": {
+            "point": 0.8147193917343878,
+            "ci95": [
+              0.6452894804944105,
+              0.9514729426142193
+            ]
+          },
+          "auroc": {
+            "point": 0.7154654654654654,
+            "ci95": [
+              0.5112740183792815,
+              0.9469708119886842
+            ]
+          },
+          "brier": {
+            "point": 0.2373622813746514,
+            "ci95": [
+              0.1685341341233269,
+              0.3216925944345828
+            ]
+          },
+          "ece": {
+            "point": 0.3126512776090674,
+            "ci95": [
+              0.2214360021899144,
+              0.41188118611701896
+            ]
+          }
+        },
+        "frozen_vision": {
+          "auprc": {
+            "point": 0.8989017489699295,
+            "ci95": [
+              0.8306974137779243,
+              0.9725155524989363
+            ]
+          },
+          "auroc": {
+            "point": 0.8915165165165165,
+            "ci95": [
+              0.7960324792641865,
+              0.981005009775171
+            ]
+          },
+          "brier": {
+            "point": 0.16617197591461852,
+            "ci95": [
+              0.06011142384572986,
+              0.290412289943553
+            ]
+          },
+          "ece": {
+            "point": 0.17386572283659965,
+            "ci95": [
+              0.06076428137337311,
+              0.31717938156695547
+            ]
+          }
+        }
+      },
+      "delta_vs_stage_only": {
+        "temporal_mlp": {
+          "auprc": {
+            "point": 0.17130573352622402,
+            "ci95": [
+              0.019001454671292762,
+              0.3358032988669454
+            ]
+          },
+          "auroc": {
+            "point": 0.12612612612612606,
+            "ci95": [
+              -0.06152161202065229,
+              0.3386976269929552
+            ]
+          },
+          "brier": {
+            "point": -0.03057670540297877,
+            "ci95": [
+              -0.0781737632496216,
+              0.022198585140790202
+            ]
+          },
+          "ece": {
+            "point": 0.1596919779599858,
+            "ci95": [
+              0.052040062261118604,
+              0.23721716119332786
+            ]
+          }
+        },
+        "frozen_vision": {
+          "auprc": {
+            "point": 0.2554880907617657,
+            "ci95": [
+              0.1120418147615022,
+              0.4254648335628702
+            ]
+          },
+          "auroc": {
+            "point": 0.3021771771771772,
+            "ci95": [
+              0.14709752321981429,
+              0.4557487668980635
+            ]
+          },
+          "brier": {
+            "point": -0.10176701086301165,
+            "ci95": [
+              -0.18853643226077782,
+              -0.008160616050715297
+            ]
+          },
+          "ece": {
+            "point": 0.020906423187518036,
+            "ci95": [
+              -0.10532327874154743,
+              0.13693267154196273
+            ]
+          }
+        }
+      }
+    }
+  },
+  "predictions": [
+    {
+      "episode_id": "smolvla-20260926T084800859837Z",
+      "initial_state_id": 0,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.39008528691571964,
+      "temporal_mlp": 0.22509217262268066,
+      "frozen_vision": 0.0014681114116683602
+    },
+    {
+      "episode_id": "smolvla-20260926T085425735289Z",
+      "initial_state_id": 0,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3918475172828498,
+      "temporal_mlp": 0.21522751450538635,
+      "frozen_vision": 0.0006534598651342094
+    },
+    {
+      "episode_id": "smolvla-20260926T090046301409Z",
+      "initial_state_id": 0,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.380643826036664,
+      "temporal_mlp": 0.24597540497779846,
+      "frozen_vision": 0.00013199704699218273
+    },
+    {
+      "episode_id": "smolvla-20260926T090705738113Z",
+      "initial_state_id": 0,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.4173086778628296,
+      "temporal_mlp": 0.27269965410232544,
+      "frozen_vision": 0.9929324388504028
+    },
+    {
+      "episode_id": "smolvla-20260926T091326112510Z",
+      "initial_state_id": 0,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.4086077822422874,
+      "temporal_mlp": 0.26008957624435425,
+      "frozen_vision": 0.0004267506010364741
+    },
+    {
+      "episode_id": "smolvla-20260926T084206528166Z",
+      "initial_state_id": 1,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3130159668997053,
+      "temporal_mlp": 0.5384896993637085,
+      "frozen_vision": 0.9999903440475464
+    },
+    {
+      "episode_id": "smolvla-20260926T084811719006Z",
+      "initial_state_id": 1,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.31045032707489106,
+      "temporal_mlp": 0.5281673669815063,
+      "frozen_vision": 0.9999945163726807
+    },
+    {
+      "episode_id": "smolvla-20260926T085437244143Z",
+      "initial_state_id": 1,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3091606411708795,
+      "temporal_mlp": 0.4838639795780182,
+      "frozen_vision": 0.9999988079071045
+    },
+    {
+      "episode_id": "smolvla-20260926T091337289156Z",
+      "initial_state_id": 1,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3099712881160214,
+      "temporal_mlp": 0.49644336104393005,
+      "frozen_vision": 0.9999954700469971
+    },
+    {
+      "episode_id": "smolvla-20260926T084824586072Z",
+      "initial_state_id": 2,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3838642453059361,
+      "temporal_mlp": 0.2842870354652405,
+      "frozen_vision": 0.018963970243930817
+    },
+    {
+      "episode_id": "smolvla-20260926T090735370284Z",
+      "initial_state_id": 2,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.32360866301803537,
+      "temporal_mlp": 0.24851775169372559,
+      "frozen_vision": 0.05826239287853241
+    },
+    {
+      "episode_id": "smolvla-20260926T091350536171Z",
+      "initial_state_id": 2,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3575265222201357,
+      "temporal_mlp": 0.2655940055847168,
+      "frozen_vision": 8.114668759162669e-08
+    },
+    {
+      "episode_id": "smolvla-20260926T084231918573Z",
+      "initial_state_id": 3,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3892441767943519,
+      "temporal_mlp": 0.5056818127632141,
+      "frozen_vision": 0.9999988079071045
+    },
+    {
+      "episode_id": "smolvla-20260926T084836653882Z",
+      "initial_state_id": 3,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.38628847420121293,
+      "temporal_mlp": 0.5278335213661194,
+      "frozen_vision": 0.9999988079071045
+    },
+    {
+      "episode_id": "smolvla-20260926T085502927318Z",
+      "initial_state_id": 3,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3543994726716001,
+      "temporal_mlp": 0.5317394733428955,
+      "frozen_vision": 0.9999997615814209
+    },
+    {
+      "episode_id": "smolvla-20260926T090124089326Z",
+      "initial_state_id": 3,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3425092414877354,
+      "temporal_mlp": 0.5308427810668945,
+      "frozen_vision": 0.9999806880950928
+    },
+    {
+      "episode_id": "smolvla-20260926T090742740676Z",
+      "initial_state_id": 3,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.32889875282036857,
+      "temporal_mlp": 0.5702245831489563,
+      "frozen_vision": 0.9999995231628418
+    },
+    {
+      "episode_id": "smolvla-20260926T091402714488Z",
+      "initial_state_id": 3,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.38674127758285354,
+      "temporal_mlp": 0.5493924021720886,
+      "frozen_vision": 0.999996542930603
+    },
+    {
+      "episode_id": "smolvla-20260926T084244674637Z",
+      "initial_state_id": 4,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.37191172066002437,
+      "temporal_mlp": 0.27712762355804443,
+      "frozen_vision": 0.0022183149121701717
+    },
+    {
+      "episode_id": "smolvla-20260926T084251988998Z",
+      "initial_state_id": 5,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3039885349051182,
+      "temporal_mlp": 0.19483911991119385,
+      "frozen_vision": 0.06762262433767319
+    },
+    {
+      "episode_id": "smolvla-20260926T084903565613Z",
+      "initial_state_id": 5,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3374572697412946,
+      "temporal_mlp": 0.2089802324771881,
+      "frozen_vision": 0.012151484377682209
+    },
+    {
+      "episode_id": "smolvla-20260926T085528715192Z",
+      "initial_state_id": 5,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3469146628513124,
+      "temporal_mlp": 0.21149471402168274,
+      "frozen_vision": 0.12895329296588898
+    },
+    {
+      "episode_id": "smolvla-20260926T090150033728Z",
+      "initial_state_id": 5,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.35764640145479026,
+      "temporal_mlp": 0.22405895590782166,
+      "frozen_vision": 0.015574281103909016
+    },
+    {
+      "episode_id": "smolvla-20260926T090808389270Z",
+      "initial_state_id": 5,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.36201148312529136,
+      "temporal_mlp": 0.21931473910808563,
+      "frozen_vision": 0.00012909239740110934
+    },
+    {
+      "episode_id": "smolvla-20260926T091429065461Z",
+      "initial_state_id": 5,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3911241664870278,
+      "temporal_mlp": 0.4056428074836731,
+      "frozen_vision": 0.999996542930603
+    },
+    {
+      "episode_id": "smolvla-20260926T084259458066Z",
+      "initial_state_id": 6,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3395049064054233,
+      "temporal_mlp": 0.37604567408561707,
+      "frozen_vision": 0.0653524324297905
+    },
+    {
+      "episode_id": "smolvla-20260926T084911298547Z",
+      "initial_state_id": 6,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.301586412958881,
+      "temporal_mlp": 0.38676172494888306,
+      "frozen_vision": 0.0829472690820694
+    },
+    {
+      "episode_id": "smolvla-20260926T085536293585Z",
+      "initial_state_id": 6,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.36979914783588913,
+      "temporal_mlp": 0.22343626618385315,
+      "frozen_vision": 0.00043560375343076885
+    },
+    {
+      "episode_id": "smolvla-20260926T090157553077Z",
+      "initial_state_id": 6,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3235452835834906,
+      "temporal_mlp": 0.2648853659629822,
+      "frozen_vision": 0.09531530737876892
+    },
+    {
+      "episode_id": "smolvla-20260926T090821798381Z",
+      "initial_state_id": 6,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.40375080816759595,
+      "temporal_mlp": 0.24370500445365906,
+      "frozen_vision": 0.014248657040297985
+    },
+    {
+      "episode_id": "smolvla-20260926T091441895377Z",
+      "initial_state_id": 6,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3304978137190664,
+      "temporal_mlp": 0.29918843507766724,
+      "frozen_vision": 0.15289491415023804
+    },
+    {
+      "episode_id": "smolvla-20260926T084311841077Z",
+      "initial_state_id": 7,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.36555175065583984,
+      "temporal_mlp": 0.19623954594135284,
+      "frozen_vision": 0.0011033513583242893
+    },
+    {
+      "episode_id": "smolvla-20260926T084922913252Z",
+      "initial_state_id": 7,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3242747425312846,
+      "temporal_mlp": 0.16368313133716583,
+      "frozen_vision": 0.0013596784556284547
+    },
+    {
+      "episode_id": "smolvla-20260926T085545775151Z",
+      "initial_state_id": 7,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3136701942156576,
+      "temporal_mlp": 0.16909632086753845,
+      "frozen_vision": 0.09760072827339172
+    },
+    {
+      "episode_id": "smolvla-20260926T090207840637Z",
+      "initial_state_id": 7,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.31079883468713604,
+      "temporal_mlp": 0.14342525601387024,
+      "frozen_vision": 0.005723114125430584
+    },
+    {
+      "episode_id": "smolvla-20260926T090835006513Z",
+      "initial_state_id": 7,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.34136234954175676,
+      "temporal_mlp": 0.16501115262508392,
+      "frozen_vision": 0.0021238168701529503
+    },
+    {
+      "episode_id": "smolvla-20260926T091454797064Z",
+      "initial_state_id": 7,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3632797660502479,
+      "temporal_mlp": 0.19005395472049713,
+      "frozen_vision": 0.005434329155832529
+    },
+    {
+      "episode_id": "smolvla-20260926T084319016031Z",
+      "initial_state_id": 8,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3076043698825461,
+      "temporal_mlp": 0.16459199786186218,
+      "frozen_vision": 0.03533748909831047
+    },
+    {
+      "episode_id": "smolvla-20260926T084930568452Z",
+      "initial_state_id": 8,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.35404916734086594,
+      "temporal_mlp": 0.17628353834152222,
+      "frozen_vision": 0.016644500195980072
+    },
+    {
+      "episode_id": "smolvla-20260926T085553767541Z",
+      "initial_state_id": 8,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.2719803730858706,
+      "temporal_mlp": 0.19043363630771637,
+      "frozen_vision": 0.21670228242874146
+    },
+    {
+      "episode_id": "smolvla-20260926T090215217167Z",
+      "initial_state_id": 8,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.28304420590208484,
+      "temporal_mlp": 0.162653386592865,
+      "frozen_vision": 0.09203353524208069
+    },
+    {
+      "episode_id": "smolvla-20260926T090843256841Z",
+      "initial_state_id": 8,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.2774783248377965,
+      "temporal_mlp": 0.16191089153289795,
+      "frozen_vision": 0.38483497500419617
+    },
+    {
+      "episode_id": "smolvla-20260926T091502301846Z",
+      "initial_state_id": 8,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.33029500456373473,
+      "temporal_mlp": 0.15879590809345245,
+      "frozen_vision": 0.06640879064798355
+    },
+    {
+      "episode_id": "smolvla-20260926T084331995711Z",
+      "initial_state_id": 9,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.30886223776029326,
+      "temporal_mlp": 0.2090156525373459,
+      "frozen_vision": 0.0001342244358966127
+    },
+    {
+      "episode_id": "smolvla-20260926T084943507749Z",
+      "initial_state_id": 9,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.33928088977643184,
+      "temporal_mlp": 0.17624369263648987,
+      "frozen_vision": 0.0015371624613180757
+    },
+    {
+      "episode_id": "smolvla-20260926T085607702808Z",
+      "initial_state_id": 9,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3622998169689137,
+      "temporal_mlp": 0.221350759267807,
+      "frozen_vision": 0.12756489217281342
+    },
+    {
+      "episode_id": "smolvla-20260926T090228199392Z",
+      "initial_state_id": 9,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3754834270247731,
+      "temporal_mlp": 0.21429161727428436,
+      "frozen_vision": 0.984238862991333
+    },
+    {
+      "episode_id": "smolvla-20260926T090856403073Z",
+      "initial_state_id": 9,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.33263927198885246,
+      "temporal_mlp": 0.16466841101646423,
+      "frozen_vision": 0.0004401073674671352
+    },
+    {
+      "episode_id": "smolvla-20260926T091509926289Z",
+      "initial_state_id": 9,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.32931561313999963,
+      "temporal_mlp": 0.1872425228357315,
+      "frozen_vision": 2.7866217351402156e-05
+    },
+    {
+      "episode_id": "smolvla-20260926T084339220293Z",
+      "initial_state_id": 10,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.36098750784878686,
+      "temporal_mlp": 0.5246393084526062,
+      "frozen_vision": 0.9998480081558228
+    },
+    {
+      "episode_id": "smolvla-20260926T084954184236Z",
+      "initial_state_id": 10,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.31457435551933205,
+      "temporal_mlp": 0.5262076258659363,
+      "frozen_vision": 0.9994951486587524
+    },
+    {
+      "episode_id": "smolvla-20260926T085615797867Z",
+      "initial_state_id": 10,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.4393341752731497,
+      "temporal_mlp": 0.5531877279281616,
+      "frozen_vision": 0.9997450709342957
+    },
+    {
+      "episode_id": "smolvla-20260926T090240388014Z",
+      "initial_state_id": 10,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3472104713642,
+      "temporal_mlp": 0.5311511754989624,
+      "frozen_vision": 0.9997134804725647
+    },
+    {
+      "episode_id": "smolvla-20260926T090903780563Z",
+      "initial_state_id": 10,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.39621976868515624,
+      "temporal_mlp": 0.5301321744918823,
+      "frozen_vision": 0.9998601675033569
+    },
+    {
+      "episode_id": "smolvla-20260926T091517230375Z",
+      "initial_state_id": 10,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3583820804797983,
+      "temporal_mlp": 0.5202857851982117,
+      "frozen_vision": 0.9999960660934448
+    },
+    {
+      "episode_id": "smolvla-20260926T084353778786Z",
+      "initial_state_id": 11,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.34242234127801713,
+      "temporal_mlp": 0.20015422999858856,
+      "frozen_vision": 0.003514992306008935
+    },
+    {
+      "episode_id": "smolvla-20260926T085007231560Z",
+      "initial_state_id": 11,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3433625379330268,
+      "temporal_mlp": 0.20972779393196106,
+      "frozen_vision": 0.18446485698223114
+    },
+    {
+      "episode_id": "smolvla-20260926T085629288535Z",
+      "initial_state_id": 11,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.30567520197886666,
+      "temporal_mlp": 0.18207073211669922,
+      "frozen_vision": 0.0825476199388504
+    },
+    {
+      "episode_id": "smolvla-20260926T090253146584Z",
+      "initial_state_id": 11,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.32748871777651245,
+      "temporal_mlp": 0.1536611169576645,
+      "frozen_vision": 0.12269964814186096
+    },
+    {
+      "episode_id": "smolvla-20260926T090916920685Z",
+      "initial_state_id": 11,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.31396604202438017,
+      "temporal_mlp": 0.15694187581539154,
+      "frozen_vision": 0.0004684539744630456
+    },
+    {
+      "episode_id": "smolvla-20260926T091530280381Z",
+      "initial_state_id": 11,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3351631727227084,
+      "temporal_mlp": 0.18423473834991455,
+      "frozen_vision": 0.036064814776182175
+    },
+    {
+      "episode_id": "smolvla-20260926T084401798326Z",
+      "initial_state_id": 12,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.30523579156921016,
+      "temporal_mlp": 0.1767764389514923,
+      "frozen_vision": 8.43843663460575e-05
+    },
+    {
+      "episode_id": "smolvla-20260926T085014605259Z",
+      "initial_state_id": 12,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3249007574563919,
+      "temporal_mlp": 0.1806504875421524,
+      "frozen_vision": 0.0004968752036802471
+    },
+    {
+      "episode_id": "smolvla-20260926T085640420146Z",
+      "initial_state_id": 12,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.361595424314283,
+      "temporal_mlp": 0.1622311770915985,
+      "frozen_vision": 0.00316837290301919
+    },
+    {
+      "episode_id": "smolvla-20260926T090300384444Z",
+      "initial_state_id": 12,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.285869579141698,
+      "temporal_mlp": 0.19097912311553955,
+      "frozen_vision": 0.00024280419165734202
+    },
+    {
+      "episode_id": "smolvla-20260926T090924132690Z",
+      "initial_state_id": 12,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.32211862264276453,
+      "temporal_mlp": 0.1663791388273239,
+      "frozen_vision": 0.001573251443915069
+    },
+    {
+      "episode_id": "smolvla-20260926T091538139686Z",
+      "initial_state_id": 12,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.30094996573081095,
+      "temporal_mlp": 0.23679709434509277,
+      "frozen_vision": 0.0002821642265189439
+    },
+    {
+      "episode_id": "smolvla-20260926T085649033454Z",
+      "initial_state_id": 13,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.37959614928258073,
+      "temporal_mlp": 0.28384262323379517,
+      "frozen_vision": 0.0011268695816397667
+    },
+    {
+      "episode_id": "smolvla-20260926T090307790877Z",
+      "initial_state_id": 13,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.41712817324939727,
+      "temporal_mlp": 0.5671201944351196,
+      "frozen_vision": 0.9999974966049194
+    },
+    {
+      "episode_id": "smolvla-20260926T091546183017Z",
+      "initial_state_id": 13,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.4096426166702826,
+      "temporal_mlp": 0.4930434226989746,
+      "frozen_vision": 0.999976396560669
+    },
+    {
+      "episode_id": "smolvla-20260926T091559600259Z",
+      "initial_state_id": 14,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.43674512213301325,
+      "temporal_mlp": 0.5628560781478882,
+      "frozen_vision": 0.9999911785125732
+    },
+    {
+      "episode_id": "smolvla-20260926T084436055137Z",
+      "initial_state_id": 15,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.34321005173435704,
+      "temporal_mlp": 0.1410411149263382,
+      "frozen_vision": 0.0022017161827534437
+    },
+    {
+      "episode_id": "smolvla-20260926T085048034959Z",
+      "initial_state_id": 15,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.31265053919568464,
+      "temporal_mlp": 0.12615421414375305,
+      "frozen_vision": 0.002680042525753379
+    },
+    {
+      "episode_id": "smolvla-20260926T085710503338Z",
+      "initial_state_id": 15,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.32671252654640964,
+      "temporal_mlp": 0.12864091992378235,
+      "frozen_vision": 0.1936437338590622
+    },
+    {
+      "episode_id": "smolvla-20260926T090334326390Z",
+      "initial_state_id": 15,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.29800130420803506,
+      "temporal_mlp": 0.1542913317680359,
+      "frozen_vision": 0.004196214023977518
+    },
+    {
+      "episode_id": "smolvla-20260926T090958465164Z",
+      "initial_state_id": 15,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.33162460024749063,
+      "temporal_mlp": 0.1406111717224121,
+      "frozen_vision": 6.445976315142389e-16
+    },
+    {
+      "episode_id": "smolvla-20260926T091613294959Z",
+      "initial_state_id": 15,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.34708870536636166,
+      "temporal_mlp": 0.15532177686691284,
+      "frozen_vision": 0.287334680557251
+    },
+    {
+      "episode_id": "smolvla-20260926T084443163942Z",
+      "initial_state_id": 16,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3685816101632715,
+      "temporal_mlp": 0.5735548734664917,
+      "frozen_vision": 0.9999847412109375
+    },
+    {
+      "episode_id": "smolvla-20260926T085055181608Z",
+      "initial_state_id": 16,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.32071071475047513,
+      "temporal_mlp": 0.2914421558380127,
+      "frozen_vision": 0.056231096386909485
+    },
+    {
+      "episode_id": "smolvla-20260926T085723806899Z",
+      "initial_state_id": 16,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.39854257752339245,
+      "temporal_mlp": 0.4491753578186035,
+      "frozen_vision": 0.9996918439865112
+    },
+    {
+      "episode_id": "smolvla-20260926T090348396852Z",
+      "initial_state_id": 16,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.4036574155233839,
+      "temporal_mlp": 0.47726011276245117,
+      "frozen_vision": 0.9999997615814209
+    },
+    {
+      "episode_id": "smolvla-20260926T091011373481Z",
+      "initial_state_id": 16,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.2976414084901003,
+      "temporal_mlp": 0.22692295908927917,
+      "frozen_vision": 0.0031384825706481934
+    },
+    {
+      "episode_id": "smolvla-20260926T091625987834Z",
+      "initial_state_id": 16,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.32213028222550993,
+      "temporal_mlp": 0.19821271300315857,
+      "frozen_vision": 0.0006402342696674168
+    },
+    {
+      "episode_id": "smolvla-20260926T084455903617Z",
+      "initial_state_id": 17,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3059987007991992,
+      "temporal_mlp": 0.4227170944213867,
+      "frozen_vision": 0.9850382208824158
+    },
+    {
+      "episode_id": "smolvla-20260926T085103050339Z",
+      "initial_state_id": 17,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.31628913253797136,
+      "temporal_mlp": 0.4891623556613922,
+      "frozen_vision": 0.9999974966049194
+    },
+    {
+      "episode_id": "smolvla-20260926T085737200057Z",
+      "initial_state_id": 17,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3288439566472558,
+      "temporal_mlp": 0.5038385391235352,
+      "frozen_vision": 0.9999949932098389
+    },
+    {
+      "episode_id": "smolvla-20260926T091019096663Z",
+      "initial_state_id": 17,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3076241953759314,
+      "temporal_mlp": 0.38207364082336426,
+      "frozen_vision": 0.9943875670433044
+    },
+    {
+      "episode_id": "smolvla-20260926T091633431340Z",
+      "initial_state_id": 17,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3856551808704695,
+      "temporal_mlp": 0.44028282165527344,
+      "frozen_vision": 0.9752217531204224
+    },
+    {
+      "episode_id": "smolvla-20260926T084508670593Z",
+      "initial_state_id": 18,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3661323873947242,
+      "temporal_mlp": 0.4684142470359802,
+      "frozen_vision": 0.9937481880187988
+    },
+    {
+      "episode_id": "smolvla-20260926T085116325785Z",
+      "initial_state_id": 18,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.30631531310174376,
+      "temporal_mlp": 0.2511988580226898,
+      "frozen_vision": 0.014227640815079212
+    },
+    {
+      "episode_id": "smolvla-20260926T085750847300Z",
+      "initial_state_id": 18,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.4022575311058585,
+      "temporal_mlp": 0.529651939868927,
+      "frozen_vision": 0.9999871253967285
+    },
+    {
+      "episode_id": "smolvla-20260926T090414411160Z",
+      "initial_state_id": 18,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3076592955221687,
+      "temporal_mlp": 0.2227245569229126,
+      "frozen_vision": 0.00011753303988371044
+    },
+    {
+      "episode_id": "smolvla-20260926T091031347707Z",
+      "initial_state_id": 18,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3669523511540429,
+      "temporal_mlp": 0.24151554703712463,
+      "frozen_vision": 0.030633939430117607
+    },
+    {
+      "episode_id": "smolvla-20260926T091645867795Z",
+      "initial_state_id": 18,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.329116154452516,
+      "temporal_mlp": 0.44898414611816406,
+      "frozen_vision": 0.9997852444648743
+    },
+    {
+      "episode_id": "smolvla-20260926T084521663230Z",
+      "initial_state_id": 19,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.266767221093191,
+      "temporal_mlp": 0.35676902532577515,
+      "frozen_vision": 0.00101506058126688
+    },
+    {
+      "episode_id": "smolvla-20260926T085129019399Z",
+      "initial_state_id": 19,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.29114466200622735,
+      "temporal_mlp": 0.3201453387737274,
+      "frozen_vision": 0.006329947616904974
+    },
+    {
+      "episode_id": "smolvla-20260926T085805224936Z",
+      "initial_state_id": 19,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.2794927164296653,
+      "temporal_mlp": 0.3923863172531128,
+      "frozen_vision": 0.0003417728585191071
+    },
+    {
+      "episode_id": "smolvla-20260926T090422231415Z",
+      "initial_state_id": 19,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.2997856953849388,
+      "temporal_mlp": 0.3025388717651367,
+      "frozen_vision": 0.13871166110038757
+    },
+    {
+      "episode_id": "smolvla-20260926T091039209225Z",
+      "initial_state_id": 19,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.33665320512723607,
+      "temporal_mlp": 0.3827274739742279,
+      "frozen_vision": 0.9811825156211853
+    },
+    {
+      "episode_id": "smolvla-20260926T091659111209Z",
+      "initial_state_id": 19,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.32481472093467106,
+      "temporal_mlp": 0.4345618784427643,
+      "frozen_vision": 0.013256967067718506
+    },
+    {
+      "episode_id": "smolvla-20260926T084529365411Z",
+      "initial_state_id": 20,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.40787598580426954,
+      "temporal_mlp": 0.3796117603778839,
+      "frozen_vision": 0.9999995231628418
+    },
+    {
+      "episode_id": "smolvla-20260926T085137101159Z",
+      "initial_state_id": 20,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3403057607633448,
+      "temporal_mlp": 0.563400387763977,
+      "frozen_vision": 0.9999998807907104
+    },
+    {
+      "episode_id": "smolvla-20260926T085813498314Z",
+      "initial_state_id": 20,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3854581186750526,
+      "temporal_mlp": 0.44006404280662537,
+      "frozen_vision": 1.0
+    },
+    {
+      "episode_id": "smolvla-20260926T090434570664Z",
+      "initial_state_id": 20,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3669068849491807,
+      "temporal_mlp": 0.4578942656517029,
+      "frozen_vision": 0.9998112320899963
+    },
+    {
+      "episode_id": "smolvla-20260926T091052546742Z",
+      "initial_state_id": 20,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.31616503033236115,
+      "temporal_mlp": 0.5272517204284668,
+      "frozen_vision": 0.9999856948852539
+    },
+    {
+      "episode_id": "smolvla-20260926T091706944917Z",
+      "initial_state_id": 20,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.35560055110182165,
+      "temporal_mlp": 0.46843576431274414,
+      "frozen_vision": 0.999996542930603
+    },
+    {
+      "episode_id": "smolvla-20260926T084542450840Z",
+      "initial_state_id": 21,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.35547600406901675,
+      "temporal_mlp": 0.33352023363113403,
+      "frozen_vision": 0.1212339997291565
+    },
+    {
+      "episode_id": "smolvla-20260926T085151085903Z",
+      "initial_state_id": 21,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3696982693537698,
+      "temporal_mlp": 0.3014800548553467,
+      "frozen_vision": 0.0019919141195714474
+    },
+    {
+      "episode_id": "smolvla-20260926T085827155312Z",
+      "initial_state_id": 21,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3205971442791662,
+      "temporal_mlp": 0.5796095132827759,
+      "frozen_vision": 0.9999923706054688
+    },
+    {
+      "episode_id": "smolvla-20260926T090447816708Z",
+      "initial_state_id": 21,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.28897453338288925,
+      "temporal_mlp": 0.48597511649131775,
+      "frozen_vision": 0.9999780654907227
+    },
+    {
+      "episode_id": "smolvla-20260926T091107248799Z",
+      "initial_state_id": 21,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.33512966498868385,
+      "temporal_mlp": 0.41366997361183167,
+      "frozen_vision": 0.9999498128890991
+    },
+    {
+      "episode_id": "smolvla-20260926T091720302236Z",
+      "initial_state_id": 21,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3243074743263784,
+      "temporal_mlp": 0.2707732617855072,
+      "frozen_vision": 0.002844390459358692
+    },
+    {
+      "episode_id": "smolvla-20260926T085158631023Z",
+      "initial_state_id": 22,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3640638400637513,
+      "temporal_mlp": 0.5718127489089966,
+      "frozen_vision": 0.9999572038650513
+    },
+    {
+      "episode_id": "smolvla-20260926T085841172801Z",
+      "initial_state_id": 22,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.411813344374531,
+      "temporal_mlp": 0.458085298538208,
+      "frozen_vision": 1.0
+    },
+    {
+      "episode_id": "smolvla-20260926T090500671059Z",
+      "initial_state_id": 22,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.32937880051178725,
+      "temporal_mlp": 0.49014100432395935,
+      "frozen_vision": 0.9999992847442627
+    },
+    {
+      "episode_id": "smolvla-20260926T091120822284Z",
+      "initial_state_id": 22,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3802483516845192,
+      "temporal_mlp": 0.27537772059440613,
+      "frozen_vision": 0.7281239032745361
+    },
+    {
+      "episode_id": "smolvla-20260926T091727954470Z",
+      "initial_state_id": 22,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.35993247355652075,
+      "temporal_mlp": 0.4553120732307434,
+      "frozen_vision": 0.9999995231628418
+    },
+    {
+      "episode_id": "smolvla-20260926T084603043133Z",
+      "initial_state_id": 23,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3127341921952187,
+      "temporal_mlp": 0.24823608994483948,
+      "frozen_vision": 0.00012412980140652508
+    },
+    {
+      "episode_id": "smolvla-20260926T085211536747Z",
+      "initial_state_id": 23,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3425188061155441,
+      "temporal_mlp": 0.2797967791557312,
+      "frozen_vision": 0.001069009187631309
+    },
+    {
+      "episode_id": "smolvla-20260926T085854941936Z",
+      "initial_state_id": 23,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3370270572817338,
+      "temporal_mlp": 0.2619808614253998,
+      "frozen_vision": 2.5269024263252504e-05
+    },
+    {
+      "episode_id": "smolvla-20260926T090514121125Z",
+      "initial_state_id": 23,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.35755731793338325,
+      "temporal_mlp": 0.4297647476196289,
+      "frozen_vision": 0.978613555431366
+    },
+    {
+      "episode_id": "smolvla-20260926T091128956781Z",
+      "initial_state_id": 23,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.33962708085026566,
+      "temporal_mlp": 0.2978893518447876,
+      "frozen_vision": 0.0005252042319625616
+    },
+    {
+      "episode_id": "smolvla-20260926T091740842235Z",
+      "initial_state_id": 23,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3388375556777893,
+      "temporal_mlp": 0.23919281363487244,
+      "frozen_vision": 0.00010115579061675817
+    },
+    {
+      "episode_id": "smolvla-20260926T084610475113Z",
+      "initial_state_id": 24,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.34936435975531954,
+      "temporal_mlp": 0.16717422008514404,
+      "frozen_vision": 0.00406688405200839
+    },
+    {
+      "episode_id": "smolvla-20260926T085219115782Z",
+      "initial_state_id": 24,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.36649500557297254,
+      "temporal_mlp": 0.17206120491027832,
+      "frozen_vision": 0.47174960374832153
+    },
+    {
+      "episode_id": "smolvla-20260926T085902818418Z",
+      "initial_state_id": 24,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.28433691496611857,
+      "temporal_mlp": 0.1685197651386261,
+      "frozen_vision": 0.0006393154617398977
+    },
+    {
+      "episode_id": "smolvla-20260926T090522186025Z",
+      "initial_state_id": 24,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3341509410244689,
+      "temporal_mlp": 0.24181655049324036,
+      "frozen_vision": 0.0036408978048712015
+    },
+    {
+      "episode_id": "smolvla-20260926T091136847617Z",
+      "initial_state_id": 24,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.33183320903449204,
+      "temporal_mlp": 0.2691270709037781,
+      "frozen_vision": 0.8453628420829773
+    },
+    {
+      "episode_id": "smolvla-20260926T091748304766Z",
+      "initial_state_id": 24,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3651590310839992,
+      "temporal_mlp": 0.18372325599193573,
+      "frozen_vision": 0.00036687066312879324
+    },
+    {
+      "episode_id": "smolvla-20260926T084618000897Z",
+      "initial_state_id": 25,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.41698681223015704,
+      "temporal_mlp": 0.5099229216575623,
+      "frozen_vision": 0.999995231628418
+    },
+    {
+      "episode_id": "smolvla-20260926T084631875509Z",
+      "initial_state_id": 26,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.42332724555234863,
+      "temporal_mlp": 0.5283026099205017,
+      "frozen_vision": 0.9999563694000244
+    },
+    {
+      "episode_id": "smolvla-20260926T085923534186Z",
+      "initial_state_id": 26,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3694737944163027,
+      "temporal_mlp": 0.3835756778717041,
+      "frozen_vision": 1.0
+    },
+    {
+      "episode_id": "smolvla-20260926T091157851652Z",
+      "initial_state_id": 26,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3945995126732363,
+      "temporal_mlp": 0.4581011235713959,
+      "frozen_vision": 1.0
+    },
+    {
+      "episode_id": "smolvla-20260926T091809026583Z",
+      "initial_state_id": 26,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.4005909822174326,
+      "temporal_mlp": 0.45945340394973755,
+      "frozen_vision": 0.9999996423721313
+    },
+    {
+      "episode_id": "smolvla-20260926T084645661750Z",
+      "initial_state_id": 27,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.42818542038816454,
+      "temporal_mlp": 0.47973567247390747,
+      "frozen_vision": 0.9999951124191284
+    },
+    {
+      "episode_id": "smolvla-20260926T085257821973Z",
+      "initial_state_id": 27,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.42367798340169327,
+      "temporal_mlp": 0.5099141001701355,
+      "frozen_vision": 0.9932790398597717
+    },
+    {
+      "episode_id": "smolvla-20260926T085936789735Z",
+      "initial_state_id": 27,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.4038494666760793,
+      "temporal_mlp": 0.5138251185417175,
+      "frozen_vision": 0.9999926090240479
+    },
+    {
+      "episode_id": "smolvla-20260926T091210917910Z",
+      "initial_state_id": 27,
+      "pickup_stall": 1,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.40327039672780324,
+      "temporal_mlp": 0.514724612236023,
+      "frozen_vision": 0.9999873638153076
+    },
+    {
+      "episode_id": "smolvla-20260926T084658820708Z",
+      "initial_state_id": 28,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3205469742903372,
+      "temporal_mlp": 0.15847383439540863,
+      "frozen_vision": 0.00034276171936653554
+    },
+    {
+      "episode_id": "smolvla-20260926T085310617664Z",
+      "initial_state_id": 28,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.28850647754714903,
+      "temporal_mlp": 0.2158869057893753,
+      "frozen_vision": 0.05333102121949196
+    },
+    {
+      "episode_id": "smolvla-20260926T085949813256Z",
+      "initial_state_id": 28,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.3035304015286928,
+      "temporal_mlp": 0.29710423946380615,
+      "frozen_vision": 4.1668401536298916e-05
+    },
+    {
+      "episode_id": "smolvla-20260926T090609058454Z",
+      "initial_state_id": 28,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.30083110142354164,
+      "temporal_mlp": 0.36738115549087524,
+      "frozen_vision": 0.1825360357761383
+    },
+    {
+      "episode_id": "smolvla-20260926T091223925812Z",
+      "initial_state_id": 28,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.30751616720080777,
+      "temporal_mlp": 0.16965074837207794,
+      "frozen_vision": 0.2585248649120331
+    },
+    {
+      "episode_id": "smolvla-20260926T091836011199Z",
+      "initial_state_id": 28,
+      "pickup_stall": 0,
+      "prevalence": 0.3333333333333333,
+      "stage_only": 0.2823880500991412,
+      "temporal_mlp": 0.21788890659809113,
+      "frozen_vision": 0.0008765423553995788
+    }
+  ]
+}
