@@ -16,7 +16,7 @@ That experience motivated a simulator-first project about distinguishing deploym
 
 ## Current project state
 
-- Status (2026-09-25): Phase 1 is complete and frozen. Phase 2 has completed a strict pickup-stall pilot; formal-scale collection is not yet complete.
+- Status (2026-09-26): Phase 1 and the Phase-2 frozen pickup-stall confirmation are complete. Remaining work is documentation and presentation, not further model tuning.
 - Canonical specification: `README.md` in this directory.
 - Platform: SmolVLA + LIBERO `libero_spatial` task 4.
 - v0.1 natural cohort: 50 episodes, 18 successes / 32 failures; group-disjoint train/validation/test = 30/10/10 by `initial_state_id`.
@@ -32,9 +32,13 @@ That experience motivated a simulator-first project about distinguishing deploym
 - Strict Phase-2 cohort: 86 aligned samples, 27 positives. Test has 19 samples, 7 positives, and 4 held-out initial-state groups; every test positive has a same-state negative.
 - Strict stage baseline uses privileged first-approach time and checkpoint target displacement for analysis only. Temporal MLP reaches AUPRC/AUROC 0.938/0.964, with increments 0.402 [0.037, 0.784] / 0.321 [0.042, 0.750]; same-state pairs are 7/7.
 - Frozen vision reaches 0.982/0.988, but incremental confidence intervals touch zero; treat it as suggestive. Temporal ECE is 0.231, so no probability-threshold or safe-stop claim is supported.
-- Phase-2 claim boundary: pilot evidence for imminent confirmation of one pickup-stall definition after 20 observed development steps. Only 27 event positives and 4 test groups; formal gate remains 40–50 positives with more independent states.
+- v0.5 predeclared confirmation: states 0–29 × 6 new seeds, 180/180 valid episodes (70 success / 110 failure). Frozen strict labeling keeps 144 samples, 61 pickup-stall positives, 83 negatives, and 29 initial-state groups.
+- Full confirmation stage-only/temporal/vision AUROC is 0.643/0.838/0.936. Vision minus stage-only AUROC is 0.293 [0.164, 0.431]; temporal is 0.195 [0.044, 0.355].
+- The mixed-initial-state subset has 73 samples, 36 positives, and 13 groups. Stage-only/temporal/vision AUROC is 0.589/0.715/0.892; vision increment is 0.302 [0.147, 0.456] and same-state pair ranking is 69/77. Temporal AUROC increment crosses zero on this subset.
+- The predeclared support gate fails because only 36/61 positives (59%) have a same-state negative, below 80%. The ranking gate passes but the combined formal claim gate remains false.
+- Phase-2 claim boundary: frozen vision contains progress-independent signal for one operational pickup-stall event after 20 observed development steps. Do not generalize this to all failures, pre-attempt prediction, safe stop, or held-out tasks.
 - A1/A2 supporting results remain bounded: A1 11/11 predefined cases; action-axis swap command-effect 10/10 with normal false alarms 1/10; camera swap 7/10 is only an indirect response.
-- Any Phase-2 continuation must expand strict event positives and independent initial states under the frozen v0.4 definition. Do not reopen ordinary outcome model selection, alter the strict test split, or upgrade model complexity before the formal data gate is satisfied.
+- Do not reopen ordinary outcome model selection, alter the frozen v0.4/v0.5 protocols, tune on confirmation results, or add post-hoc episodes to repair the failed support gate. Any future extension must predeclare a new sampling design that increases mixed-state coverage.
 
 ## Locked research definitions
 

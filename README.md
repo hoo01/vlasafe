@@ -2,9 +2,9 @@
 
 VLA-SafeBench 是一个基于 SmolVLA 和 LIBERO 的闭环评测项目，用来研究机器人策略失败时，系统能够观察到什么、预测什么，以及哪些结论不能从现有数据推出。
 
-当前核心发现是：冻结视觉与状态/动作模型都能稳定预测 task 4 的最终 outcome，但这种能力主要来自**任务执行进度**。在预先冻结的 100 条 v0.3 轨迹上，vision-step80 的原始 AUPRC/AUROC 为 `0.926/0.863`；只使用黑碗、抽屉、盘子和夹爪的真实任务阶段即可达到 `0.947/0.908`。按 initial state 做 leave-one-group-out 阶段控制后，vision 与 temporal 的残差 AUROC 分别降至 `0.426` 和 `0.514`，置信区间均包含随机水平。因此 Phase 1 证明了 outcome association 的可重复性，也确认它不能解释为独立失效前兆。风险分数只用于 Outcome Prediction 和离线效率分析，不能作为即将发生危险或安全停止的依据。
+项目得到两个层次不同的结论。Phase 1 中，冻结视觉与状态/动作模型虽然能稳定预测 task 4 的最终 outcome，但 v0.3 的真实阶段控制表明，这种能力主要来自**任务执行进度**，不能解释为失效前兆。
 
-Phase 2 重新定义了带明确事件时刻的 pickup-stall pilot：在首次接近对齐并控制 checkpoint 当前物体位移后，16步 temporal MLP 相对 privileged stage baseline 的 test AUROC 增量为 `+0.321 [0.042, 0.750]`，显示初步的未来20步 stall-confirmation 排序信号。该结果只有4个 test initial-state clusters、27个 event-positive episodes，属于 pilot，不支持通用失效检测或 safe-stop 主张。
+Phase 2 因此把问题收窄为一个有明确事件时刻的 **pickup stall（取物停滞）**：末端首次进入目标黑碗 10 cm 后，先观察20步；模型预测接下来的20步内，黑碗是否仍无法移动4 cm。v0.4 用100条 pilot rollout 冻结事件、模型和评测协议；v0.5 再采集180条独立确认轨迹。严格筛选后保留144条，其中61条 pickup stall。在13个同时含正负样本的相同 initial-state groups 中，stage-only / frozen vision 的 AUROC 为 `0.589/0.892`，视觉增量为 `+0.302 [0.147, 0.456]`，同状态配对正确率为 `69/77`。这说明视觉模型在该事件上捕捉到了当前进度之外、与未来停滞相关的信号。预声明的配对覆盖率只有 `36/61=59%`，低于80%门槛，因此整体 formal gate 未通过；结果不外推为通用失败检测或 safe stop。
 
 ## 四周执行状态
 
@@ -17,6 +17,7 @@ Phase 2 重新定义了带明确事件时刻的 pickup-stall pilot：在首次�
 | **v0.2 post-release audit** | **完成** | Initial-state identity audit；temporal checkpoint-feature ablation；20 条冻结模型独立确认集 | 不改写 v0.1 test 或选模结果 |
 | **v0.3 stage-control audit** | **完成** | 100 条预声明轨迹；真实物体阶段记录；initial-state cluster bootstrap；同状态阶段匹配 | Phase 1 机制结论已冻结 |
 | **v0.4 pickup-stall pilot** | **Pilot 完成** | 首次接近对齐；明确 `t_event`；gray zone；strict stage constraint；同状态对照；cluster bootstrap | 仅 temporal 通过 pilot 增量门槛；正式样本量尚未达到 |
+| **v0.5 frozen confirmation** | **完成** | 180条独立 rollout；冻结模型一次性评测；完整集与 mixed-state 子集；cluster bootstrap | 视觉增量信号复现；配对覆盖率59%，未通过80% formal support gate |
 
 四周主计划已在 v0.1 收口。v0.2 验证原 split 和模型信号的可重复性；v0.3 针对“模型是否只读进度”预先冻结采样与分析协议，并给出 Phase 1 的最终机制结论。后续审计不倒写为原四周计划内的预注册实验，也不修改 v0.1 test 或选模结果。
 
@@ -37,7 +38,7 @@ Phase 2 重新定义了带明确事件时刻的 pickup-stall pilot：在首次�
 3. **RQ2b（Impending Failure Detection）：** 对具有明确事件时刻的危险事件，能否预测未来 `K` 步内是否发生？
 4. **RQ3（Utility / Control）：** 预测结果能否节省无效 rollout 计算，或在有可靠 Impending 标签时支持安全干预？
 
-当前完成的是 **RQ2a 的单任务阶段结果和离线 efficiency 分析，以及 RQ1 的有界 supporting study**。RQ1 尚未包含 learned A2 monitor；RQ2b 和真实闭环干预尚未完成。
+当前完成的是 **RQ2a 的单任务阶段结果、RQ2b 的单事件 pickup-stall 结果、离线 efficiency 分析，以及 RQ1 的有界 supporting study**。RQ1 尚未包含 learned A2 monitor，RQ2b 也只覆盖一个 task 中的一种事件；真实闭环干预尚未完成。
 
 ## 2. Outcome 与 Impending 的区别
 
@@ -109,8 +110,11 @@ v0.3 将两个黑碗、盘子、柜体/抽屉和任务区域的 MuJoCo 位姿写
 | --- | ---: | ---: | ---: | --- |
 | v0.2 confirmation | 20 | 11 | 9 | 冻结模型在 preset states 30–49 上一次性复评 |
 | v0.3 stage cohort | 100 | 40 | 60 | states 30–49 × 5 个新 seed；真实阶段控制与同状态匹配 |
+| v0.5 pickup-stall confirmation | 180 | 70 | 110 | states 0–29 × 6 个新 seed；冻结 v0.4 模型一次性确认 |
 
 v0.3 在采集前冻结为 100 条，不因中途 outcome 增删样本；100/100 episode 均通过 sidecar/video validator。统计区间以 `initial_state_id` 为 cluster，而不是把同一初始状态的五次重复当成独立样本。
+
+v0.5 同样在采集前固定为 `30 initial states × 6 seeds = 180` 条，不根据事件标签补采。180/180 条通过验证；按冻结的首次接近和 checkpoint-stage 规则，3条从未接近目标、33条在预测前已移动目标，最终144条进入确认评测，其中61条 pickup stall、83条正常推进，覆盖29个 initial states。Phase 2 总计使用100条 pilot与180条独立确认 rollout；整个项目共采集350条不重复 task-4 rollout。
 
 自然失败中，已实现的 self-collision 或 joint-violation 事件只覆盖 `1/32 = 3.125%`，validation/test 均无 event-positive episode。按照预设的 20% 数据门槛，项目选择 **Outcome Prediction**，停止 Impending lead-time 和 safe-stop 主张。Workspace violation 和 impact 尚未形成冻结协议，不能记作已验证的零事件。
 
@@ -203,6 +207,8 @@ v0.2 不重新打开模型选择，而是针对 v0.1 的三个关键疑点做固
 
 v0.3 随后专门检验进度混淆。采样协议在 outcome inspection 前固定：preset states 30–49 各运行 5 个新 seed，共 100 条自然 rollout；冻结 v0.1 predictor，不重新训练或选参。分析记录真实物体阶段，并采用 leave-one-initial-state-out 控制与 initial-state cluster bootstrap。该实验回答“在控制真实任务阶段后，原 outcome signal 是否仍然存在”。
 
+Phase 2 不再预测最终 outcome。v0.4 从 task 4 中定义 pickup stall，并冻结 `h=16/K=20`、首次接近对齐、4 cm 位移阈值和 stage-only baseline。v0.5 使用与 pilot 分离的 states 0–29；模型权重、归一化、事件规则和指标均保持冻结。Privileged first-approach step 与 checkpoint 物体位移只进入 stage-only baseline，视觉和 temporal predictor 仍只读取部署可用输入。
+
 ## 6. 主结果与审计结论
 
 ### 6.1 v0.1 主结果
@@ -244,6 +250,22 @@ v0.3 使用预先冻结的 100 条轨迹（40 success、60 failure）。冻结�
 Stage-only 使用真实黑碗/抽屉/盘子/夹爪状态，但只用于分析。控制模型按 leave-one-initial-state-out 拟合，不读取被留出 state 的样本。两种 predictor 的残差区间均包含 AUROC 0.5，没有显示出可靠的阶段外排序能力。
 
 因此 Phase 1 的主张是：**冻结 predictor 能稳定预测同一 task 的最终 outcome，但已观察到的能力主要由任务执行进度解释，不构成独立失效前兆。**
+
+### 6.4 v0.4 pilot 与 v0.5 独立确认
+
+Pickup stall 的冻结定义是：末端第一次进入目标黑碗10 cm范围后，如果黑碗在40步内的最大三维位移仍不足4 cm，则在第40步确认事件。模型在首次接近后20步做预测，输入只截止到该时刻，因此预测窗口为未来20步。
+
+v0.4 pilot 的 strict test 只有19条、7个正类和4个 initial-state clusters。它用于冻结模型，不作为最终确认。v0.5 随后采集180条新轨迹；严格规则保留144条、61个正类和29个 initial states。下表同时报告完整确认集，以及只保留13个同时含 pickup-stall 与正常推进样本的 mixed-state 子集。
+
+| Frozen model | Full AUPRC / AUROC | Mixed-state AUPRC / AUROC | Mixed-state 同状态配对 |
+| --- | ---: | ---: | ---: |
+| Stage-only baseline | 0.623 / 0.643 | 0.643 / 0.589 | 47/77 |
+| 16-step temporal MLP | 0.879 / 0.838 | 0.815 / 0.715 | 64/77 |
+| Frozen dual-camera vision | **0.922 / 0.936** | **0.899 / 0.892** | **69/77** |
+
+在完整确认集上，temporal 相对 stage-only 的 AUPRC/AUROC 增量为 `+0.256 [0.102, 0.423]` / `+0.195 [0.044, 0.355]`；vision 为 `+0.299 [0.146, 0.468]` / `+0.293 [0.164, 0.431]`。在更严格的 mixed-state 子集中，vision 增量仍为 `+0.255 [0.112, 0.425]` / `+0.302 [0.147, 0.456]`；temporal 的 AUPRC 增量为正，但 AUROC 增量区间跨0。
+
+因此，冻结视觉模型在相同 initial state 且控制当前阶段后，仍保留稳定的 pickup-stall 排序信号。与此同时，只有36/61个正类拥有同-state negative，配对覆盖率 `59%` 低于预声明的80%，所以 support gate 未通过，整体 formal claim gate 保持 false。该结果支持一个特定 pickup-stall 事件的短期预测，不支持所有失败、抓取前预知、跨任务泛化或闭环 safe stop。
 
 ## 7. 模型实际读取了什么
 
@@ -306,19 +328,11 @@ A2 使用 20 组相同 seed 和 initial state 的三路配对 rollout：normal�
 
 Phase 1 已完成。v0.1 提供闭环系统、冻结 split、模型和 RQ1 supporting study；v0.2 验证 initial-state 身份并在 20 条独立轨迹上复现 outcome association；v0.3 用 100 条预声明轨迹确认该 association 主要由真实任务阶段解释。三版结果分别保留，不用后续数据反向修改旧 test、模型或阈值。
 
-Phase 2 已完成一个 **progress-controlled pickup-stall pilot**。事件定义为：末端首次进入目标碗 10 cm 后，如果40步内目标三维位移仍不足4 cm，则在第40步确认 pickup stall。预测时刻固定为首次接近后20步，因此任务是预测未来20步内是否确认该事件；它不是抓取尝试前的失败预知。
+Phase 2 实验也已收口。v0.4 在100条 pilot 轨迹上完成事件定义、人工复核、strict stage constraint、模型训练和协议冻结；v0.5 在180条独立轨迹上一次性应用冻结模型。完整确认集与 mixed-state 子集都显示视觉模型显著优于 stage-only，说明该模型对 pickup stall 的判断不只是读取当前任务进度。
 
-Strict 数据排除了 checkpoint 前已经移动4 cm的负类。最终为86条样本、27个正类；group-disjoint test 有19条、7个正类、4个 initial states，其中所有正类都有同-state负类。Analysis-only stage baseline 同时使用首次接近时刻和 checkpoint 当前目标位移；这些 privileged 变量不进入 predictor。
+预声明 gate 分开检查两件事：模型增量和数据支持度。视觉增量在严格 mixed-state 子集上通过；但61个正类中只有36个拥有同-state negative，`59%` 低于80%覆盖门槛。因此最终状态记录为 `support=False, ranking=True, formal=False`。这不是空结果：它确认了一个特定事件上的进度外视觉信号；同时也阻止项目把有限覆盖夸大成通用 detector。
 
-| Strict test | AUPRC | AUROC | 同-state配对 |
-| --- | ---: | ---: | ---: |
-| Stage-only baseline | 0.536 | 0.643 | 3/7 |
-| 16-step temporal MLP | **0.938** | **0.964** | **7/7** |
-| Frozen dual-camera vision | **0.982** | **0.988** | 6/7 |
-
-Temporal 相对 stage-only 的 AUPRC/AUROC 增量为 `+0.402 [0.037, 0.784]` / `+0.321 [0.042, 0.750]`，通过 pilot gate。Vision 的对应增量为 `+0.446 [0.000, 0.784]` / `+0.345 [0.000, 0.750]`，区间下界触及0，只作为提示性证据。Temporal ECE 为 `0.231`，不能把分数直接当作可靠概率或据此触发 safe stop。
-
-该结果仍是 pilot：test 只有4个 initial-state clusters，正式 gate 要求40–50个 event-positive episodes，而当前只有27个；事件还要求先观察20步停滞发展。因此当前可声称的是：**在首次接近对齐、且控制当前目标位移后，16步状态/动作历史对未来20步内的 pickup-stall 确认显示出初步增量排序信号。** 没有 `t_event` 的最终失败标签仍只按 Outcome Prediction 报告。
+核心实验不再继续采集、调参或升级网络。剩余工作是文档、结果图、artifact 索引和展示材料整理。后续若扩展，应预先设计能提高 mixed-state coverage 的采样方案，并在新 task 或新事件上重复冻结确认，而不是根据本次标签补采。
 
 ### 原始目标完成度核对
 
@@ -339,7 +353,8 @@ Temporal 相对 stage-only 的 AUPRC/AUROC 增量为 `+0.402 [0.037, 0.784]` / `
 | 2–3 个正式任务 | **未完成** | 当前只有 task 4，不声称 task generalization |
 | A1 运行时规则覆盖 | **完成（有界案例集）** | 11/11 deterministic cases；不外推到未测试协议错误 |
 | A2 / command-effect consistency | **完成（supporting study）** | 20 组配对 cohort；动作置换 10/10、normal 误报 1/10；相机结果仅为间接响应 |
-| Impending detector / safe stop | **不适用当前主线** | event-positive 数据不足，按门槛主动放弃 |
+| 单事件 Impending predictor | **完成（有边界）** | v0.5 frozen vision mixed-state AUROC 0.892；增量 CI 高于0；support gate 未通过 |
+| Safe stop | **未完成** | 未选择可靠概率阈值，也未执行闭环干预 |
 
 ## 10. 复现
 
@@ -360,7 +375,9 @@ python scripts/plot_v01_main_results.py
 - 当前正式数据只覆盖一个 LIBERO task。
 - v0.3 虽有 100 条 episode，但只覆盖 20 个 preset states、每个重复 5 次；区间已按 initial state 聚类，仍不能外推到新任务。
 - 当前 Outcome predictor 的高分主要反映执行进度，不能当作 failure precursor。
-- Outcome predictor 没有明确 failure timestamp，不能报告 unsafe lead time。
+- Phase 2 只验证 pickup stall：必须先观察首次接近后的20步，再预测随后20步；不能外推到所有 failure event 或抓取前预知。
+- v0.5 虽有61个正类，但同-state negative 覆盖只有36/61，未达到预声明的80% formal support gate。
+- Temporal 与 vision 的概率校准尚不足以支持固定风险阈值。
 - Self-collision/joint-violation 标签覆盖不足，workspace/impact 尚未冻结。
 - RQ1 只测试两类 A2 故障、一个任务和 10 组 evaluation pairs，且不包含 learned A2 monitor。
 - Offline utility 没有执行真实闭环干预。
@@ -368,7 +385,7 @@ python scripts/plot_v01_main_results.py
 
 ## 12. 项目定位
 
-这是一个关于 VLA 失败预测的**单任务方法论与混淆变量审计项目**。它建立了泄漏受控的闭环数据与评测流程，复现了冻结模型的 outcome association，并用 100 条预声明轨迹显示真实任务阶段足以解释该信号。项目的结论不是“实现了失败检测器”，而是“高 Outcome AUROC 不等于学到了失效前兆”；Phase 2 必须在相同阶段、明确未来事件的条件下重新定义问题。
+这是一个关于 VLA 失败预测的**单任务方法论、混淆变量审计与事件预测项目**。Phase 1 说明高 Outcome AUROC 可能只是任务进度；Phase 2 随后把问题改写为有明确 `t_event` 的 pickup-stall prediction，并在独立180条轨迹上确认冻结视觉模型包含进度之外的短期信号。项目没有实现通用失败检测器或 safe stop，但给出了一条可复现的证据链：先识别并否定进度捷径，再在相同阶段和相同 initial state 条件下检验具体未来事件。
 
 ## 附录 A：Wrist 与 dual-camera 配对区间
 

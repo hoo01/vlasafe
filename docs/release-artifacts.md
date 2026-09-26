@@ -124,6 +124,30 @@ but its incremental intervals touch zero. This is pilot evidence for predicting
 stall confirmation after 20 observed development steps, not a safe-stop result or
 a general failure detector.
 
+## v0.5 frozen pickup-stall confirmation
+
+The confirmation protocol was frozen before collection: preset states 0–29, six
+new seeds per state, and 180 episodes total. Frozen v0.4 event rules and model
+weights were applied once without confirmation-time tuning.
+
+- Confirmation protocol: `docs/manifests/v05_task4_pickup_stall_confirmation_protocol.json`
+- Complete cohort: `docs/manifests/v05_task4_pickup_stall_confirmation_cohort.json`
+- Strict event manifest: `docs/manifests/v05_task4_pickup_stall_confirmation.json`
+- Temporal metadata: `artifacts/v05/datasets/task4_pickup_stall_confirmation.json`
+- Vision-feature metadata:
+  `artifacts/v05/features/task4_pickup_stall_confirmation_frozen_vision.json`
+- Frozen confirmation result:
+  `artifacts/results/v05_task4_pickup_stall_frozen_confirmation.json`
+- Release checksum: `artifacts/v05/release-sha256.txt`
+
+All 180 episodes passed validation. The strict manifest retains 144 samples with
+61 positives. On the full set, frozen vision reaches AUPRC/AUROC 0.922/0.936 and
+improves over stage-only by 0.299 [0.146, 0.468] / 0.293 [0.164, 0.431]. On the
+13-group mixed-state subset, vision reaches 0.899/0.892; its increments remain
+0.255 [0.112, 0.425] / 0.302 [0.147, 0.456], with 69/77 same-state pairs ranked
+correctly. Only 36/61 positives have a same-state negative, below the predeclared
+80% support gate, so the combined formal claim gate remains false.
+
 ## Reproduce evaluation from frozen inputs
 
 Activate the recorded environment and expose the source package:
@@ -249,6 +273,20 @@ python scripts/analyze_stage_aligned_signal.py \
   --output artifacts/results/v03_task4_stage_aligned_signal.json
 ```
 
+Re-evaluate the frozen v0.4 pickup-stall models on the already built v0.5 inputs:
+
+```bash
+python scripts/evaluate_frozen_pickup_stall_confirmation.py \
+  artifacts/v05/datasets/task4_pickup_stall_confirmation.npz \
+  artifacts/v05/features/task4_pickup_stall_confirmation_frozen_vision.npz \
+  --pilot-temporal artifacts/v04/datasets/task4_pickup_stall_pilot_strict.npz \
+  --pilot-report artifacts/results/v04_task4_pickup_stall_pilot_strict.json \
+  --model artifacts/results/v04_task4_pickup_stall_pilot_strict.pt \
+  --confirmation-manifest docs/manifests/v05_task4_pickup_stall_confirmation.json \
+  --output artifacts/results/v05_task4_pickup_stall_frozen_confirmation.json \
+  --bootstrap-samples 10000 --device cuda
+```
+
 ## Integrity check before publishing
 
 Run this on the experiment host after all artifacts are frozen, store the output with
@@ -271,7 +309,9 @@ all 21 files.
 
 Phase 1 supports reproducible same-task outcome association, an offline efficiency
 analysis, a bounded A1/A2 supporting study, and a task-progress confounding result.
-Phase 2 adds pilot-level temporal evidence for one operational pickup-stall event.
+Phase 2 adds independently confirmed visual ranking signal for one operational
+pickup-stall event after controlling current stage and initial state. The
+predeclared support gate remains unmet because same-state negative coverage is 59%.
 It does not establish held-out task generalization, general impending unsafe-event
 detection, safe-stop effectiveness, learned A2 monitoring, or coverage beyond the
 explicitly tested event and fault cases.

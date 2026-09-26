@@ -1,12 +1,14 @@
 # VLA-SafeBench Progress
 
-> 最后更新：2026-09-25。README 解释项目与结论；本文只记录冻结状态、关键证据和 Phase 2 入口。
+> 最后更新：2026-09-26。README 解释项目与结论；本文只记录冻结状态和关键证据。
 
 ## 当前判断
 
 Phase 1 已完成。冻结视觉和状态/动作历史能够稳定预测 LIBERO-Spatial task 4 的最终 outcome，但预先冻结的 v0.3 阶段控制实验确认：**已观察到的排序能力主要由任务执行进度解释；控制真实物体阶段后，没有发现可靠的阶段外预测信号。**
 
-当前证据不支持独立失效前兆、Impending Failure Detection、safe stop、held-out task 泛化或未测试 A2 类型的检测率。
+Phase 2 已在独立180条轨迹上确认：针对一个明确的 pickup-stall 事件，冻结视觉模型在相同 initial state 与当前阶段控制后仍保留增量排序信号。该结果只支持单事件短期预测，不支持通用失效检测、safe stop、held-out task 泛化或未测试 A2 类型的检测率。
+
+预声明的模型 ranking gate 通过，但 formal support gate 未通过：61个正类中只有36个拥有同-state negative，覆盖率59%，低于80%。最终状态为 `support=False, ranking=True, formal=False`。
 
 ## 冻结版本
 
@@ -61,6 +63,23 @@ Phase 1 已完成。冻结视觉和状态/动作历史能够稳定预测 LIBERO-
 
 配对阶段距离中位数仍为 2.89/4.41 SD；原始配对准确率不能解释为严格同阶段 precursor。残差排序与随机水平一致。
 
+### v0.4：pickup-stall pilot
+
+- 在v0.3的100条轨迹上定义首次接近后的 pickup stall，并人工复核事件语义。
+- 冻结事件：首次进入目标10 cm后，40步内目标最大三维位移不足4 cm。
+- 预测时刻为首次接近后20步，输入最近16步历史，预测未来20步内是否确认 stall。
+- Strict cohort 为86条、27 positives；test 为19条、7 positives、4 groups。
+- Temporal 相对 stage-only 的 AUPRC/AUROC 增量为 `+0.402 [0.037, 0.784]` / `+0.321 [0.042, 0.750]`；用于决定进入独立确认。
+
+### v0.5：冻结模型独立确认
+
+- 采集前固定 states 0–29、每个6个新seed，共180条；不根据标签停止或补采。
+- 180/180有效：70 success / 110 failure。严格规则保留144条、61 positives、83 negatives、29 groups。
+- 完整集 stage-only/temporal/vision AUROC 为 `0.643/0.838/0.936`；相对 stage-only 的增量分别为 `+0.195 [0.044, 0.355]` 与 `+0.293 [0.164, 0.431]`。
+- Mixed-state 子集为73条、36 positives、13 groups。Vision AUROC `0.892`，增量 `+0.302 [0.147, 0.456]`，同-state配对 `69/77`。
+- Temporal 在 mixed-state 子集的 AUROC 增量区间跨0；vision 是严格控制下更稳定的信号。
+- Same-state positive覆盖为36/61=`59%`，低于预声明80%；support gate失败，不能报告完整 formal claim 通过。
+
 ## Phase 1 最终结论
 
 1. 冻结 predictor 的 outcome association 真实且可以在新数据上复现。
@@ -104,7 +123,7 @@ Pilot 只决定是否进入正式采集，不能形成强模型结论。
 
 三维位移版本初次复核仍发现同一 success trigger：检测器在有效 pickup 后继续扫描后续 close approaches，把 transport/placement 后的静止误标为新的 pickup stall。规则进一步收紧为只检查首次进入 10 cm 后的唯一 40 步窗口；若该窗口内目标移动达到 4 cm，则 pickup 已推进，episode 后续不再产生 pickup-stall event。该修正来自事件阶段语义而非 outcome 指标，修正后须重新审计。
 
-最终 pilot 规则 `pickup_stall_approach0.10_w40_move0.04` 产生 27 个 event-positive episodes、0/40 success triggers，覆盖 11 个 initial states，27/27 具有完整窗口。人工复核的 12 条覆盖全部 11 个 positive states：11 条为明确 pickup stall，1 条为 stall/40-step window 边界，未发现错误目标、成功搬运或无法判断样本。规则、`h=16/K=20/M=20`、首次接近相对 checkpoint 和 grouped split 算法已冻结在 `docs/manifests/v04_task4_pickup_stall_protocol.json`；模型尚未训练，仍需验证对齐 negative 与分组 split 的支持度。
+最终 pilot 规则 `pickup_stall_approach0.10_w40_move0.04` 产生 27 个 event-positive episodes、0/40 success triggers，覆盖 11 个 initial states，27/27 具有完整窗口。人工复核的 12 条覆盖全部 11 个 positive states：11 条为明确 pickup stall，1 条为 stall/40-step window 边界，未发现错误目标、成功搬运或无法判断样本。规则、`h=16/K=20/M=20`、首次接近相对 checkpoint 和 grouped split 算法冻结在 `docs/manifests/v04_task4_pickup_stall_protocol.json`；这是模型训练前的当时状态，后续结果见上方 v0.4/v0.5 冻结版本。
 
 首次 grouped split support audit 保留 95/100 条（5 条从未进入 10 cm），但 test 仅 4/9 positives 拥有同-state negative，未通过额外匹配 gate。由于尚未训练任何 predictor，split 算法在模型实验前修订并重新冻结：9 个 mixed groups 与 9 个 negative-only groups 分别按 60/20/20 分配，2 个 all-positive groups 只进入 train；revision 及原因写入 protocol，后续不再因模型结果调整。
 
@@ -118,7 +137,7 @@ Strict manifest 排除 9 条 checkpoint 前已跨越 4 cm 的 negatives 和 5 �
 
 Strict pilot 已完成。Test 共19条、7 positives、4个 initial-state clusters。Stage-only baseline 为 AUPRC/AUROC `0.536/0.643`、同-state `3/7`；temporal MLP 为 `0.938/0.964`、`7/7`，相对 stage-only 增量 `+0.402 [0.037, 0.784]` / `+0.321 [0.042, 0.750]`，通过 pilot 排序门槛；frozen vision 为 `0.982/0.988`、`6/7`，增量 `+0.446 [0.000, 0.784]` / `+0.345 [0.000, 0.750]`，区间触及0，只作提示性证据。Temporal ECE `0.231`，不支持概率阈值或 safe-stop 主张。
 
-Phase 2 当前结论严格限于：观察首次接近后的20步历史，在控制首次接近时刻和 checkpoint 当前目标位移后，temporal history 对未来20步内 pickup-stall 确认显示 pilot-level 增量排序信号。当前仅27个 event-positive episodes、test仅4个 groups，未达到40–50 positives 的 Formal gate；下一步若升级结论，必须扩充独立 initial states 和 strict event positives，而不是升级模型复杂度。
+v0.4 当时的结论严格限于 pilot-level temporal 信号；v0.5 已完成独立冻结确认并取代它作为 Phase 2 当前证据。当前主结果是 mixed-state 子集上的 frozen-vision 增量，当前限制是59%的同-state positive覆盖，而不是 event-positive 总数不足。
 
 ### Formal gate
 
