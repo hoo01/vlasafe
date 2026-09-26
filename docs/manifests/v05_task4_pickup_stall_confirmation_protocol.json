@@ -1,0 +1,71 @@
+{
+  "schema_version": "0.1.0",
+  "role": "predeclared_phase2_pickup_stall_frozen_confirmation",
+  "frozen_before_collection": true,
+  "research_question": "Does the frozen Phase-2 predictor retain incremental ability over the privileged stage-only baseline to predict pickup-stall confirmation within 20 steps on an independent initial-state cohort?",
+  "identity": {
+    "task": "libero_spatial",
+    "task_id": 4,
+    "task_description": "pick up the black bowl from the top drawer of the wooden cabinet and place it on the plate",
+    "policy": "the same frozen SmolVLA checkpoint used by v0.1-v0.4",
+    "fault_mode": "none",
+    "max_steps": 280,
+    "event_schema_version": "0.3.0"
+  },
+  "sampling": {
+    "preset_initial_state_ids": {
+      "start_inclusive": 0,
+      "stop_exclusive": 30
+    },
+    "repetitions_per_initial_state": 6,
+    "seed_starts": [8000, 9000, 10000, 11000, 12000, 13000],
+    "episodes_per_repetition": 30,
+    "total_episodes": 180,
+    "output_root": "artifacts/v05/task4_pickup_stall_confirmation",
+    "selection_rule": "collect every declared episode; do not stop, extend, replace, or exclude episodes based on outcomes or event labels"
+  },
+  "frozen_event_and_window": {
+    "source_protocol": "docs/manifests/v04_task4_pickup_stall_protocol.json",
+    "event": "pickup_stall_approach0.10_w40_move0.04",
+    "checkpoint": "first_approach_step + 20",
+    "history_h": 16,
+    "future_horizon_k": 20,
+    "negative": "target has not moved 0.04 m at the checkpoint and crosses 0.04 m during the following 20 steps",
+    "positive": "target still has not moved 0.04 m at first_approach_step + 40",
+    "predeclared_exclusions": [
+      "no first approach within 0.10 m",
+      "insufficient recorded history or future window",
+      "negative candidate whose target already crossed 0.04 m on or before the checkpoint"
+    ]
+  },
+  "information_boundary": {
+    "predictor_inputs": "the frozen temporal predictor receives only proprioception, action, and timing history; the frozen vision predictor receives only main/wrist RGB",
+    "analysis_only": [
+      "target body identity and pose",
+      "end-effector-to-target distance",
+      "first approach step",
+      "checkpoint target displacement"
+    ],
+    "forbidden": "privileged simulator state may not enter predictor features or normalization statistics"
+  },
+  "evaluation": {
+    "primary_model": "frozen five-seed temporal MLP ensemble from v0.4",
+    "secondary_model": "frozen dual-camera ResNet-50 linear probe from v0.4",
+    "baseline": "v0.4 stage-only logistic baseline reconstructed from the frozen pilot train split and its validation-selected L2",
+    "model_selection": "none on the confirmation cohort",
+    "threshold_selection": "none; this study reports ranking and probability metrics without a safe-stop threshold",
+    "primary_comparison": "temporal MLP minus stage-only AUROC and AUPRC",
+    "secondary_comparison": "frozen vision minus stage-only AUROC and AUPRC",
+    "uncertainty": "initial_state_id-cluster bootstrap with 10000 resamples",
+    "same_state_analysis": "report pairwise ranking within initial states containing both labels",
+    "decision_rule": "the primary precursor gate passes only if the temporal-minus-stage 95% confidence intervals for both AUROC and AUPRC are strictly above zero",
+    "report_once": "evaluate and publish the complete declared cohort once; do not tune from confirmation outcomes"
+  },
+  "formal_gate": {
+    "target_event_positive_episodes": "40-50",
+    "minimum_event_positive_episodes": 40,
+    "minimum_event_positive_initial_state_groups": 10,
+    "minimum_same_state_matched_positive_fraction": 0.8,
+    "shortfall_policy": "If the fixed 180-episode cohort misses a support gate, report the shortfall. Do not extend collection after inspecting labels."
+  }
+}
