@@ -1,26 +1,30 @@
 # VLA-SafeBench
 
-**VLA-SafeBench** 是一个基于 SmolVLA、LIBERO 和 MuJoCo 的闭环 VLA 运行时评测项目。项目研究两个问题：机器人执行过程中能否预测失败，以及高预测分数究竟来自真实失效信号，还是仅仅来自“任务做到了哪一步”。
+**VLA-SafeBench** 是一个基于 SmolVLA、LIBERO 和 MuJoCo 的闭环 VLA 运行时评测项目。
 
-项目不微调 SmolVLA。SmolVLA 始终作为冻结的执行策略；我们在其外部训练轻量级预测器，并通过独立数据和进度对照检验这些预测器实际读取了什么。
+项目研究两个问题：
+1. 机器人执行过程中能否预测失败
+2. 高预测分数究竟来自真实失效信号，还是仅仅来自"任务做到了哪一步"。
+
+
+项目不微调 SmolVLA。SmolVLA 始终作为冻结的执行策略。在其外部训练了两个轻量级预测器（一个temporal MLP 一个linear probe），并通过独立数据和进度对照检验这些预测器实际读取了什么。
 
 ## 核心结果
 
-Phase 1 的模型能够预测 LIBERO-Spatial task 4 的最终成功或失败，但真实物体阶段控制显示，高分主要来自任务执行进度，不能解释为失效前兆。
+阶段1的模型能够预测 LIBERO-Spatial task 4 的最终成功或失败，但真实物体阶段控制显示，高分主要来自预测器读取任务执行进度，而不是学会预测失效。
 
-Phase 2 将问题重构为一个具有明确事件时刻的 **pickup stall（抓取停滞）预测**：机械臂首次进入目标黑碗 10 cm 范围后，先观察20步，再预测未来20步内黑碗是否仍无法移动4 cm。
+阶段2将问题重构为一个具有明确事件时刻的 **pickup stall（抓取停滞）预测**：机械臂首次进入目标黑碗10cm范围后，先观察20步，再预测未来20步内黑碗是否仍无法移动4cm。
 
-在独立采集的180条确认轨迹上，冻结双相机视觉预测器在严格 mixed-state 子集中取得：
+在独立采集的180条确认轨迹上，冻结双相机视觉预测器在严格 mixed-state 子集（同一初始场景下同时含正负样本）中取得：
 
 | Model | AUPRC | AUROC | Same-state ranking |
 | --- | ---: | ---: | ---: |
-| Stage-only baseline | 0.643 | 0.589 | 47/77 |
-| Temporal MLP | 0.815 | 0.715 | 64/77 |
-| Frozen dual-camera vision | **0.899** | **0.892** | **69/77** |
+| 仅使用进度变量的对照模型 Stage-only baseline | 0.643 | 0.589 | 47/77 |
+| 16 步状态-动作时序 MLP Temporal MLP | 0.815 | 0.715 | 64/77 |
+| 冻结双相机视觉特征 + 线性预测头 Frozen dual-camera vision | **0.899** | **0.892** | **69/77** |
 
-视觉模型相对 stage-only baseline 的 AUROC 提升为 **+0.302，95% CI [0.147, 0.456]**。这说明冻结视觉表示包含由“首次接近时刻”和“当前物体位移”无法解释、但与未来 pickup stall 相关的信号。
-
-预声明的同状态配对覆盖率为 `36/61 = 59%`，低于80%门槛，因此整体 formal support gate 未通过。项目不据此声称通用失败检测、跨任务泛化或 safe stop。
+视觉模型相对“仅使用进度变量”的对照模型的 AUROC 提升为 **+0.302，95% CI [0.147, 0.456]**。这说明视觉特征中包含了仅靠“首次接近时刻”和“当前物体位移”无法解释、但与未来抓取停滞相关的信息。
+预声明的同状态配对覆盖率为 36/61 = 59%，低于 80% 门槛，因此项目不据此声称已经实现通用失败检测、跨任务泛化或闭环 safe stop。
 
 ## 系统
 
@@ -29,43 +33,40 @@ flowchart LR
     O["双相机 RGB + 机器人状态"] --> P["冻结 SmolVLA"]
     P --> A["执行动作"]
     A --> E["LIBERO / MuJoCo"]
-    E --> L["同步 rollout 日志"]
-    L --> T["16-step temporal MLP"]
+    E --> L["同步闭环日志"]
+    L --> T["16 步时序 MLP"]
     L --> R["冻结 ResNet-50 特征"]
     R --> H["线性预测头"]
-    T --> S["Pickup-stall score"]
+    T --> S["抓取停滞风险分数"]
     H --> S
 ```
 
-每个 rollout 从第一个控制步开始同步记录：
-
+每条闭环轨迹从第一个控制步开始同步记录：
 - 主相机与腕部相机 RGB；
 - 末端、夹爪和关节本体状态；
 - 模型动作与实际执行动作；
 - 推理与控制时延；
 - task、seed、initial state、代码 revision 与 checkpoint digest；
 - 仅用于标签和审计的仿真器诊断信息。
-
-Predictor 只能读取部署时可获得的 RGB、proprioception、动作与 timing。物体真实位姿等 privileged state 只用于事件标签、进度基线和评测，不进入 predictor 或归一化统计。
+预测器只能读取部署时可获得的 RGB、本体状态、动作和时序信息。物体真实位姿等仿真器内部真值只用于事件标签、进度对照和评测，不进入预测器输入或归一化统计。
 
 ## 数据与实验阶段
 
 项目共采集 **350条不重复的 task-4 闭环轨迹**：
 
-| Version | Episodes | Purpose |
+| 阶段 | 轨迹数 | 用途 |
 | --- | ---: | --- |
-| v0.1 | 50 | 闭环系统、Outcome predictor 与冻结 split |
-| v0.2 | 20 | 冻结模型的独立 initial-state 确认 |
-| v0.3 / v0.4 | 100 | 真实阶段控制与 pickup-stall pilot |
-| v0.5 | 180 | 冻结 pickup-stall 模型的一次性独立确认 |
+| v0.1 | 50 | 建立闭环系统、训练最终结果预测器并冻结数据划分 |
+| v0.2 | 20 | 在未见初始场景上复评冻结模型 |
+| v0.3 / v0.4 | 100 | 审计“任务进度”混淆并完成抓取停滞 pilot |
+| v0.5 | 180 | 对冻结的抓取停滞模型做一次性独立确认 |
 
-v0.5 采用 `30 initial states × 6 seeds` 的预声明网格。180条轨迹全部通过验证；严格事件规则保留144条样本，其中61条 pickup stall、83条正常推进。严格 mixed-state 子集包含73条轨迹、36条正类和13个同时具有正负样本的 initial states。
-
-置信区间以 `initial_state_id` 为 cluster 进行10,000次 bootstrap，避免把相同起始场景下的重复执行视为完全独立样本。
+v0.5 在 30 个不同初始场景上进行独立确认，每个场景使用 6 组随机种子重复运行，共得到 180 条轨迹。按照预先冻结的事件定义筛选后，最终保留 144 条有效样本，其中 61 条发生抓取停滞，83 条正常推进。
+为了排除“某些初始场景本身更容易失败”的影响，项目单独分析了在同一个初始场景下既出现过抓取停滞、也出现过正常推进的样本，共涉及 13 个初始场景、73 条轨迹。统计置信区间时按初始场景分组进行 10,000 次 bootstrap，避免把同一场景下的多次重复运行误当成完全独立的数据。
 
 ## 训练了什么
 
-| Component | Updated? | Role |
+| 组件 | 是否更新参数 | 作用 |
 | --- | --- | --- |
 | SmolVLA | No | 执行 task 4 |
 | ResNet-50 encoder | No | 提取双相机视觉特征 |
@@ -76,60 +77,58 @@ Temporal MLP 使用每步25维 proprioception、7维实际动作和2维 timing�
 
 两个 predictor 在同一实验阶段预测相同标签，区别只在输入：temporal 读取近期运动历史，vision 读取当前视觉构型。
 
-## 为什么需要 stage-only baseline
+## 如何排除“模型只是在读任务进度”
 
-仅报告视觉 AUROC 无法排除模型通过任务进度答题。Phase 2 的 stage-only baseline 只读取两个 privileged 进度变量：
-
-1. 机械臂第一次进入目标10 cm范围的时刻；
+如果只看视觉模型的 AUROC，很难判断它到底学到了失效信号，还是只是发现“失败轨迹通常做得更慢”。因此 Phase 2 额外构造了一个只使用两个进度变量的对照模型：
+1. 机械臂第一次进入目标 10 cm 范围的时刻；
 2. 预测时目标物体相对首次接近位置的三维位移。
+这两个变量来自仿真器内部真值，只用于评测，不提供给部署预测器。
 
-只有部署模型稳定超过该基线，才能说明它包含这两个进度变量无法解释的信息。这个比较不代表排除了所有可能的进度表征，也没有定位视觉模型具体使用了夹爪对准、遮挡或接触状态中的哪一种信号。
+如果视觉模型在控制这些进度因素后仍然稳定优于对照模型，说明视觉特征中包含了这些简单进度变量无法解释的信息。这个结果并不等于已经排除所有可能的进度表征，也不能直接说明模型具体依赖的是夹爪对准、遮挡还是接触状态；它只说明存在进度之外的额外预测信号。
 
 ## 运行与复现
 
-环境准备：
-
 ```bash
-source /root/autodl-tmp/envs/vlasafe312/bin/activate
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
 export PYTHONPATH="$PWD/src"
-```
 
-运行测试：
-
-```bash
 python -m pytest -q
 ```
 
-使用已经生成的 v0.5 输入复现冻结确认评测：
+复现 v0.5 冻结确认评测：
 
 ```bash
-python scripts/evaluate_frozen_pickup_stall_confirmation.py \
-  artifacts/v05/datasets/task4_pickup_stall_confirmation.npz \
-  artifacts/v05/features/task4_pickup_stall_confirmation_frozen_vision.npz \
-  --pilot-temporal artifacts/v04/datasets/task4_pickup_stall_pilot_strict.npz \
-  --pilot-report artifacts/results/v04_task4_pickup_stall_pilot_strict.json \
-  --model artifacts/results/v04_task4_pickup_stall_pilot_strict.pt \
-  --confirmation-manifest docs/manifests/v05_task4_pickup_stall_confirmation.json \
-  --output artifacts/results/v05_task4_pickup_stall_frozen_confirmation.json \
-  --bootstrap-samples 10000 --device cuda
+bash scripts/reproduce_v05_confirmation.sh
 ```
 
-大型 rollout、视频、模型权重与 feature cache 不提交 Git。仓库通过 manifest、结果 JSON 和 SHA-256 清单记录其身份与完整性。完整产物索引见 [`docs/release-artifacts.md`](docs/release-artifacts.md)。
+该脚本封装了冻结模型、pilot 协议和 manifest 的完整参数；各参数含义与产物路径见 [`docs/release-artifacts.md`](docs/release-artifacts.md)。
 
-## 结论边界
+大型 rollout、视频、模型权重与 feature cache 不提交 Git。仓库通过 manifest、结果 JSON 和 SHA-256 清单记录其身份与完整性。
 
-当前证据支持：
+## 仓库结构
 
-- 同一 task 内的 outcome association 可以复现；
-- Phase 1 的 outcome 高分主要由任务进度解释；
-- 针对冻结定义的 pickup-stall 事件，视觉 predictor 包含 stage-only 无法解释的短期预测信号。
+```text
+vlasafe/
+├── src/vlasafe/    # 核心库：rollout 记录、输入边界、监控器与评测指标
+├── scripts/        # 数据采集、特征提取、模型训练和冻结评测入口
+├── tests/          # 数据协议、事件规则与评测代码的自动化测试
+├── docs/
+│   ├── manifests/  # 冻结的数据划分、采集网格与实验协议
+│   └── figures/    # 结果图与绘图元数据
+└── artifacts/      # 小型结果 JSON、metadata 与 SHA-256 清单
+```
+
+## 结论
+
+当前实验结果支持：
+- 同一 task 内，最终成功/失败的预测信号可以复现；
+- Phase 1 的高 outcome 分数主要由任务执行进度解释；
+- 对于已明确定义的抓取停滞事件，冻结视觉特征包含简单进度变量无法解释的短期预测信号。
 
 当前证据不支持：
-
 - 通用 VLA 失败检测；
 - held-out task、物体或机器人平台泛化；
 - 抓取开始前的失败预知；
 - 可靠概率阈值或闭环 safe stop；
 - 对视觉模型具体因果判据的机制定位。
-
-完整实验历史、消融、部署故障审计和数值结果保留在 [`README.md`](README.md) 与 [`PROGRESS.md`](PROGRESS.md)。
